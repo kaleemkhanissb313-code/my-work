@@ -10,12 +10,17 @@
   --line: 214 218 232;
   --fg: 17 20 39;
   --muted: 88 96 122;
-  --accent: 124 58 237;
-  --accent2: 37 99 235;
+  /* Accent (default "teal"). --accent/--accent2 are for text, rings and highlights;
+     --btn-from/--btn-to are darker so white button text keeps WCAG AA contrast (≥ 4.5:1). */
+  --accent: 15 118 110;
+  --accent2: 14 116 144;
+  --on-accent: 255 255 255;
+  --btn-from: 15 118 110;
+  --btn-to: 14 116 144;
   --ok: 5 150 105;
   --warn: 180 83 9;
   --danger: 220 38 38;
-  --home: 13 148 136;
+  --home: 77 124 15;
   --work: 37 99 235;
   --life: 219 39 119;
   --secure: 217 119 6;
@@ -29,18 +34,27 @@
   --line: 44 52 86;
   --fg: 232 235 250;
   --muted: 150 158 190;
-  --accent: 157 115 255;
-  --accent2: 96 150 255;
+  --accent: 45 212 191;
+  --accent2: 34 211 238;
+  --on-accent: 9 12 26;
   --ok: 52 211 153;
   --warn: 251 191 36;
   --danger: 248 113 113;
-  --home: 45 212 191;
+  --home: 163 230 53;
   --work: 96 165 250;
   --life: 244 114 182;
   --secure: 251 191 36;
   --shadow: 0 0 0;
   color-scheme: dark;
 }
+
+/* ---------- Accent presets (Settings → Appearance). Light rules first, dark rules after (same specificity). ---------- */
+:root[data-accent='violet'] { --accent: 124 58 237; --accent2: 37 99 235; --btn-from: 109 40 217; --btn-to: 29 78 216; }
+:root[data-accent='sunset'] { --accent: 194 65 12; --accent2: 190 24 93; --btn-from: 194 65 12; --btn-to: 190 24 93; }
+:root[data-accent='gold']   { --accent: 180 83 9; --accent2: 161 98 7; --btn-from: 180 83 9; --btn-to: 161 98 7; }
+.dark[data-accent='violet'] { --accent: 157 115 255; --accent2: 96 150 255; }
+.dark[data-accent='sunset'] { --accent: 251 146 60; --accent2: 244 114 182; }
+.dark[data-accent='gold']   { --accent: 251 191 36; --accent2: 245 158 11; }
 
 @layer base {
   html, body, #root { height: 100%; }
@@ -81,15 +95,15 @@
   }
   .btn-3d {
     @apply text-white;
-    background-image: linear-gradient(180deg, rgb(var(--accent) / 1), rgb(var(--accent2) / 1));
+    background-image: linear-gradient(180deg, rgb(var(--btn-from) / 1), rgb(var(--btn-to) / 1));
     box-shadow:
       inset 0 1px 0 rgb(255 255 255 / 0.35),
       inset 0 -2px 0 rgb(0 0 0 / 0.18),
-      0 4px 0 rgb(var(--accent) / 0.45),
-      0 10px 20px -8px rgb(var(--accent) / 0.6);
+      0 4px 0 rgb(var(--btn-to) / 0.55),
+      0 10px 20px -8px rgb(var(--btn-from) / 0.7);
   }
-  .btn-3d:not(:disabled):hover { transform: translateY(-1px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), inset 0 -2px 0 rgb(0 0 0 / 0.18), 0 5px 0 rgb(var(--accent) / 0.45), 0 14px 24px -8px rgb(var(--accent) / 0.7); }
-  .btn-3d:not(:disabled):active { transform: translateY(3px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), inset 0 -1px 0 rgb(0 0 0 / 0.18), 0 1px 0 rgb(var(--accent) / 0.45), 0 4px 10px -6px rgb(var(--accent) / 0.6); }
+  .btn-3d:not(:disabled):hover { transform: translateY(-1px); filter: brightness(1.08); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.35), inset 0 -2px 0 rgb(0 0 0 / 0.18), 0 5px 0 rgb(var(--btn-to) / 0.55), 0 14px 24px -8px rgb(var(--btn-from) / 0.8); }
+  .btn-3d:not(:disabled):active { transform: translateY(3px); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), inset 0 -1px 0 rgb(0 0 0 / 0.18), 0 1px 0 rgb(var(--btn-to) / 0.55), 0 4px 10px -6px rgb(var(--btn-from) / 0.7); }
   .btn-soft {
     @apply bg-raised text-fg border border-line;
     box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.06), 0 2px 0 rgb(var(--line));
@@ -147,3 +161,48 @@
   body { background: white !important; color: black !important; }
   .card { box-shadow: none !important; border-color: #ccc !important; }
 }
+
+/* ---------- Touch: ≥44px targets on coarse pointers (phones/tablets) ---------- */
+@media (pointer: coarse) {
+  .btn { min-height: 44px; }
+  .btn.w-9, .btn.h-9.w-9 { min-width: 44px; }
+  .input { min-height: 44px; font-size: 16px; /* prevents iOS zoom on focus */ }
+}
+
+/* ---------- GLAMIEX scoped design presets (visual only — never affect data) ---------- */
+.gx { --gx-radius: 1rem; position: relative; border-radius: 1.5rem; background: rgb(var(--bg)); color: rgb(var(--fg)); }
+.gx .card { border-radius: var(--gx-radius); }
+.gx[data-accent='violet'] { --accent: 167 139 250; --accent2: 96 165 250; --btn-from: 109 40 217; --btn-to: 29 78 216; }
+.gx[data-accent='blue'] { --accent: 96 165 250; --accent2: 34 211 238; --btn-from: 29 78 216; --btn-to: 14 116 144; }
+.gx[data-accent='emerald'] { --accent: 52 211 153; --accent2: 45 212 191; --btn-from: 4 120 87; --btn-to: 15 118 110; }
+.gx[data-accent='rose'] { --accent: 251 113 133; --accent2: 244 114 182; --btn-from: 190 18 60; --btn-to: 190 24 93; }
+:root:not(.dark) .gx[data-accent='violet'] { --accent: 109 40 217; --accent2: 29 78 216; }
+:root:not(.dark) .gx[data-accent='blue'] { --accent: 29 78 216; --accent2: 14 116 144; }
+:root:not(.dark) .gx[data-accent='emerald'] { --accent: 4 120 87; --accent2: 15 118 110; }
+:root:not(.dark) .gx[data-accent='rose'] { --accent: 190 18 60; --accent2: 190 24 93; }
+
+/* 1. Neon 3D — dimensional cards with a violet/electric-blue rim light */
+.gx[data-preset='neon'] .card { box-shadow: 0 0 0 1px rgb(var(--accent) / 0.18), 0 1px 0 rgb(255 255 255 / 0.06) inset, 0 18px 40px -20px rgb(var(--accent) / 0.45), 0 8px 18px -12px rgb(0 0 0 / 0.6); }
+.gx[data-preset='neon'] .gx-kpi { background-image: linear-gradient(160deg, rgb(var(--accent) / 0.14), transparent 55%), linear-gradient(0deg, rgb(var(--surface)), rgb(var(--surface))); }
+/* 2. Glass Finance — translucent surfaces over a soft gradient */
+.gx[data-preset='glass'] { background-image: radial-gradient(800px 400px at 0% 0%, rgb(var(--accent) / 0.18), transparent 60%), radial-gradient(700px 400px at 100% 100%, rgb(var(--accent2) / 0.16), transparent 60%); }
+.gx[data-preset='glass'] .card { background: rgb(var(--surface) / 0.55); backdrop-filter: blur(18px) saturate(140%); -webkit-backdrop-filter: blur(18px) saturate(140%); border-color: rgb(255 255 255 / 0.12); }
+/* 3. Executive Pro — clean navy, restrained, compact */
+.gx[data-preset='executive'] { --gx-radius: 0.6rem; }
+.dark .gx[data-preset='executive'] { --bg: 11 19 38; --surface: 16 27 52; --raised: 24 38 70; --line: 38 55 92; }
+.gx[data-preset='executive'] .card { box-shadow: 0 1px 2px rgb(0 0 0 / 0.25); }
+.gx[data-preset='executive'] .gx-kpi .gx-kpi-value { font-weight: 600; }
+/* 4. Aurora Analytics — blue-purple aurora backdrop, prominent charts */
+.gx[data-preset='aurora'] { background-image: radial-gradient(900px 500px at 15% -10%, rgb(129 140 248 / 0.28), transparent 60%), radial-gradient(800px 500px at 90% 0%, rgb(192 132 252 / 0.25), transparent 60%), radial-gradient(700px 500px at 50% 110%, rgb(56 189 248 / 0.18), transparent 60%); }
+.gx[data-preset='aurora'] .gx-chart { min-height: 320px; }
+/* 5. Minimal Business — light surfaces, subtle depth, highly readable */
+.gx[data-preset='minimal'] { --bg: 246 247 251; --surface: 255 255 255; --raised: 238 241 247; --line: 222 226 236; --fg: 15 23 42; --muted: 71 85 105;
+  --ok: 4 120 87; --danger: 185 28 28; --warn: 161 98 7; --accent: 79 70 229; --accent2: 37 99 235; --shadow: 15 23 42; color-scheme: light; }
+.gx[data-preset='minimal'] .card { box-shadow: 0 1px 2px rgb(15 23 42 / 0.06), 0 6px 16px -10px rgb(15 23 42 / 0.15); }
+
+.gx[data-density='compact'] .card { padding: 0.75rem; }
+.gx[data-density='compact'] .gx-table td, .gx[data-density='compact'] .gx-table th { padding-top: 0.35rem; padding-bottom: 0.35rem; }
+.gx-table th { position: sticky; top: 0; z-index: 1; background: rgb(var(--raised)); }
+.gx-num { font-variant-numeric: tabular-nums; text-align: right; white-space: nowrap; }
+@keyframes gx-rise { from { opacity: 0; transform: translateY(10px) scale(0.99); } to { opacity: 1; transform: none; } }
+.gx-rise { animation: gx-rise 420ms cubic-bezier(.2,.8,.2,1) both; }

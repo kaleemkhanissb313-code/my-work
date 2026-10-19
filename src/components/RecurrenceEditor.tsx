@@ -32,7 +32,7 @@ export function RecurrenceEditor({ value, onChange }: { value: RecurrenceRule | 
             const on = value.byWeekday?.includes(i)
             return (
               <button key={i} type="button" aria-pressed={on} aria-label={DAY_NAMES[i]}
-                className={cn('h-8 w-8 rounded-lg border text-xs font-semibold', on ? 'border-accent bg-accent text-white' : 'border-line text-muted')}
+                className={cn('h-8 w-8 rounded-lg border text-xs font-semibold', on ? 'border-accent bg-accent text-onaccent' : 'border-line text-muted')}
                 onClick={() => onChange({ ...value, byWeekday: on ? value.byWeekday!.filter((x) => x !== i) : [...(value.byWeekday ?? []), i].sort() })}>{d}</button>
             )
           })}

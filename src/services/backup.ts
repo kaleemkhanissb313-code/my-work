@@ -28,11 +28,12 @@ export async function exportBackup(includeMedia = true) {
     }
     tables[name] = rows
   }
-  for (const name of ['links', 'savedViews', 'calcHistory', 'audit'] as const) tables[name] = await db.table(name).toArray()
+  for (const name of ['links', 'savedViews', 'calcHistory', 'audit', 'gxAudit'] as const) tables[name] = await db.table(name).toArray()
   const settings = await db.kv.get('settings')
+  const gxSettings = await db.kv.get('gx.settings')
   const vaultMeta = await db.kv.get('vault.meta')
   await audit('backup_exported', includeMedia ? 'Backup exported (with media)' : 'Backup exported (no media)')
-  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, exportedAt: new Date().toISOString(), settings: settings?.value ?? null, vaultMeta: vaultMeta?.value ?? null, tables }
+  return { format: BACKUP_FORMAT, version: BACKUP_VERSION, exportedAt: new Date().toISOString(), settings: settings?.value ?? null, gxSettings: gxSettings?.value ?? null, vaultMeta: vaultMeta?.value ?? null, tables }
 }
 
 const rowSchema = z.object({ id: z.string().min(1) }).passthrough()
@@ -51,7 +52,7 @@ export async function importBackup(json: unknown): Promise<ImportReport> {
   if (!parsed.success) throw new Error('This file is not a valid Basic to Advanced backup.')
   const data = parsed.data
   const report: ImportReport = { inserted: 0, updated: 0, skipped: 0, errors: [] }
-  const allowed = new Set<string>([...entityTables, 'links', 'savedViews', 'calcHistory'])
+  const allowed = new Set<string>([...entityTables, 'links', 'savedViews', 'calcHistory', 'gxAudit'])
   // Refuse to import vault rows encrypted with a different vault key than the one on this device.
   const localMeta = (await db.kv.get('vault.meta'))?.value as { salt?: string } | undefined
   const incomingMeta = data.vaultMeta as { salt?: string } | null | undefined

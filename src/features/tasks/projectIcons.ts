@@ -1,12 +1,13 @@
 import {
-  BookOpen, Briefcase, Camera, Code, Dumbbell, Folder, GraduationCap, Heart, Home, Leaf, Lightbulb, Music, Palette, Plane, Rocket,
-  ShoppingCart, Target, Wrench, type LucideIcon,
+  BookOpen, Briefcase, Camera, Code, Dumbbell, Folder, GraduationCap, Heart, Home, Leaf, Lightbulb, Mail, Megaphone, Music, Palette, PartyPopper,
+  PenTool, Plane, Rocket, Search, ShoppingCart, Smartphone, Target, TrendingUp, Users, Video, Wrench, type LucideIcon,
 } from 'lucide-react'
 import type { ProjectStatus } from '@/types/models'
 
 /** Fixed set of icons a project can use (stored by name in `Project.icon`). */
 export const PROJECT_ICONS: Record<string, LucideIcon> = {
   Folder, Briefcase, Rocket, Home, Heart, Code, BookOpen, Camera, Music, Plane, ShoppingCart, Target, Lightbulb, Palette, Wrench, GraduationCap, Dumbbell, Leaf,
+  Search, Megaphone, PenTool, Smartphone, Video, Mail, TrendingUp, Users, PartyPopper,
 }
 export const projectIcon = (name: string | undefined): LucideIcon => (name && PROJECT_ICONS[name]) || Folder
 

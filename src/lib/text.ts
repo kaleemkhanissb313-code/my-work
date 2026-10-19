@@ -104,3 +104,25 @@ export const ALPHABETS: Record<string, { name: string; letters: string[]; note?:
 
 export const NATO_MAP: Record<string, string> = Object.fromEntries(ALPHABETS.nato.letters.map((w) => [w[0].toLowerCase(), w]))
 export const toNato = (s: string) => [...s].map((c) => NATO_MAP[c.toLowerCase()] ?? (c.trim() ? c : '')).filter(Boolean).join(' ')
+
+/** Collapse runs of spaces/tabs, trim each line, and limit blank lines to one. */
+export const removeExtraSpaces = (s: string) => lines(s).map((l) => l.replace(/[ \t00a0]+/g, ' ').trim()).join('\n').replace(/\n{3,}/g, '\n\n')
+
+/** Capitalize the first letter of every word (keeps the rest of each word unchanged). */
+export const capitalizeWords = (s: string) => s.replace(/(^|[\s\-(“"'])(\p{Ll})/gu, (_m, p: string, c: string) => p + c.toUpperCase())
+
+export interface FindOptions { caseSensitive?: boolean; wholeWord?: boolean; regex?: boolean }
+/** Build a safe RegExp for find/replace. Throws a readable error for invalid regex input. */
+export function buildFindRegex(find: string, o: FindOptions = {}): RegExp {
+  if (!find) throw new Error('Enter text to find.')
+  let src = o.regex ? find : find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  if (o.wholeWord) src = `(?<![\\p{L}\\p{N}_])(?:${src})(?![\\p{L}\\p{N}_])`
+  try { return new RegExp(src, `g${o.caseSensitive ? '' : 'i'}u`) } catch { throw new Error('That regular expression is not valid.') }
+}
+export function countMatches(text: string, find: string, o: FindOptions = {}) { return [...text.matchAll(buildFindRegex(find, o))].length }
+export function replaceAll(text: string, find: string, replacement: string, o: FindOptions = {}) {
+  const re = buildFindRegex(find, o)
+  let n = 0
+  const out = text.replace(re, (...args) => { n++; return o.regex ? replacement.replace(/\$(\d)/g, (_x, i: string) => String(args[Number(i)] ?? '')) : replacement })
+  return { text: out, count: n }
+}

@@ -6,7 +6,7 @@ import { addDays, format, startOfWeek } from 'date-fns'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import {
   AlertTriangle, ArrowDown, ArrowUp, Banknote, Briefcase, Calculator, CalendarDays, CheckSquare, Eye, EyeOff, FileText, FolderKanban,
-  Heart, Home, Image, LayoutGrid, Link2, Pause, Play, ShieldCheck, Sparkles, Timer, Wrench, Zap,
+  Heart, Home, Image, LayoutGrid, Link2, Pause, Play, ShieldCheck, Sparkles, Timer, Wand2, Wrench, Zap,
 } from 'lucide-react'
 import { db } from '@/lib/db'
 import { Badge, Button, Card, CardTitle, EmptyState, IconButton, Modal, Progress } from '@/components/ui'
@@ -14,6 +14,7 @@ import { DASHBOARD_WIDGETS, updateSettings, useSettings } from '@/services/setti
 import { tasksRepo } from '@/services/repo'
 import { safeWrite, toast } from '@/components/feedback'
 import { quick } from '@/services/quick'
+import { openQuickAdd } from '@/features/quickadd/QuickAdd'
 import { expandOccurrences, fmtDate, fmtDuration, fmtHours, nextOccurrence, toISODate, todayISO } from '@/lib/dates'
 import { elapsedMs, pause, start } from '@/lib/timer'
 import { evaluate, formatResult, MathError } from '@/lib/mathParser'
@@ -307,6 +308,10 @@ function QuickWidget() {
   ]
   return (
     <Card><CardTitle icon={Zap}>Quick actions</CardTitle>
+      <form className="relative mb-3" onSubmit={(e) => { e.preventDefault(); const v = new FormData(e.currentTarget).get('qa'); openQuickAdd(String(v ?? '')); e.currentTarget.reset() }}>
+        <Wand2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-accent" aria-hidden />
+        <input name="qa" className="input pl-9" aria-label="Smart quick add" placeholder="Pay rent tomorrow 5pm #bills…" />
+      </form>
       <div className="grid grid-cols-2 gap-2">{items.map(([l, I, run]) => <Button key={l} size="sm" icon={I} onClick={run} className="justify-start">{l}</Button>)}</div>
     </Card>
   )
@@ -348,7 +353,12 @@ export function Dashboard() {
     tasks: await db.tasks.filter((t) => !t.deletedAt && t.status !== 'completed').count(),
     docs: await db.docs.filter((d) => !d.deletedAt).count(),
     projects: await db.projects.filter((p) => !p.deletedAt && p.status === 'active').count(),
+    // Today's plan: tasks due today (any status) and how many of them are done.
+    dueToday: await db.tasks.filter((t) => !t.deletedAt && t.dueDate === todayISO()).toArray(),
   }), [])
+  const planned = counts?.dueToday.length ?? 0
+  const doneToday = counts?.dueToday.filter((t) => t.status === 'completed').length ?? 0
+  const pct = planned ? Math.round((doneToday / planned) * 100) : 0
   const hour = new Date(now).getHours()
   const greet = hour < 5 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   const visible = useMemo(() => s.dashboardWidgets.filter((w) => w.visible && WIDGETS[w.id]), [s.dashboardWidgets])
@@ -366,9 +376,20 @@ export function Dashboard() {
               {counts ? `${counts.tasks} open task${counts.tasks === 1 ? '' : 's'} · ${counts.projects} active project${counts.projects === 1 ? '' : 's'} · ${counts.docs} document${counts.docs === 1 ? '' : 's'}` : ' '}
             </p>
           </div>
+          <div className="flex items-center gap-5">
+            <Link to="/tasks" className="flex items-center gap-3" aria-label={planned ? `Today's progress: ${doneToday} of ${planned} tasks done` : 'No tasks due today'}>
+              <svg viewBox="0 0 44 44" className="h-16 w-16 -rotate-90" aria-hidden>
+                <defs><linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="rgb(var(--accent))" /><stop offset="1" stopColor="rgb(var(--accent2))" /></linearGradient></defs>
+                <circle cx="22" cy="22" r="18" fill="none" stroke="rgb(var(--raised))" strokeWidth="5" />
+                <motion.circle cx="22" cy="22" r="18" fill="none" stroke="url(#ring)" strokeWidth="5" strokeLinecap="round" strokeDasharray={113.1}
+                  initial={{ strokeDashoffset: 113.1 }} animate={{ strokeDashoffset: 113.1 * (1 - pct / 100) }} transition={{ duration: 0.9, ease: 'easeOut' }} />
+              </svg>
+              <div className="hidden text-left sm:block"><div className="text-xl font-bold tabular-nums">{planned ? `${pct}%` : '—'}</div><div className="text-xs text-muted">{planned ? `${doneToday}/${planned} due today` : 'Nothing due today'}</div></div>
+            </Link>
           <div className="text-right">
             <div className="font-mono text-4xl font-bold tabular-nums" aria-label="Current time">{format(now, 'HH:mm')}<span className="text-xl text-muted">:{format(now, 'ss')}</span></div>
             <div className="text-xs text-muted">{Intl.DateTimeFormat().resolvedOptions().timeZone}</div>
+          </div>
           </div>
         </div>
         <div className="relative mt-4 flex flex-wrap gap-2">

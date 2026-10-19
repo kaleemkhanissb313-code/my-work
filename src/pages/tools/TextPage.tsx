@@ -1,7 +1,13 @@
 import { useMemo, useState } from 'react'
-import { Copy, Download, GitCompare, Type, Undo2 } from 'lucide-react'
-import { Button, Card, CardTitle, Checkbox, PageHeader, Select, Tabs } from '@/components/ui'
-import { ALPHABETS, convertCase, dedupeLines, diffLines, removeEmptyLines, reverseText, sortLines, textStats, toNato, type CaseKind } from '@/lib/text'
+import { Copy, Download, GitCompare, Search, Type, Undo2 } from 'lucide-react'
+import { Button, Card, CardTitle, Checkbox, Input, PageHeader, Select, Tabs } from '@/components/ui'
+import { toast } from '@/components/feedback'
+import {
+  ALPHABETS, capitalizeWords, convertCase, countMatches, dedupeLines, diffLines, removeEmptyLines, removeExtraSpaces, replaceAll, reverseText, sortLines, textStats, toNato,
+  type CaseKind, type FindOptions,
+} from '@/lib/text'
+import { numberToWords, wordsToNumber } from '@/lib/numberWords'
+import { CHARACTER_SETS, fromUrduDigits, toUrduDigits } from '@/lib/symbols'
 import { copyText } from '@/features/tools/clipboard'
 import { downloadText } from '@/services/backup'
 import { cn } from '@/lib/cn'
@@ -50,10 +56,40 @@ function TextTools() {
             <Button size="sm" disabled={!text} onClick={() => apply(removeEmptyLines)}>Remove empty</Button>
             <Button size="sm" disabled={!text} onClick={() => apply(reverseText)}>Reverse text</Button>
             <Button size="sm" disabled={!text} onClick={() => apply(toNato)}>NATO spelling</Button>
+            <Button size="sm" disabled={!text} onClick={() => apply(removeExtraSpaces)}>Remove extra spaces</Button>
+            <Button size="sm" disabled={!text} onClick={() => apply(capitalizeWords)}>Capitalize Words</Button>
+            <Button size="sm" disabled={!text} onClick={() => apply(toUrduDigits)}>Digits → ۱۲۳</Button>
+            <Button size="sm" disabled={!text} onClick={() => apply(fromUrduDigits)}>۱۲۳ → digits</Button>
+            <Button size="sm" disabled={!text} onClick={() => apply((s) => s.replace(/-?\d[\d,]*(\.\d+)?/g, (m) => { try { return numberToWords(Number(m.replace(/,/g, ''))) } catch { return m } }))}>Numbers → words</Button>
+            <Button size="sm" disabled={!text} onClick={() => apply((s) => { const n = wordsToNumber(s.trim()); if (n == null) { toast('Could not read those words as a number', 'warn'); return s } return String(n) })}>Words → number</Button>
           </div>
         </Card>
+        <FindReplace text={text} onApply={(t) => apply(() => t)} />
       </div>
     </div>
+  )
+}
+
+function FindReplace({ text, onApply }: { text: string; onApply: (t: string) => void }) {
+  const [find, setFind] = useState('')
+  const [repl, setRepl] = useState('')
+  const [opts, setOpts] = useState<FindOptions>({})
+  let count = 0, err: string | null = null
+  if (find) { try { count = countMatches(text, find, opts) } catch (e) { err = (e as Error).message } }
+  return (
+    <Card><CardTitle icon={Search}>Find & replace</CardTitle>
+      <div className="space-y-2">
+        <Input aria-label="Find" placeholder="Find…" value={find} onChange={(e) => setFind(e.target.value)} />
+        <Input aria-label="Replace with" placeholder="Replace with…" value={repl} onChange={(e) => setRepl(e.target.value)} />
+        <div className="flex flex-wrap gap-x-3 gap-y-1 text-xs">
+          <Checkbox label="Match case" checked={!!opts.caseSensitive} onChange={(v) => setOpts({ ...opts, caseSensitive: v })} />
+          <Checkbox label="Whole words" checked={!!opts.wholeWord} onChange={(v) => setOpts({ ...opts, wholeWord: v })} />
+          <Checkbox label="Regex" checked={!!opts.regex} onChange={(v) => setOpts({ ...opts, regex: v })} />
+        </div>
+        <p className={cn('text-xs', err ? 'text-danger' : 'text-muted')} aria-live="polite">{err ?? (find ? `${count} match${count === 1 ? '' : 'es'}` : 'Type text to find')}</p>
+        <Button size="sm" variant="primary" disabled={!count || !!err} onClick={() => { const r = replaceAll(text, find, repl, opts); onApply(r.text); toast(`Replaced ${r.count}`) }}>Replace all</Button>
+      </div>
+    </Card>
   )
 }
 
@@ -87,15 +123,16 @@ function Compare() {
   )
 }
 
+const SETS: Record<string, { name: string; letters: string[]; note?: string }> = { ...Object.fromEntries(CHARACTER_SETS.filter((s) => ['upper', 'lower', 'digits', 'alnum'].includes(s.id)).map((s) => [s.id, { name: s.name, letters: s.chars }])), ...ALPHABETS }
 function Alphabets() {
   const [key, setKey] = useState('english')
-  const a = ALPHABETS[key]
+  const a = SETS[key]
   const rtl = key === 'arabic' || key === 'urdu'
   return (
     <Card>
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <label htmlFor="alpha" className="text-sm text-muted">Alphabet</label>
-        <Select id="alpha" className="w-auto" value={key} onChange={(e) => setKey(e.target.value)}>{Object.entries(ALPHABETS).map(([k, v]) => <option key={k} value={k}>{v.name}</option>)}</Select>
+        <Select id="alpha" className="w-auto" value={key} onChange={(e) => setKey(e.target.value)}>{Object.entries(SETS).map(([k, v]) => <option key={k} value={k}>{v.name}</option>)}</Select>
         <span className="text-sm text-muted">{a.letters.length} letters{a.note ? ` · ${a.note}` : ''}</span>
         <Button size="sm" icon={Copy} className="ml-auto" onClick={() => void copyText(a.letters.join(key === 'nato' ? '\n' : ' '), a.name)}>Copy all</Button>
       </div>

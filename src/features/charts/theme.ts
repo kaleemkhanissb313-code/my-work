@@ -40,7 +40,7 @@ export function useChartTheme(): ChartTheme {
   const [theme, setTheme] = useState(resolveChartTheme)
   useEffect(() => {
     const obs = new MutationObserver(() => setTheme(resolveChartTheme()))
-    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style'] })
+    obs.observe(document.documentElement, { attributes: true, attributeFilter: ['class', 'style', 'data-accent'] })
     return () => obs.disconnect()
   }, [])
   return theme

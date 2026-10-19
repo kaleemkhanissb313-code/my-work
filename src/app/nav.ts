@@ -1,6 +1,6 @@
 import {
   Banknote, BarChart3, Briefcase, Calculator, CalendarDays, CheckSquare, FileText, FolderKanban, GanttChart, Hash, Heart, Home,
-  Image, LayoutDashboard, Link2, Lock, NotebookPen, Palette, Settings, ShieldCheck, Timer, Trash2, Type, LayoutTemplate, PieChart, type LucideIcon,
+  Gem, Image, LayoutDashboard, Link2, Lock, NotebookPen, Palette, Settings, ShieldCheck, Timer, Trash2, Type, LayoutTemplate, PieChart, type LucideIcon,
 } from 'lucide-react'
 
 export interface NavLeaf { id: string; label: string; path: string; icon: LucideIcon; shortcut?: string }
@@ -52,6 +52,7 @@ export const NAV: NavGroup[] = [
       { id: 'reports', label: 'Reports', path: '/reports', icon: PieChart },
     ],
   },
+  { id: 'glamiex', label: 'GLAMIEX Business', icon: Gem, path: '/glamiex', tone: 'text-accent' },
   { id: 'finance', label: 'Finance & Expenses', icon: Banknote, path: '/finance' },
   { id: 'security', label: 'Security Center', icon: ShieldCheck, path: '/security', tone: 'text-secure' },
   { id: 'vault', label: 'Private Vault', icon: Lock, path: '/vault', tone: 'text-secure' },

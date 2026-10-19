@@ -181,7 +181,7 @@ function CalculatorTool({ scientific, show }: { scientific: boolean; show: (n: n
                 <div role="radiogroup" aria-label="Angle unit" className="flex overflow-hidden rounded-lg border border-line">
                   {(['deg', 'rad'] as const).map((m) => (
                     <button key={m} type="button" role="radio" aria-checked={mode === m} onClick={() => setMode(m)}
-                      className={cn('px-2 py-0.5 font-semibold uppercase', mode === m ? 'bg-accent text-white' : 'text-muted hover:text-fg')}>{m}</button>
+                      className={cn('px-2 py-0.5 font-semibold uppercase', mode === m ? 'bg-accent text-onaccent' : 'text-muted hover:text-fg')}>{m}</button>
                   ))}
                 </div>
               )}

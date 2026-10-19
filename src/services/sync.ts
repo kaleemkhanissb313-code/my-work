@@ -11,6 +11,8 @@ export const SYNC_TABLES: Record<EntityTableName, string> = {
   docs: 'docs', folders: 'folders', projects: 'projects', tasks: 'tasks', events: 'events', media: 'media_files',
   bookmarks: 'bookmarks', timerSessions: 'timer_sessions', datasets: 'datasets', records: 'records', habitLogs: 'habit_logs',
   vault: 'vault_items', palettes: 'palettes',
+  gxProducts: 'gx_products', gxStock: 'gx_stock_moves', gxOrders: 'gx_orders', gxRefunds: 'gx_refunds', gxPeople: 'gx_people',
+  gxPayments: 'gx_payments', gxAdIncome: 'gx_ad_income', gxAdSpend: 'gx_ad_spend', gxExpenses: 'gx_expenses', gxSheets: 'gx_sheets',
 }
 
 interface RemoteRow { id: string; data: Record<string, unknown>; updated_at_ms: number; version: number; deleted_at_ms: number | null; server_updated_at: string }

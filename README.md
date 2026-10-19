@@ -39,7 +39,9 @@ Requires Node 20+.
 | **Graphs & Reports** | Editable datasets, CSV import/export, bar/line/area/pie/donut charts, PNG/SVG export, live charts from app data, reports with print. |
 | **Finance** | Expenses & income by area (personal/home/work/life), budgets vs actual, bills, monthly charts, CSV export. |
 | **Security Center / Private Vault** | PIN/password app lock with back-off and auto-lock, encrypted vault (AES-256-GCM), backups, activity log, sessions, TOTP 2FA (with Supabase). |
-| **Global** | Universal search + command menu (`Ctrl K`), quick-create, tags, favorites, pins, archive, trash & restore, saved views, module hiding, dark/light/system theme, reduced motion. |
+| **Smart quick add** | Press `Q` (or the ✨ button / bottom-bar button on phones) and type naturally: `Pay rent tomorrow 5pm #bills !high @home`, `Call mom every sunday`, `Client call fri 3pm for 30m +Website-Redesign`. Dates, times, durations, repeats, tags, priority, area, project and estimates are detected with a live preview. |
+| **Project templates** | 14 ready-made plans in 9 categories — SEO (audit, local SEO), Marketing (launch, social calendar, email), Design (brand identity, UI/UX), Development, Content, Video, Sales, Events, Personal. Each creates phased tasks, subtasks, milestones, due dates and a project brief document. |
+| **Global** | Universal search + command menu (`Ctrl K`), quick-create, tags, favorites, pins, archive, trash & restore, saved views, module hiding, dark/light/system theme, 4 accent colors (Ocean teal default, Royal violet, Sunset, Gold), collapsible sidebar, mobile bottom bar, page transitions, reduced motion. |
 
 ## Cloud setup (optional)
 

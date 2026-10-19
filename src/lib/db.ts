@@ -3,6 +3,10 @@ import type {
   AuditEvent, Bookmark, CalcHistory, CalendarEvent, CrossLink, Dataset, Doc, Folder, HabitLog, MediaFile,
   Palette, Project, RecentItem, RecordItem, RunningTimer, SavedView, Task, TimerSession, VaultItem,
 } from '@/types/models'
+import type {
+  GxAdIncome, GxAdSpend, GxAuditEvent, GxExpense, GxOrder, GxPayment, GxPerson, GxProduct, GxRefund, GxStockMove,
+} from '@/features/glamiex/types'
+import type { GxSheet } from '@/features/sheets/types'
 
 /** Local-first IndexedDB store. All UI reads go through here; cloud sync mirrors it when configured. */
 export class AppDB extends Dexie {
@@ -26,6 +30,18 @@ export class AppDB extends Dexie {
   recents!: EntityTable<RecentItem, 'id'>
   timers!: EntityTable<RunningTimer, 'id'>
   kv!: EntityTable<{ key: string; value: unknown }, 'key'>
+  // GLAMIEX (sales & finance module)
+  gxProducts!: EntityTable<GxProduct, 'id'>
+  gxStock!: EntityTable<GxStockMove, 'id'>
+  gxOrders!: EntityTable<GxOrder, 'id'>
+  gxRefunds!: EntityTable<GxRefund, 'id'>
+  gxPeople!: EntityTable<GxPerson, 'id'>
+  gxPayments!: EntityTable<GxPayment, 'id'>
+  gxAdIncome!: EntityTable<GxAdIncome, 'id'>
+  gxAdSpend!: EntityTable<GxAdSpend, 'id'>
+  gxExpenses!: EntityTable<GxExpense, 'id'>
+  gxAudit!: EntityTable<GxAuditEvent, 'id'>
+  gxSheets!: EntityTable<GxSheet, 'id'>
 
   constructor(name = 'basic-to-advanced') {
     super(name)
@@ -51,6 +67,21 @@ export class AppDB extends Dexie {
       timers: 'id, createdAt',
       kv: 'key',
     })
+    // v2: GLAMIEX. Unique indexes (&) on SKU / order no. / transaction no. block duplicate submissions.
+    this.version(2).stores({
+      gxProducts: 'id, &sku, category, status, updatedAt, deletedAt',
+      gxStock: 'id, productId, refId, at',
+      gxOrders: 'id, &orderNo, personId, at, status, updatedAt, deletedAt',
+      gxRefunds: 'id, orderId, at',
+      gxPeople: 'id, type, name, updatedAt, deletedAt',
+      gxPayments: 'id, &txnNo, personId, type, at, updatedAt',
+      gxAdIncome: 'id, reportDate, platform, deletedAt',
+      gxAdSpend: 'id, start, platform, deletedAt',
+      gxExpenses: 'id, date, category, deletedAt',
+      gxAudit: 'id, at, entity, entityId',
+    })
+    // v3: GLAMIEX Overall Sheets (user-created spreadsheets)
+    this.version(3).stores({ gxSheets: 'id, order, updatedAt, deletedAt' })
   }
 }
 
@@ -59,5 +90,6 @@ export const db = new AppDB()
 /** Tables whose rows extend BaseEntity (trash, sync and backup apply to these). */
 export const entityTables = [
   'docs', 'folders', 'projects', 'tasks', 'events', 'media', 'bookmarks', 'timerSessions', 'datasets', 'records', 'habitLogs', 'vault', 'palettes',
+  'gxProducts', 'gxStock', 'gxOrders', 'gxRefunds', 'gxPeople', 'gxPayments', 'gxAdIncome', 'gxAdSpend', 'gxExpenses', 'gxSheets',
 ] as const
 export type EntityTableName = (typeof entityTables)[number]

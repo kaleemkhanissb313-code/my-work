@@ -151,8 +151,8 @@ function ProjectView({ project }: { project: Project }) {
         {tab === 'related' && <Related project={project} />}
       </>}
 
-      <ProjectEditor key={editingProject ? 'open' : 'closed'} open={editingProject} project={project} onClose={() => setEditingProject(false)} />
-      <TaskEditor key={editingTask ? editingTask.id ?? 'new' : 'closed'} open={!!editingTask} taskId={editingTask?.id ?? null} defaults={editingTask?.defaults} onClose={() => setEditingTask(null)} />
+      <ProjectEditor key={editingProject ? 'project-open' : 'project-closed'} open={editingProject} project={project} onClose={() => setEditingProject(false)} />
+      <TaskEditor key={editingTask ? `task-${editingTask.id ?? 'new'}` : 'task-closed'} open={!!editingTask} taskId={editingTask?.id ?? null} defaults={editingTask?.defaults} onClose={() => setEditingTask(null)} />
     </div>
   )
 }

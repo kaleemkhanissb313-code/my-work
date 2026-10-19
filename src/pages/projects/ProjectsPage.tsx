@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { Archive, ArchiveRestore, CalendarClock, FolderKanban, Pencil, Plus, Search, Star, Trash2 } from 'lucide-react'
+import { Archive, ArchiveRestore, CalendarClock, FolderKanban, LayoutTemplate, Pencil, Plus, Search, Star, Trash2 } from 'lucide-react'
 import { db } from '@/lib/db'
 import { projectsRepo } from '@/services/repo'
 import { safeWrite, toast } from '@/components/feedback'
@@ -11,6 +11,7 @@ import { fmtDate, todayISO } from '@/lib/dates'
 import { AREA_LABEL, AREA_TONE, PRIORITY_TONE } from '@/lib/format'
 import { cn } from '@/lib/cn'
 import { ProjectEditor } from '@/features/tasks/ProjectEditor'
+import { TemplateGallery } from '@/features/projects/TemplateGallery'
 import { PROJECT_STATUSES, PROJECT_STATUS_LABEL, PROJECT_STATUS_TONE, projectIcon } from '@/features/tasks/projectIcons'
 import { AREAS, PRIORITY_ORDER } from '@/features/tasks/taskUtils'
 
@@ -29,6 +30,7 @@ export function ProjectsPage() {
   const [favOnly, setFavOnly] = useState(false)
   const [showArchived, setShowArchived] = useState(false)
   const [editing, setEditing] = useState<Project | 'new' | null>(null)
+  const [gallery, setGallery] = useState(false)
 
   const all = useLiveQuery(() => db.projects.toArray(), [])
   const tasks = useLiveQuery(() => db.tasks.toArray(), [])
@@ -87,7 +89,7 @@ export function ProjectsPage() {
   return (
     <div>
       <PageHeader title="Projects" icon={FolderKanban} description="Plan, track progress and hit deadlines."
-        actions={<Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>New project</Button>} />
+        actions={<><Button icon={LayoutTemplate} onClick={() => setGallery(true)}>From template</Button><Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>New project</Button></>} />
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="relative min-w-[160px] flex-1 sm:max-w-xs">
@@ -118,7 +120,7 @@ export function ProjectsPage() {
         <EmptyState icon={FolderKanban} title={filtered ? 'No projects match these filters' : 'No projects yet'}
           action={filtered
             ? <Button onClick={() => { setQ(''); setStatus('open'); setArea(''); setFavOnly(false); setShowArchived(false) }}>Clear filters</Button>
-            : <Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>Create a project</Button>}>
+            : <div className="flex flex-wrap justify-center gap-2"><Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>Create a project</Button><Button icon={LayoutTemplate} onClick={() => setGallery(true)}>Use a template (SEO, Marketing, Design…)</Button></div>}>
           {!filtered && 'Group related tasks, documents and events into a project to track progress and deadlines.'}
         </EmptyState>
       ) : (
@@ -173,6 +175,7 @@ export function ProjectsPage() {
         </ul>
       )}
 
+      <TemplateGallery open={gallery} onClose={() => setGallery(false)} />
       <ProjectEditor key={editing === 'new' ? 'new' : editing?.id ?? 'none'} open={!!editing} project={editing === 'new' ? null : editing}
         onClose={() => setEditing(null)} onCreated={(p) => navigate(`/projects/${p.id}`)} />
     </div>

@@ -33,6 +33,7 @@ const VaultPage = p(() => import('@/pages/security/VaultPage'), 'VaultPage')
 const TrashPage = p(() => import('@/pages/TrashPage'), 'TrashPage')
 const SettingsPage = p(() => import('@/pages/SettingsPage'), 'SettingsPage')
 const AuthPage = p(() => import('@/pages/AuthPage'), 'AuthPage')
+const GlamiexPage = p(() => import('@/pages/glamiex/GlamiexPage'), 'GlamiexPage')
 
 export const router = createBrowserRouter([
   {
@@ -69,6 +70,7 @@ export const router = createBrowserRouter([
       { path: 'trash', element: <TrashPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'auth', element: <AuthPage /> },
+      { path: 'glamiex/:section?/:id?', element: <GlamiexPage /> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },

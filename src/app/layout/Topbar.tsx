@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
-  Bell, CalendarPlus, CheckSquare, FileText, FolderPlus, Lock, Menu, Monitor, Moon, NotebookPen, Plus, Search, Sun, Timer, User, Zap,
+  Bell, CalendarPlus, CheckSquare, FileText, FolderPlus, Lock, Menu, Monitor, Moon, NotebookPen, Plus, Search, Sun, Timer, User, Wand2, Zap,
 } from 'lucide-react'
 import { Button, IconButton } from '@/components/ui'
 import { quick } from '@/services/quick'
+import { openQuickAdd } from '@/features/quickadd/QuickAdd'
 import { updateSettings, useSettings } from '@/services/settings'
 import { lockApp } from '@/services/security'
 import { authState, auth } from '@/services/auth'
@@ -63,6 +64,10 @@ export function Topbar({ onMenu, onSearch }: { onMenu: () => void; onSearch: () 
         <Search className="h-4 w-4" aria-hidden /><span className="flex-1 truncate">Search everything…</span><span className="kbd hidden sm:inline-flex">Ctrl K</span>
       </button>
       <div className="ml-auto flex items-center gap-1">
+        <button type="button" onClick={() => openQuickAdd()} title="Smart quick add (Q)" className="btn btn-soft hidden h-9 px-3 text-sm md:inline-flex">
+          <Wand2 className="h-4 w-4 text-accent" aria-hidden />Quick add<span className="kbd">Q</span>
+        </button>
+        <IconButton icon={Wand2} label="Smart quick add (Q)" className="md:hidden" onClick={() => openQuickAdd()} />
         <Menu_ label="Create new" icon={Plus} buttonClass="btn-3d text-white hover:text-white">
           {(close) => <>
             <div className="px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-muted">Create</div>

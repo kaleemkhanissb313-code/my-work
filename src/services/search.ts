@@ -32,9 +32,9 @@ export async function searchAll(q: string, limit = 50): Promise<SearchHit[]> {
     if (s) hits.push({ ...h, score: s })
   }
   const live = <T extends { deletedAt: number | null }>(rows: T[]) => rows.filter((r) => !r.deletedAt)
-  const [docs, projects, tasks, events, media, bookmarks, records, datasets] = await Promise.all([
+  const [docs, projects, tasks, events, media, bookmarks, records, datasets, gxProducts, gxOrders, gxPeople] = await Promise.all([
     db.docs.toArray(), db.projects.toArray(), db.tasks.toArray(), db.events.toArray(), db.media.toArray(),
-    db.bookmarks.toArray(), db.records.toArray(), db.datasets.toArray(),
+    db.bookmarks.toArray(), db.records.toArray(), db.datasets.toArray(), db.gxProducts.toArray(), db.gxOrders.toArray(), db.gxPeople.toArray(),
   ])
   live(docs).forEach((d) => push({ type: 'doc', id: d.id, title: d.title || 'Untitled', subtitle: d.isTemplate ? 'Template' : d.kind === 'note' ? 'Note' : 'Document', path: `/${d.kind === 'note' ? 'notes' : 'documents'}/${d.id}` }, `${d.description} ${d.tags.join(' ')} ${stripHtml(d.content)}`))
   live(projects).forEach((p) => push({ type: 'project', id: p.id, title: p.name, subtitle: `Project · ${p.status}`, path: `/projects/${p.id}` }, `${p.description} ${p.tags.join(' ')}`))
@@ -44,5 +44,10 @@ export async function searchAll(q: string, limit = 50): Promise<SearchHit[]> {
   live(bookmarks).forEach((b) => push({ type: 'bookmark', id: b.id, title: b.title || b.url, subtitle: `Link · ${b.category}`, path: `/links?open=${b.id}` }, `${b.url} ${b.description} ${b.notes} ${b.tags.join(' ')}`))
   live(records).forEach((r) => push({ type: 'record', id: r.id, title: r.title, subtitle: COLLECTIONS[r.collection]?.label ?? r.collection, path: `${recordPath(r)}?open=${r.id}` }, `${r.category} ${r.tags.join(' ')} ${Object.values(r.fields).join(' ')}`))
   live(datasets).forEach((d) => push({ type: 'dataset', id: d.id, title: d.name, subtitle: 'Dataset', path: `/graphs?open=${d.id}` }, d.columns.join(' ')))
+  // GLAMIEX
+  const peopleById = new Map(gxPeople.map((p) => [p.id, p.name]))
+  live(gxProducts).forEach((p) => push({ type: 'gx', id: p.id, title: p.name, subtitle: `GLAMIEX product · ${p.sku}`, path: `/glamiex/products/${p.id}` }, `${p.sku} ${p.category} ${p.description} ${p.tags.join(' ')}`))
+  live(gxOrders).forEach((o) => push({ type: 'gx', id: o.id, title: o.orderNo, subtitle: `GLAMIEX sale · ${o.status}`, path: `/glamiex/sales/${o.id}` }, `${peopleById.get(o.personId ?? '') ?? ''} ${o.items.map((i) => i.name).join(' ')} ${o.notes}`))
+  live(gxPeople).forEach((p) => push({ type: 'gx', id: p.id, title: p.name, subtitle: `GLAMIEX ${p.type}`, path: `/glamiex/people/${p.id}` }, `${p.phone} ${p.email} ${p.notes}`))
   return hits.sort((a, b) => b.score - a.score).slice(0, limit)
 }

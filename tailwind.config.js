@@ -13,6 +13,7 @@ export default {
         muted: 'rgb(var(--muted) / <alpha-value>)',
         accent: 'rgb(var(--accent) / <alpha-value>)',
         accent2: 'rgb(var(--accent2) / <alpha-value>)',
+        onaccent: 'rgb(var(--on-accent) / <alpha-value>)',
         ok: 'rgb(var(--ok) / <alpha-value>)',
         warn: 'rgb(var(--warn) / <alpha-value>)',
         danger: 'rgb(var(--danger) / <alpha-value>)',

@@ -1,10 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { ArrowRight, CalendarPlus, CheckSquare, FileText, FolderPlus, Lock, Moon, NotebookPen, Search, Timer } from 'lucide-react'
+import { ArrowRight, Wand2, CalendarPlus, CheckSquare, FileText, FolderPlus, Lock, Moon, NotebookPen, Search, Timer } from 'lucide-react'
 import { Modal } from '@/components/ui'
 import { searchAll, type SearchHit } from '@/services/search'
 import { ALL_LEAVES } from '../nav'
 import { quick } from '@/services/quick'
+import { openQuickAdd } from '@/features/quickadd/QuickAdd'
 import { lockApp } from '@/services/security'
 import { getSettings, updateSettings } from '@/services/settings'
 import { cn } from '@/lib/cn'
@@ -28,6 +29,7 @@ export function CommandMenu({ open, onClose }: { open: boolean; onClose: () => v
   const commands: Cmd[] = useMemo(() => {
     const go = (fn: () => void) => () => { onClose(); fn() }
     const actions: Cmd[] = [
+      { id: 'quick-add', label: q.trim() ? `Quick add: “${q.trim()}”` : 'Smart quick add (natural language)', hint: 'Q', icon: Wand2, group: 'Actions', run: go(() => openQuickAdd(q.trim())) },
       { id: 'new-doc', label: 'Create document', hint: 'Alt N', icon: FileText, group: 'Actions', run: go(() => void quick.doc(nav)) },
       { id: 'new-note', label: 'Create note', icon: NotebookPen, group: 'Actions', run: go(() => void quick.doc(nav, 'note')) },
       { id: 'new-task', label: 'Create task', hint: 'Alt T', icon: CheckSquare, group: 'Actions', run: go(() => void quick.task(nav)) },

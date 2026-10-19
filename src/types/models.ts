@@ -177,7 +177,7 @@ export interface AuditEvent { id: ID; at: number; type: AuditType; detail: strin
 
 export interface Palette extends BaseEntity { name: string; colors: string[] }
 export interface CalcHistory { id: ID; at: number; expression: string; result: string; tool: string }
-export type EntityType = 'doc' | 'project' | 'task' | 'event' | 'media' | 'bookmark' | 'record' | 'dataset'
+export type EntityType = 'doc' | 'project' | 'task' | 'event' | 'media' | 'bookmark' | 'record' | 'dataset' | 'gx'
 export interface CrossLink { id: ID; fromType: EntityType; fromId: ID; toType: EntityType; toId: ID; createdAt: number }
 export interface SavedView { id: ID; name: string; path: string; createdAt: number }
 export interface RecentItem { id: string; type: EntityType; refId: ID; title: string; path: string; at: number }
@@ -200,8 +200,15 @@ export interface RunningTimer {
   createdAt: number
 }
 
+export type AccentName = 'teal' | 'violet' | 'sunset' | 'gold' | 'custom'
+
 export interface Settings {
   theme: 'dark' | 'light' | 'system'
+  accent: AccentName
+  /** Used when accent === 'custom' (HEX). */
+  customAccent: string
+  /** App background: default glow, a solid color, or a CSS gradient. */
+  background: { kind: 'default' | 'solid' | 'gradient'; value: string }
   reduceMotion: boolean
   displayName: string
   hiddenModules: string[]

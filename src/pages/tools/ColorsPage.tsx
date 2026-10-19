@@ -10,6 +10,15 @@ import { copyText } from '@/features/tools/clipboard'
 import { downloadText } from '@/services/backup'
 import { cn } from '@/lib/cn'
 import type { Palette } from '@/types/models'
+import { nearestColorName } from '@/lib/colorNames'
+import { pushRecentColor, useRecentColors } from '@/features/colors/ColorPicker'
+import { updateSettings } from '@/services/settings'
+
+function RecentRow({ onPick }: { onPick: (c: string) => void }) {
+  const recent = useRecentColors()
+  if (!recent.length) return null
+  return <div><div className="mb-1 text-xs text-muted">Recent colors</div><div className="flex flex-wrap gap-1.5">{recent.map((c) => <button key={c} type="button" aria-label={`Use ${c}`} title={c} onClick={() => onPick(c)} className="h-8 w-8 rounded-lg border border-line" style={{ background: c }} />)}</div></div>
+}
 
 const FAVORITES = 'Favorites'
 
@@ -40,9 +49,16 @@ function ColorTool({ hex, setHex, onFavorite }: { hex: string; setHex: (h: strin
             </Field>
             {formats.map(([l, v]) => (
               <div key={l} className="flex items-center gap-2 text-sm"><span className="w-10 text-xs text-muted">{l}</span><code className="flex-1 truncate rounded-lg bg-raised px-2 py-1">{v}</code>
-                <IconButton icon={Copy} label={`Copy ${l}`} onClick={() => void copyText(v, l)} /></div>
+                <IconButton icon={Copy} label={`Copy ${l}`} onClick={() => { void copyText(v, l); void pushRecentColor(hex) }} /></div>
             ))}
-            <Button size="sm" icon={Heart} onClick={onFavorite}>Add to favorites</Button>
+            <p className="text-sm">Name: <b>{nearestColorName(rgb).name}</b>{!nearestColorName(rgb).exact && <span className="text-xs text-muted"> (closest named color)</span>}</p>
+            <div className="flex flex-wrap gap-2">
+              <Button size="sm" icon={Heart} onClick={() => { onFavorite(); void pushRecentColor(hex) }}>Add to favorites</Button>
+              <Button size="sm" onClick={() => void safeWrite(() => updateSettings({ accent: 'custom', customAccent: hex }), 'Applied as app accent color')}>Use as app accent</Button>
+              <Button size="sm" onClick={() => void safeWrite(() => updateSettings({ background: { kind: 'solid', value: hex } }), 'Applied as app background')}>Use as background</Button>
+              <Button size="sm" variant="ghost" onClick={() => void safeWrite(() => updateSettings({ accent: 'teal', background: { kind: 'default', value: '' } }), 'Colors reset to default')}>Reset to default</Button>
+            </div>
+            <RecentRow onPick={(c) => { setHex(c); setText(c) }} />
           </div>
         </div>
       </Card>
@@ -77,6 +93,8 @@ function GradientTool() {
         {kind === 'linear' && <Field label={`Angle: ${angle}°`} htmlFor="ga"><input id="ga" type="range" min={0} max={360} value={angle} onChange={(e) => setAngle(Number(e.target.value))} className="w-40" /></Field>}
       </div>
       <div className="mt-3 flex items-center gap-2"><code className="flex-1 truncate rounded-lg bg-raised px-2 py-1 text-xs">background: {css};</code><Button size="sm" icon={Copy} onClick={() => void copyText(`background: ${css};`, 'CSS')}>Copy CSS</Button></div>
+      <div className="mt-2 flex flex-wrap gap-2"><Button size="sm" onClick={() => void safeWrite(() => updateSettings({ background: { kind: 'gradient', value: css } }), 'Gradient applied as app background')}>Use as app background</Button>
+        <Button size="sm" variant="ghost" onClick={() => void safeWrite(() => updateSettings({ background: { kind: 'default', value: '' } }), 'Background reset')}>Reset background</Button></div>
     </Card>
   )
 }

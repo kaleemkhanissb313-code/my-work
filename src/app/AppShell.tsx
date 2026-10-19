@@ -1,16 +1,18 @@
 import { Suspense, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { MotionConfig } from 'framer-motion'
+import { MotionConfig, motion } from 'framer-motion'
 import { Sidebar } from './layout/Sidebar'
 import { Topbar } from './layout/Topbar'
+import { BottomNav } from './layout/BottomNav'
 import { CommandMenu } from './layout/CommandMenu'
 import { LockScreen } from './layout/LockScreen'
 import { ConfirmHost, Toaster } from '@/components/feedback'
 import { Spinner } from '@/components/ui'
-import { useSettings } from '@/services/settings'
+import { applyAppearance, useSettings } from '@/services/settings'
 import { lockApp, lockState } from '@/services/security'
 import { quick } from '@/services/quick'
 import { useReminderLoop } from './useReminders'
+import { openQuickAdd, QuickAddDialog } from '@/features/quickadd/QuickAdd'
 
 /** Is the keyboard focus in a text-entry control? Single-key shortcuts must not fire there. */
 const typing = (t: EventTarget | null) => {
@@ -29,17 +31,12 @@ export function AppShell() {
 
   // Theme + reduced motion
   useEffect(() => {
-    const apply = () => {
-      const dark = s.theme === 'dark' || (s.theme === 'system' && matchMedia('(prefers-color-scheme: dark)').matches)
-      document.documentElement.classList.toggle('dark', dark)
-      document.documentElement.classList.toggle('reduce-motion', s.reduceMotion)
-      document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#0b1020' : '#f4f5fa')
-    }
+    const apply = () => applyAppearance(s)
     apply()
     const mq = matchMedia('(prefers-color-scheme: dark)')
     mq.addEventListener('change', apply)
     return () => mq.removeEventListener('change', apply)
-  }, [s.theme, s.reduceMotion])
+  }, [s.theme, s.accent, s.customAccent, s.background.kind, s.background.value, s.reduceMotion]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Global keyboard shortcuts
   useEffect(() => {
@@ -54,7 +51,9 @@ export function AppShell() {
         else if (k === 't') { e.preventDefault(); void quick.task(nav) }
         else if (k === 'e') { e.preventDefault(); void quick.event(nav) }
         else if (k === 's') { e.preventDefault(); void quick.timer(nav) }
+        else if (k === 'q') { e.preventDefault(); openQuickAdd() }
       } else if (e.key === '/' && !mod) { e.preventDefault(); setCmd(true) }
+      else if (e.key.toLowerCase() === 'q' && !mod && !e.shiftKey) { e.preventDefault(); openQuickAdd() }
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -88,12 +87,17 @@ export function AppShell() {
         <Sidebar mobileOpen={menu} onClose={() => setMenu(false)} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar onMenu={() => setMenu(true)} onSearch={() => setCmd(true)} />
-          <main id="main" className="mx-auto w-full max-w-[1400px] flex-1 px-4 py-6 sm:px-6">
-            <Suspense fallback={<Spinner />}><Outlet /></Suspense>
+          <main id="main" className="mx-auto w-full max-w-[1400px] flex-1 px-4 pb-28 pt-6 sm:px-6 lg:pb-8">
+            {/* Subtle page transition (disabled automatically with reduced motion) */}
+            <motion.div key={loc.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: 'easeOut' }}>
+              <Suspense fallback={<Spinner />}><Outlet /></Suspense>
+            </motion.div>
           </main>
         </div>
       </div>
+      <BottomNav onMenu={() => setMenu(true)} />
       <CommandMenu open={cmd} onClose={() => setCmd(false)} />
+      <QuickAddDialog />
       <Toaster />
       <ConfirmHost />
     </MotionConfig>

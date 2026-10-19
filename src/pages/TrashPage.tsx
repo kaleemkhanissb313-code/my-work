@@ -11,13 +11,14 @@ import type { BaseEntity } from '@/types/models'
 const TABLES = {
   docs: 'Document', projects: 'Project', tasks: 'Task', events: 'Event', media: 'Media', bookmarks: 'Link',
   records: 'Record', datasets: 'Dataset', folders: 'Folder', palettes: 'Palette', timerSessions: 'Time entry',
+  gxProducts: 'GLAMIEX product', gxPeople: 'GLAMIEX person', gxExpenses: 'GLAMIEX expense', gxAdIncome: 'GLAMIEX ad income', gxAdSpend: 'GLAMIEX ad spend', gxSheets: 'GLAMIEX sheet',
 } as const
 type TableName = keyof typeof TABLES
 
 interface TrashItem { key: string; table: TableName; id: string; title: string; type: string; deletedAt: number }
 
 function titleOf(r: Record<string, unknown>): string {
-  const t = (r.title ?? r.name ?? r.label ?? r.url) as string | undefined
+  const t = (r.title ?? r.name ?? r.label ?? r.url ?? r.platform ?? r.category ?? r.description) as string | undefined
   return t?.trim() || '(untitled)'
 }
 

@@ -6,6 +6,8 @@ import { cleanNumber } from '@/lib/mathParser'
 import { copyText, num } from '@/features/tools/clipboard'
 import { downloadText } from '@/services/backup'
 import { toCSV } from '@/lib/csv'
+import { generateIds, numberToWords, pkrToWords, wordsToNumber } from '@/lib/numberWords'
+import { toUrduDigits } from '@/lib/symbols'
 
 const LOCALES = ['en-US', 'en-GB', 'de-DE', 'fr-FR', 'es-ES', 'ur-PK', 'hi-IN', 'ar-SA', 'ja-JP', 'zh-CN']
 const CURRENCIES = ['USD', 'EUR', 'GBP', 'PKR', 'INR', 'AED', 'JPY', 'CNY']
@@ -165,12 +167,88 @@ function Sequences() {
   )
 }
 
+
+function BusinessCalc() {
+  const [cost, setCost] = useState('2000')
+  const [price, setPrice] = useState('3500')
+  const [qty, setQty] = useState('1')
+  const [taxPct, setTaxPct] = useState('0')
+  const [inclusive, setInclusive] = useState(false)
+  const c = num(cost), p = num(price), q = num(qty) ?? 1, t = num(taxPct) ?? 0
+  const valid = c != null && p != null && q > 0 && t >= 0
+  const net = valid ? (inclusive ? p / (1 + t / 100) : p) : 0
+  const tax = valid ? (inclusive ? p - net : (p * t) / 100) : 0
+  const profit = valid ? (net - c!) * q : 0
+  const margin = valid && net ? ((net - c!) / net) * 100 : null
+  const markup = valid && c ? ((net - c!) / c!) * 100 : null
+  const money = (v: number) => formatNumber(v, { style: 'currency', currency: 'PKR', decimals: 2, locale: 'en-PK' })
+  return (
+    <Card><CardTitle icon={Hash}>Profit, margin & tax</CardTitle>
+      <div className="grid gap-3 sm:grid-cols-3">
+        <Field label="Unit cost (Rs)" htmlFor="bc-c" error={cost && c == null ? 'Invalid' : null}><Input id="bc-c" inputMode="decimal" value={cost} onChange={(e) => setCost(e.target.value)} /></Field>
+        <Field label="Selling price (Rs)" htmlFor="bc-p" error={price && p == null ? 'Invalid' : null}><Input id="bc-p" inputMode="decimal" value={price} onChange={(e) => setPrice(e.target.value)} /></Field>
+        <Field label="Quantity" htmlFor="bc-q" error={!(q > 0) ? 'Must be > 0' : null}><Input id="bc-q" inputMode="numeric" value={qty} onChange={(e) => setQty(e.target.value)} /></Field>
+        <Field label="Tax %" htmlFor="bc-t"><Input id="bc-t" inputMode="decimal" value={taxPct} onChange={(e) => setTaxPct(e.target.value)} /></Field>
+        <label className="flex items-end gap-2 pb-2 text-sm"><input type="checkbox" checked={inclusive} onChange={(e) => setInclusive(e.target.checked)} />Price already includes tax</label>
+      </div>
+      {valid && <div className="mt-3 space-y-1.5">
+        <Out label="Price before tax" value={money(net)} />
+        <Out label="Tax per unit" value={money(tax)} />
+        <Out label="Total with tax" value={money((net + tax) * q)} />
+        <Out label={profit >= 0 ? 'Profit ▲' : 'Loss ▼'} value={money(profit)} />
+        <Out label="Profit margin" value={margin == null ? 'n/a (price is 0)' : `${margin.toFixed(2)}%`} />
+        <Out label="Markup on cost" value={markup == null ? 'n/a (cost is 0)' : `${markup.toFixed(2)}%`} />
+      </div>}
+    </Card>
+  )
+}
+
+function NumberWords() {
+  const [v, setV] = useState('150000')
+  const [words, setWords] = useState('two lakh fifty thousand')
+  const n = num(v)
+  const safe = (fn: () => string) => { try { return fn() } catch (e) { return (e as Error).message } }
+  const back = wordsToNumber(words)
+  return (
+    <Card><CardTitle icon={Hash}>Numbers ↔ words</CardTitle>
+      <Field label="Number" htmlFor="nw-v" error={v && n == null ? 'Not a valid number' : null}><Input id="nw-v" inputMode="decimal" value={v} onChange={(e) => setV(e.target.value)} /></Field>
+      {n != null && <div className="mt-3 space-y-1.5">
+        <Out label="International" value={safe(() => numberToWords(n))} />
+        <Out label="Lakh / crore" value={safe(() => numberToWords(n, 'south-asian'))} />
+        <Out label="PKR (cheque)" value={safe(() => pkrToWords(n))} />
+        <Out label="Urdu digits" value={toUrduDigits(new Intl.NumberFormat('en-PK').format(n))} />
+      </div>}
+      <Field label="Words → number" htmlFor="nw-w" className="mt-4" error={words && back == null ? 'Could not read those words' : null}><Input id="nw-w" value={words} onChange={(e) => setWords(e.target.value)} /></Field>
+      {back != null && <div className="mt-2"><Out label="Value" value={new Intl.NumberFormat('en-PK').format(back)} /></div>}
+    </Card>
+  )
+}
+
+function IdGenerator() {
+  const [prefix, setPrefix] = useState('INV-')
+  const [start, setStart] = useState('1')
+  const [count, setCount] = useState('10')
+  const [pad, setPad] = useState('4')
+  const ids = generateIds({ prefix, start: Math.trunc(num(start) ?? 1), count: Math.trunc(num(count) ?? 0), pad: Math.max(0, Math.min(12, Math.trunc(num(pad) ?? 0))) })
+  return (
+    <Card><CardTitle icon={Hash} action={<Button size="sm" icon={Copy} disabled={!ids.length} onClick={() => void copyText(ids.join('\n'), 'IDs')}>Copy</Button>}>Counters & numeric IDs</CardTitle>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <Field label="Prefix" htmlFor="id-p"><Input id="id-p" value={prefix} onChange={(e) => setPrefix(e.target.value.slice(0, 12))} /></Field>
+        <Field label="Start" htmlFor="id-s"><Input id="id-s" inputMode="numeric" value={start} onChange={(e) => setStart(e.target.value)} /></Field>
+        <Field label="How many" htmlFor="id-c" hint="Max 10,000"><Input id="id-c" inputMode="numeric" value={count} onChange={(e) => setCount(e.target.value)} /></Field>
+        <Field label="Digits" htmlFor="id-d"><Input id="id-d" inputMode="numeric" value={pad} onChange={(e) => setPad(e.target.value)} /></Field>
+      </div>
+      <p className="mt-3 max-h-32 overflow-auto break-words rounded-xl bg-raised p-3 font-mono text-xs">{ids.slice(0, 200).join(', ')}{ids.length > 200 && ' …'}</p>
+    </Card>
+  )
+}
+
 export function NumbersPage() {
   return (
     <div>
-      <PageHeader title="Number Tools" description="Formatting, rounding, conversions, bases, statistics and sequences." icon={Hash} />
+      <PageHeader title="Number Tools" description="Profit & tax, numbers in words, formatting, rounding, conversions, bases, statistics, sequences and IDs." icon={Hash} />
       <div className="grid gap-4 lg:grid-cols-2">
-        <Formatting /><Conversions /><Bases /><Statistics /><div className="lg:col-span-2"><Sequences /></div>
+        <BusinessCalc /><NumberWords /><Formatting /><Conversions /><Bases /><Statistics /><IdGenerator /><div className="lg:col-span-2"><Sequences /></div>
       </div>
     </div>
   )

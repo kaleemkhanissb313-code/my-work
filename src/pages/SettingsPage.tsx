@@ -6,7 +6,7 @@ import { db } from '@/lib/db'
 import { uid } from '@/lib/id'
 import { Badge, Button, Card, CardTitle, Field, IconButton, Input, PageHeader, Select, Toggle } from '@/components/ui'
 import { confirm, safeWrite, toast } from '@/components/feedback'
-import { updateSettings, useSettings } from '@/services/settings'
+import { ACCENTS, updateSettings, useSettings } from '@/services/settings'
 import { HIDEABLE } from '@/app/nav'
 import { cloudConfigured } from '@/services/supabase'
 import { authState } from '@/services/auth'
@@ -87,6 +87,24 @@ export function SettingsPage() {
 
         <Card><CardTitle icon={Palette}>Appearance & accessibility</CardTitle>
           <Field label="Theme" htmlFor="th"><Select id="th" value={s.theme} onChange={(e) => set({ theme: e.target.value as typeof s.theme })}><option value="dark">Dark (default)</option><option value="light">Light</option><option value="system">Match system</option></Select></Field>
+          <fieldset className="mt-3">
+            <legend className="label">Accent & button color</legend>
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4" role="radiogroup" aria-label="Accent color">
+              {ACCENTS.map((a) => (
+                <button key={a.id} type="button" role="radio" aria-checked={s.accent === a.id} onClick={() => set({ accent: a.id })}
+                  className={`flex flex-col items-center gap-1.5 rounded-xl border p-2 text-xs transition ${s.accent === a.id ? 'border-accent bg-raised font-semibold' : 'border-line hover:bg-raised/60'}`}>
+                  <span className="h-8 w-full rounded-lg shadow-inner" style={{ background: `linear-gradient(180deg, ${a.swatch[0]}, ${a.swatch[1]})` }} aria-hidden />
+                  {a.label}{a.id === 'teal' && <span className="text-[10px] font-normal text-muted">Default</span>}
+                </button>
+              ))}
+              <label className={`flex cursor-pointer flex-col items-center gap-1.5 rounded-xl border p-2 text-xs transition ${s.accent === 'custom' ? 'border-accent bg-raised font-semibold' : 'border-line hover:bg-raised/60'}`}>
+                <input type="color" aria-label="Custom accent color" value={s.customAccent} className="h-8 w-full cursor-pointer rounded-lg border-0 bg-transparent"
+                  onChange={(e) => set({ accent: 'custom', customAccent: e.target.value })} />
+                Custom
+              </label>
+            </div>
+            {s.background.kind !== 'default' && <button type="button" className="mt-2 text-xs text-accent underline" onClick={() => set({ background: { kind: 'default', value: '' } })}>Reset app background to default</button>}
+          </fieldset>
           <Toggle label="Reduce motion" description="Turns off animations and transitions (the OS setting is also respected)." checked={s.reduceMotion} onChange={(v) => set({ reduceMotion: v })} />
           <p className="mt-2 text-xs text-muted">Keyboard: <span className="kbd">Ctrl K</span> search & commands · <span className="kbd">/</span> search · <span className="kbd">Alt N</span> document · <span className="kbd">Alt T</span> task · <span className="kbd">Alt E</span> event · <span className="kbd">Alt S</span> stopwatch · <span className="kbd">Ctrl Shift L</span> lock. Single-key shortcuts never fire while typing.</p>
         </Card>
