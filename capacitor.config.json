@@ -1,0 +1,7 @@
+{
+  "appId": "app.basictoadvanced.mobile",
+  "appName": "Basic to Advanced",
+  "webDir": "dist",
+  "server": { "androidScheme": "https" },
+  "plugins": {}
+}
