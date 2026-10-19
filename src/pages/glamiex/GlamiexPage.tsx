@@ -84,7 +84,7 @@ export function GlamiexPage() {
     return () => window.removeEventListener('keydown', onKey)
   }, [nav])
 
-  useEffect(() => { document.title = `${current.label} · GLAMIEX` ; return () => { document.title = 'Basic to Advanced' } }, [current.label])
+  useEffect(() => { document.title = `${current.label} · GLAMIEX` ; return () => { document.title = 'workMYwork — Basic to Advanced' } }, [current.label])
 
   const content = () => {
     switch (current.id) {

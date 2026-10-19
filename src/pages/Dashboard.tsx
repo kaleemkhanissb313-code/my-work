@@ -216,7 +216,7 @@ function RecentMediaWidget() {
       {!media?.length ? <p className="py-3 text-sm text-muted">No uploads yet.</p> : (
         <div className="grid grid-cols-3 gap-2">{media.map((m) => (
           <Link key={m.id} to={`/media?open=${m.id}`} className="aspect-square overflow-hidden rounded-xl bg-raised" title={m.name}>
-            {m.thumbnail ? <img src={m.thumbnail} alt={m.name} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center p-1 text-center text-[10px] text-muted">{m.name}</div>}
+            {m.thumbnail ? <img loading="lazy" decoding="async" src={m.thumbnail} alt={m.name} className="h-full w-full object-cover" /> : <div className="grid h-full place-items-center p-1 text-center text-[10px] text-muted">{m.name}</div>}
           </Link>
         ))}</div>
       )}
@@ -403,7 +403,7 @@ export function Dashboard() {
       </motion.section>
 
       {isEmpty && (
-        <div className="mb-6"><EmptyState icon={Sparkles} title="Welcome to Basic to Advanced">
+        <div className="mb-6"><EmptyState icon={Sparkles} title="Welcome to workMYwork">
           Your workspace is empty and everything you add is saved on this device. Start with a task, a document or a project — or press <span className="kbd">Ctrl K</span> to search and run commands.
         </EmptyState></div>
       )}

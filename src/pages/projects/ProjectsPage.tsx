@@ -120,7 +120,7 @@ export function ProjectsPage() {
         <EmptyState icon={FolderKanban} title={filtered ? 'No projects match these filters' : 'No projects yet'}
           action={filtered
             ? <Button onClick={() => { setQ(''); setStatus('open'); setArea(''); setFavOnly(false); setShowArchived(false) }}>Clear filters</Button>
-            : <div className="flex flex-wrap justify-center gap-2"><Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>Create a project</Button><Button icon={LayoutTemplate} onClick={() => setGallery(true)}>Use a template (SEO, Marketing, Design…)</Button></div>}>
+            : <div className="flex flex-wrap justify-center gap-2"><Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>Create a project</Button><Button icon={LayoutTemplate} onClick={() => setGallery(true)} title="SEO, Marketing, Design and more">Use a template</Button></div>}>
           {!filtered && 'Group related tasks, documents and events into a project to track progress and deadlines.'}
         </EmptyState>
       ) : (

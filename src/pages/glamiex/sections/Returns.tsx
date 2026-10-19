@@ -216,7 +216,7 @@ function ReturnDetail({ id }: { id: string }) {
 function ProductImage({ id }: { id: string | null }) {
   const url = useLiveQuery(async () => { if (!id) return null; const m = await db.media.get(id); return m && !m.deletedAt ? m.thumbnail ?? null : null }, [id])
   if (!url) return <div className="grid h-16 w-16 shrink-0 place-items-center rounded-xl bg-raised text-muted"><PackageOpen className="h-6 w-6" aria-hidden /></div>
-  return <img src={url} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
+  return <img loading="lazy" decoding="async" src={url} alt="" className="h-16 w-16 shrink-0 rounded-xl object-cover" />
 }
 
 function PickupPanel({ r }: { r: GxReturn }) {

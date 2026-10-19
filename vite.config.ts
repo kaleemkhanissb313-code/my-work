@@ -11,8 +11,8 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg'],
       manifest: {
-        name: 'Basic to Advanced',
-        short_name: 'B2A',
+        name: 'workMYwork — Basic to Advanced',
+        short_name: 'workMYwork',
         description: 'All-in-one workspace for life, home, work, projects, files, time and data.',
         theme_color: '#0b1020',
         background_color: '#0b1020',

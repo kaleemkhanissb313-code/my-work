@@ -5,18 +5,18 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { NAV, type NavGroup } from '../nav'
 import { useSettings } from '@/services/settings'
 import { cn } from '@/lib/cn'
+import { BrandMark, Wordmark } from '@/components/Logo'
 
 const COLLAPSE_KEY = 'b2a-sidebar-collapsed'
 const readCollapsed = () => { try { return localStorage.getItem(COLLAPSE_KEY) === '1' } catch { return false } }
 
 function Logo({ compact }: { compact?: boolean }) {
   return (
-    <div className="flex items-center gap-2.5 px-2 py-1">
-      <div className="grid h-9 w-9 shrink-0 place-items-center rounded-xl text-sm font-black text-white btn-3d">B</div>
-      {!compact && (
-        <div className="leading-tight">
-          <div className="text-sm font-bold">Basic to Advanced</div>
-          <div className="text-[11px] text-muted">All-in-one workspace</div>
+    <div className="flex items-center gap-2 px-2 py-1">
+      {compact ? <BrandMark className="h-8 w-8 text-fg" /> : (
+        <div className="min-w-0">
+          <Wordmark className="h-8 w-auto text-fg" />
+          <div className="mt-0.5 text-[11px] text-muted">Basic to Advanced workspace</div>
         </div>
       )}
     </div>

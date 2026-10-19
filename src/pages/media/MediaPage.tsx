@@ -298,7 +298,7 @@ function PreviewModal({ item, onClose, onTrash }: { item: MediaFile | null; onCl
       </>}>
       <div className="mb-4 overflow-hidden rounded-xl border border-line bg-raised">
         {!url ? <Spinner /> : k === 'image' ? (
-          <img src={url} alt={item.description || item.name} className="mx-auto max-h-[60vh] w-auto object-contain" />
+          <img decoding="async" src={url} alt={item.description || item.name} className="mx-auto max-h-[60vh] w-auto object-contain" />
         ) : k === 'video' ? (
           <video src={url} controls className="max-h-[60vh] w-full" aria-label={item.name} />
         ) : item.mime === 'application/pdf' ? (

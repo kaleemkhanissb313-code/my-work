@@ -16,7 +16,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
   { variant = 'soft', size = 'md', icon: Icon, loading, className, children, disabled, type = 'button', ...rest }, ref,
 ) {
   const v = { primary: 'btn-3d', soft: 'btn-soft', ghost: 'btn-ghost', danger: 'btn-danger' }[variant]
-  const s = { sm: 'h-8 px-3 text-xs', md: 'h-10 px-4 text-sm', lg: 'h-12 px-6 text-base' }[size]
+  const s = { sm: 'h-8 gap-1.5 px-3 text-xs', md: 'h-10 px-4 text-sm', lg: 'h-12 px-6 text-[15px]' }[size]
   return (
     <button ref={ref} type={type} className={cn('btn', v, s, className)} disabled={disabled || loading} aria-busy={loading || undefined} {...rest}>
       {loading ? <Loader2 className="h-4 w-4 animate-spin" aria-hidden /> : Icon ? <Icon className="h-4 w-4 shrink-0" aria-hidden /> : null}
@@ -28,7 +28,7 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button
 export function IconButton({ icon: Icon, label, className, active, ...rest }: ButtonHTMLAttributes<HTMLButtonElement> & { icon: LucideIcon; label: string; active?: boolean }) {
   return (
     <button type="button" aria-label={label} title={label} aria-pressed={active}
-      className={cn('btn btn-ghost h-9 w-9 shrink-0 rounded-xl', active && 'text-accent', className)} {...rest}>
+      className={cn('btn btn-ghost h-9 w-9 shrink-0 rounded-xl', active && 'bg-accent/10 text-accent', className)} {...rest}>
       <Icon className="h-4 w-4" aria-hidden />
     </button>
   )
@@ -126,12 +126,12 @@ export function Spinner({ label = 'Loading' }: { label?: string }) {
 
 export function PageHeader({ title, description, icon: Icon, actions, tone }: { title: string; description?: string; icon?: LucideIcon; actions?: ReactNode; tone?: string }) {
   return (
-    <div className="mb-6 flex flex-wrap items-end justify-between gap-3">
-      <div className="flex min-w-0 items-center gap-3">
-        {Icon && <div className={cn('grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-raised shadow-inner', tone ?? 'text-accent')}><Icon className="h-5 w-5" aria-hidden /></div>}
+    <div className="mb-5 flex flex-wrap items-center justify-between gap-x-4 gap-y-3 sm:mb-6">
+      <div className="flex min-w-0 flex-1 items-center gap-3">
+        {Icon && <div className={cn('grid h-10 w-10 shrink-0 place-items-center rounded-xl bg-accent/10 sm:h-11 sm:w-11', tone ?? 'text-accent')}><Icon className="h-5 w-5" aria-hidden /></div>}
         <div className="min-w-0">
-          <h1 className="truncate text-xl font-bold tracking-tight sm:text-2xl">{title}</h1>
-          {description && <p className="text-sm text-muted">{description}</p>}
+          <h1 className="leading-tight">{title}</h1>
+          {description && <p className="mt-0.5 max-w-prose text-sm text-muted">{description}</p>}
         </div>
       </div>
       {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}

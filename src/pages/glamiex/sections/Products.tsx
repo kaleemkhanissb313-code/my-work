@@ -77,7 +77,7 @@ function ProductList() {
 
 function ThumbById({ id, alt, size }: { id?: string; alt: string; size: string }) {
   const m = useLiveQuery(async () => (id ? db.media.get(id) : undefined), [id])
-  return <div className={cn('shrink-0 overflow-hidden rounded-xl bg-raised', size)}>{m?.thumbnail ? <img src={m.thumbnail} alt={alt} className="h-full w-full object-cover" /> : <Package className="m-auto h-full w-1/2 text-muted" aria-hidden />}</div>
+  return <div className={cn('shrink-0 overflow-hidden rounded-xl bg-raised', size)}>{m?.thumbnail ? <img loading="lazy" decoding="async" src={m.thumbnail} alt={alt} className="h-full w-full object-cover" /> : <Package className="m-auto h-full w-1/2 text-muted" aria-hidden />}</div>
 }
 function ProductName({ p }: { p: ProductPerf }) {
   return <div className="flex items-center gap-2"><ThumbById id={p.product.imageIds[0]} alt={p.product.name} size="h-9 w-9" /><div className="min-w-0"><div className="truncate font-medium">{p.product.name}</div><div className="text-xs text-muted">{p.product.sku}{p.product.status !== 'active' && <Badge className="ml-1">{p.product.status}</Badge>}</div></div></div>

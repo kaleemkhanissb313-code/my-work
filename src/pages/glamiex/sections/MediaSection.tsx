@@ -48,7 +48,7 @@ export default function MediaSection() {
           {list.map((f) => (
             <li key={f.id} className="card overflow-hidden p-0">
               <button type="button" className="block aspect-square w-full bg-raised" onClick={() => setPreview({ url: URL.createObjectURL(f.blob), file: f })} aria-label={`Preview ${f.name}`}>
-                {f.thumbnail ? <img src={f.thumbnail} alt={f.name} className="h-full w-full object-cover" loading="lazy" /> : <span className="grid h-full place-items-center text-muted">{f.mime.startsWith('video/') ? <Video className="h-8 w-8" /> : <FileText className="h-8 w-8" />}</span>}
+                {f.thumbnail ? <img decoding="async" src={f.thumbnail} alt={f.name} className="h-full w-full object-cover" loading="lazy" /> : <span className="grid h-full place-items-center text-muted">{f.mime.startsWith('video/') ? <Video className="h-8 w-8" /> : <FileText className="h-8 w-8" />}</span>}
               </button>
               <div className="p-2">
                 <div className="truncate text-xs font-medium" title={f.name}>{f.name}</div>
@@ -71,7 +71,7 @@ export default function MediaSection() {
       )}
       <Modal open={!!preview} onClose={() => { if (preview) URL.revokeObjectURL(preview.url); setPreview(null) }} title={preview?.file.name ?? ''} wide
         footer={preview && <Button icon={Download} onClick={() => downloadBlob(preview.file.blob, preview.file.name)}>Download</Button>}>
-        {preview && (preview.file.mime.startsWith('image/') ? <img src={preview.url} alt={preview.file.name} className="mx-auto max-h-[70vh] rounded-xl object-contain" />
+        {preview && (preview.file.mime.startsWith('image/') ? <img decoding="async" src={preview.url} alt={preview.file.name} className="mx-auto max-h-[70vh] rounded-xl object-contain" />
           : preview.file.mime.startsWith('video/') ? <video src={preview.url} controls playsInline className="max-h-[70vh] w-full rounded-xl" />
           : preview.file.mime === 'application/pdf' ? <iframe src={preview.url} title={preview.file.name} className="h-[70vh] w-full rounded-xl" />
           : <p className="text-sm text-muted">No preview for this file type. Use Download.</p>)}

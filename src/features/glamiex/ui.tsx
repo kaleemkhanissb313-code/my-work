@@ -266,7 +266,7 @@ export function AttachmentField({ ids, onChange, accept = 'any', label, tag }: {
         {files?.filter(Boolean).map((f) => (
           <div key={f!.id} className="group relative h-20 w-20 overflow-hidden rounded-xl border border-line bg-raised">
             <button type="button" className="h-full w-full" onClick={() => open(f!.id)} aria-label={`Preview ${f!.name}`}>
-              {f!.thumbnail ? <img src={f!.thumbnail} alt={f!.name} className="h-full w-full object-cover" /> : (
+              {f!.thumbnail ? <img loading="lazy" decoding="async" src={f!.thumbnail} alt={f!.name} className="h-full w-full object-cover" /> : (
                 <span className="flex h-full flex-col items-center justify-center gap-1 p-1 text-[10px] text-muted">
                   {f!.mime.startsWith('video/') ? <Video className="h-5 w-5" aria-hidden /> : <Paperclip className="h-5 w-5" aria-hidden />}<span className="line-clamp-2 break-all">{f!.name}</span>
                 </span>
@@ -294,7 +294,7 @@ export function AttachmentField({ ids, onChange, accept = 'any', label, tag }: {
   )
 }
 function AttachmentPreview({ url, mime }: { url: string; mime: string }) {
-  if (mime.startsWith('image/')) return <img src={url} alt="Attachment preview" className="mx-auto max-h-[70vh] w-auto rounded-xl object-contain" />
+  if (mime.startsWith('image/')) return <img decoding="async" src={url} alt="Attachment preview" className="mx-auto max-h-[70vh] w-auto rounded-xl object-contain" />
   if (mime.startsWith('video/')) return <video src={url} controls className="max-h-[70vh] w-full rounded-xl" />
   if (mime === 'application/pdf') return <iframe src={url} title="PDF preview" className="h-[70vh] w-full rounded-xl" />
   return <a className="text-accent underline" href={url} download>Download file</a>

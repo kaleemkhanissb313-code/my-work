@@ -31,7 +31,7 @@ export function LockScreen() {
     <div className="fixed inset-0 z-[100] grid place-items-center bg-bg p-4">
       <form onSubmit={submit} className="card w-full max-w-sm p-6 text-center" aria-labelledby="lock-title">
         <div className="mx-auto mb-4 grid h-16 w-16 place-items-center rounded-2xl btn-3d"><Lock className="h-7 w-7" aria-hidden /></div>
-        <h1 id="lock-title" className="text-lg font-bold">Basic to Advanced is locked</h1>
+        <h1 id="lock-title" className="text-lg font-bold">workMYwork is locked</h1>
         <p className="mb-4 text-sm text-muted">Enter your PIN or app password to continue.</p>
         <label htmlFor="unlock-pin" className="sr-only">PIN or password</label>
         <Input id="unlock-pin" type="password" autoFocus autoComplete="current-password" inputMode="text" value={pin} onChange={(e) => setPin(e.target.value)} disabled={waiting} aria-invalid={!!error} aria-describedby="unlock-err" />

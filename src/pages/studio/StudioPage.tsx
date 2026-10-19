@@ -358,7 +358,7 @@ function FilterPanel({ preview, edits, set }: { preview: ImageBitmap | HTMLCanva
       <div className="grid grid-cols-3 gap-2">{FILTERS.map((f) => (
         <button key={f.id} type="button" onClick={() => set({ filter: f.id })} aria-pressed={edits.filter === f.id}
           className={cn('overflow-hidden rounded-xl border text-xs transition', edits.filter === f.id ? 'border-accent ring-2 ring-accent/40' : 'border-line hover:border-accent/50')}>
-          <div className="aspect-square bg-raised">{thumbs[f.id] && <img src={thumbs[f.id]} alt="" className="h-full w-full object-cover" />}</div>
+          <div className="aspect-square bg-raised">{thumbs[f.id] && <img loading="lazy" decoding="async" src={thumbs[f.id]} alt="" className="h-full w-full object-cover" />}</div>
           <div className="py-1">{f.label}</div>
         </button>
       ))}</div>
