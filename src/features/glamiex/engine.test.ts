@@ -30,6 +30,7 @@ const person = (id: string, type: GxPerson['type'] = 'customer', opening = 0): G
  *  Payments: Ali pays Rs 2,000 allocated to o1 (Oct 6); Ali deposit Rs 500 (Oct 8); owner contributes Rs 10,000 (Oct 1).
  */
 const data: GxData = {
+  returns: [], shipments: [], partners: [], riderPays: [], npPeople: [], npPayments: [],
   products: [product('shirt', 50000, 100000), product('bag', 120000, 200000)],
   stock: [],
   orders: [

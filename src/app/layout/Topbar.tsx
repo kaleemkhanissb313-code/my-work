@@ -60,14 +60,13 @@ export function Topbar({ onMenu, onSearch }: { onMenu: () => void; onSearch: () 
   return (
     <header className="glass sticky top-0 z-30 flex h-14 items-center gap-2 border-x-0 border-t-0 px-3 sm:px-4">
       <IconButton icon={Menu} label="Open menu" className="lg:hidden" onClick={onMenu} />
-      <button type="button" onClick={onSearch} className="input flex h-9 max-w-md flex-1 items-center gap-2 text-left text-muted" aria-label="Search and commands (Ctrl+K)">
-        <Search className="h-4 w-4" aria-hidden /><span className="flex-1 truncate">Search everything…</span><span className="kbd hidden sm:inline-flex">Ctrl K</span>
+      <button type="button" onClick={onSearch} className="input flex h-9 min-w-0 max-w-md flex-1 items-center gap-2 text-left text-muted" aria-label="Search and commands (Ctrl+K)">
+        <Search className="h-4 w-4 shrink-0" aria-hidden /><span className="min-w-0 flex-1 truncate">Search everything…</span><span className="kbd hidden sm:inline-flex">Ctrl K</span>
       </button>
-      <div className="ml-auto flex items-center gap-1">
+      <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
         <button type="button" onClick={() => openQuickAdd()} title="Smart quick add (Q)" className="btn btn-soft hidden h-9 px-3 text-sm md:inline-flex">
           <Wand2 className="h-4 w-4 text-accent" aria-hidden />Quick add<span className="kbd">Q</span>
         </button>
-        <IconButton icon={Wand2} label="Smart quick add (Q)" className="md:hidden" onClick={() => openQuickAdd()} />
         <Menu_ label="Create new" icon={Plus} buttonClass="btn-3d text-white hover:text-white">
           {(close) => <>
             <div className="px-3 pb-1 pt-1 text-[11px] font-semibold uppercase tracking-wide text-muted">Create</div>
@@ -111,7 +110,7 @@ export function Topbar({ onMenu, onSearch }: { onMenu: () => void; onSearch: () 
             <p className="px-3 pt-2 text-[11px] text-muted">Reminders are checked while the app is open. Background push/email reminders are not enabled.</p>
           </>}
         </Menu_>
-        <IconButton icon={ThemeIcon} label={`Theme: ${s.theme} (click to change)`} onClick={cycleTheme} />
+        <IconButton icon={ThemeIcon} className="max-[419px]:hidden" label={`Theme: ${s.theme} (click to change)`} onClick={cycleTheme} />
         {hasPin && <IconButton icon={Lock} label="Lock app (Ctrl+Shift+L)" onClick={() => void lockApp('manual')} />}
         <Menu_ label="Profile" icon={User}>
           {(close) => <>

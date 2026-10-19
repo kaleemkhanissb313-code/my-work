@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router-dom'
 import {
   ArrowLeftRight, BarChart3, CalendarDays, CalendarRange, Calendar as CalendarIcon, ChevronsLeft, ChevronsRight, FileBarChart, Gem, Images, LayoutDashboard,
-  LayoutGrid, Megaphone, Package, Receipt, Scale, Settings2, Sheet, ShoppingCart, TrendingUp, Users, Wallet, X,
+  LayoutGrid, Megaphone, Bike, HandCoins, Truck, Undo2, ClipboardList, Package, Receipt, Scale, Settings2, Sheet, ShoppingCart, TrendingUp, Users, Wallet, X,
 } from 'lucide-react'
 import { Spinner } from '@/components/ui'
 import { cn } from '@/lib/cn'
@@ -16,6 +16,11 @@ export const GX_SECTIONS = [
   { id: 'sales', label: 'Sales & Orders', icon: ShoppingCart },
   { id: 'people', label: 'Customers & People', icon: Users },
   { id: 'payments', label: 'Deposits & Payments', icon: Wallet },
+  { id: 'names', label: 'Names & Payments', icon: HandCoins },
+  { id: 'returns', label: 'Returns and Refunds', icon: Undo2 },
+  { id: 'deliveries', label: 'Deliveries and Shipments', icon: Truck },
+  { id: 'riders', label: 'Delivery Partners & Riders', icon: Bike },
+  { id: 'logistics-reports', label: 'Return & Delivery Reports', icon: ClipboardList },
   { id: 'ad-income', label: 'Advertising Revenue', icon: TrendingUp },
   { id: 'ad-spend', label: 'Advertising Expenses', icon: Megaphone },
   { id: 'expenses', label: 'Business Expenses', icon: Receipt },
@@ -49,6 +54,11 @@ const Transactions = lazy(() => import('./sections/Transactions'))
 const Reports = lazy(() => import('./sections/Reports'))
 const SettingsSection = lazy(() => import('./sections/SettingsSection'))
 const Sheets = lazy(() => import('./sections/Sheets'))
+const NamesPayments = lazy(() => import('./sections/NamesPayments'))
+const Returns = lazy(() => import('./sections/Returns'))
+const Deliveries = lazy(() => import('./sections/Deliveries'))
+const Riders = lazy(() => import('./sections/Riders'))
+const LogisticsReports = lazy(() => import('./sections/LogisticsReports'))
 
 const typing = (t: EventTarget | null) => { const el = t as HTMLElement | null; return !!el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) }
 
@@ -96,6 +106,11 @@ export function GlamiexPage() {
       case 'reports': return <Reports />
       case 'settings': return <SettingsSection />
       case 'sheets': return <Sheets id={id} />
+      case 'names': return <NamesPayments />
+      case 'returns': return <Returns id={id} />
+      case 'deliveries': return <Deliveries id={id} />
+      case 'riders': return <Riders id={id} />
+      case 'logistics-reports': return <LogisticsReports />
     }
   }
 

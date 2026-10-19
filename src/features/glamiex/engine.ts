@@ -8,7 +8,8 @@
  *     and is NOT revenue (reported separately).
  *  3. COGS uses the unit-cost snapshot stored on each sale; restocked refund units reverse their COGS.
  *  4. Gross profit = net sales − COGS.
- *     Net profit = gross profit + advertising income − advertising spend − business expenses.
+ *     Net profit = gross profit + advertising income − advertising spend − business expenses
+ *                  + delivery charges collected − delivery costs (rider earnings / courier costs) − return costs.
  *  5. Advertising income is recognised on its report date (net, converted to PKR).
  *     Advertising spend is spread evenly per day across the campaign's start–end dates (so a monthly campaign
  *     counts in each week it ran). In cash reports, ad spend is treated as paid on the campaign start date.
@@ -23,8 +24,12 @@ import { bucketOf, bucketsInRange, daysInclusive, inRange, zoned, type DateRange
 import { addDays } from 'date-fns'
 import { parseDate, toISODate } from '@/lib/dates'
 import { safeRatio } from './money'
+import { logisticsDaily, type LgData } from './logistics'
+import type { NpPayment, NpPerson } from './logisticsTypes'
 
-export interface GxData {
+export interface GxData extends LgData {
+  npPeople: NpPerson[]
+  npPayments: NpPayment[]
   products: GxProduct[]
   stock: GxStockMove[]
   orders: GxOrder[]
@@ -69,10 +74,12 @@ export interface Agg {
   units: number; refundUnits: number; orders: number
   adIncome: Paisa; adSpend: Paisa; expenses: Paisa
   cashIn: Paisa; cashOut: Paisa; customerReceipts: Paisa; deposits: Paisa; financing: Paisa; drawings: Paisa
+  deliveryIncome: Paisa; deliveryCost: Paisa; returnCost: Paisa; riderPaid: Paisa
 }
 const emptyAgg = (): Agg => ({
   grossSales: 0, discounts: 0, tax: 0, refunds: 0, cogs: 0, refundCost: 0, units: 0, refundUnits: 0, orders: 0,
   adIncome: 0, adSpend: 0, expenses: 0, cashIn: 0, cashOut: 0, customerReceipts: 0, deposits: 0, financing: 0, drawings: 0,
+  deliveryIncome: 0, deliveryCost: 0, returnCost: 0, riderPaid: 0,
 })
 const addAgg = (a: Agg, b: Partial<Agg>) => { for (const k in b) (a as unknown as Record<string, number>)[k] += (b as Record<string, number>)[k] ?? 0 }
 
@@ -134,6 +141,12 @@ export function dailyAgg(d: GxData, r: DateRange, tz: string): Map<string, Agg> 
     if (p.type === 'owner_contribution' || p.type === 'loan_in') a.financing += p.amount
     if (p.type === 'owner_drawing') a.drawings += p.amount
   }
+  // Returns, deliveries and rider settlements (rider payments are cash out against the payable, not expenses).
+  logisticsDaily(d, r, tz, (date, x) => {
+    const a = at(date)
+    a.deliveryIncome += x.deliveryIncome ?? 0; a.deliveryCost += x.deliveryCost ?? 0; a.returnCost += x.returnCost ?? 0
+    a.riderPaid += x.riderPaid ?? 0; a.cashOut += (x.riderPaid ?? 0) + (x.directLogisticsCash ?? 0)
+  })
   return m
 }
 
@@ -145,7 +158,7 @@ export function metricsFrom(a: Agg): Metrics {
   const netSales = a.grossSales - a.discounts - a.refunds
   const netCogs = a.cogs - a.refundCost
   const grossProfit = netSales - netCogs
-  const netProfit = grossProfit + a.adIncome - a.adSpend - a.expenses
+  const netProfit = grossProfit + a.adIncome - a.adSpend - a.expenses + a.deliveryIncome - a.deliveryCost - a.returnCost
   return {
     ...a, netSales, netCogs, grossProfit, netProfit, netUnits: a.units - a.refundUnits,
     aov: a.orders ? Math.round(netSales / a.orders) : null,
@@ -277,6 +290,8 @@ export function distribution(d: GxData, r: DateRange, tz: string) {
   const rows = [
     { name: 'Cost of goods', value: m.netCogs },
     { name: 'Advertising spend', value: m.adSpend },
+    { name: 'Delivery costs', value: m.deliveryCost },
+    { name: 'Return costs', value: m.returnCost },
     ...[...cats].map(([name, value]) => ({ name, value })),
     { name: 'Net profit', value: Math.max(0, m.netProfit) },
   ].filter((x) => x.value > 0)

@@ -33,11 +33,12 @@ export function useGxSettings(): GxSettings {
 /* ---------------- Live data ---------------- */
 export function useGxData(): GxData | undefined {
   return useLiveQuery(async () => {
-    const [products, stock, orders, refunds, people, payments, adIncome, adSpend, expenses] = await Promise.all([
+    const [products, stock, orders, refunds, people, payments, adIncome, adSpend, expenses, returns, shipments, partners, riderPays, npPeople, npPayments] = await Promise.all([
       db.gxProducts.toArray(), db.gxStock.toArray(), db.gxOrders.toArray(), db.gxRefunds.toArray(), db.gxPeople.toArray(),
       db.gxPayments.toArray(), db.gxAdIncome.toArray(), db.gxAdSpend.toArray(), db.gxExpenses.toArray(),
+      db.gxReturns.toArray(), db.gxShipments.toArray(), db.gxPartners.toArray(), db.gxRiderPays.toArray(), db.npPeople.toArray(), db.npPayments.toArray(),
     ])
-    return { products, stock, orders, refunds, people, payments, adIncome, adSpend, expenses }
+    return { products, stock, orders, refunds, people, payments, adIncome, adSpend, expenses, returns, shipments, partners, riderPays, npPeople, npPayments }
   }, [])
 }
 
@@ -60,7 +61,7 @@ export async function saveRecord<T extends { id: string }>(repo: { create: (d: P
 }
 
 /* ---------------- Numbering ---------------- */
-async function nextNo(key: string, prefix: string) {
+export async function nextNo(key: string, prefix: string) {
   const row = await db.kv.get(`gx.seq.${key}`)
   const n = ((row?.value as number) ?? 0) + 1
   await db.kv.put({ key: `gx.seq.${key}`, value: n })
@@ -68,7 +69,7 @@ async function nextNo(key: string, prefix: string) {
 }
 export const normaliseSku = (s: string) => s.trim().toUpperCase().replace(/\s+/g, '-')
 
-const isConstraint = (e: unknown) => e instanceof Dexie.ConstraintError || (e as { name?: string })?.name === 'ConstraintError' ||
+export const isConstraint = (e: unknown) => e instanceof Dexie.ConstraintError || (e as { name?: string })?.name === 'ConstraintError' ||
   (e as { inner?: { name?: string } })?.inner?.name === 'ConstraintError'
 
 const stockMove = (id: string, productId: string, qty: number, reason: StockReason, refId: string | null, note: string, at = new Date().toISOString()): GxStockMove =>

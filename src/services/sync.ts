@@ -13,6 +13,7 @@ export const SYNC_TABLES: Record<EntityTableName, string> = {
   vault: 'vault_items', palettes: 'palettes',
   gxProducts: 'gx_products', gxStock: 'gx_stock_moves', gxOrders: 'gx_orders', gxRefunds: 'gx_refunds', gxPeople: 'gx_people',
   gxPayments: 'gx_payments', gxAdIncome: 'gx_ad_income', gxAdSpend: 'gx_ad_spend', gxExpenses: 'gx_expenses', gxSheets: 'gx_sheets',
+  gxReturns: 'gx_returns', gxShipments: 'gx_shipments', gxPartners: 'gx_partners', gxRiderPays: 'gx_rider_payments', npPeople: 'np_people', npPayments: 'np_payments',
 }
 
 interface RemoteRow { id: string; data: Record<string, unknown>; updated_at_ms: number; version: number; deleted_at_ms: number | null; server_updated_at: string }

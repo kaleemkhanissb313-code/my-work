@@ -7,6 +7,7 @@ import type {
   GxAdIncome, GxAdSpend, GxAuditEvent, GxExpense, GxOrder, GxPayment, GxPerson, GxProduct, GxRefund, GxStockMove,
 } from '@/features/glamiex/types'
 import type { GxSheet } from '@/features/sheets/types'
+import type { GxPartner, GxReturn, GxRiderPayment, GxShipment, NpPayment, NpPerson } from '@/features/glamiex/logisticsTypes'
 
 /** Local-first IndexedDB store. All UI reads go through here; cloud sync mirrors it when configured. */
 export class AppDB extends Dexie {
@@ -42,6 +43,12 @@ export class AppDB extends Dexie {
   gxExpenses!: EntityTable<GxExpense, 'id'>
   gxAudit!: EntityTable<GxAuditEvent, 'id'>
   gxSheets!: EntityTable<GxSheet, 'id'>
+  gxReturns!: EntityTable<GxReturn, 'id'>
+  gxShipments!: EntityTable<GxShipment, 'id'>
+  gxPartners!: EntityTable<GxPartner, 'id'>
+  gxRiderPays!: EntityTable<GxRiderPayment, 'id'>
+  npPeople!: EntityTable<NpPerson, 'id'>
+  npPayments!: EntityTable<NpPayment, 'id'>
 
   constructor(name = 'basic-to-advanced') {
     super(name)
@@ -82,6 +89,15 @@ export class AppDB extends Dexie {
     })
     // v3: GLAMIEX Overall Sheets (user-created spreadsheets)
     this.version(3).stores({ gxSheets: 'id, order, updatedAt, deletedAt' })
+    // v4: returns, deliveries, delivery partners & rider settlements; Names & Payments. Additive only — existing data is untouched.
+    this.version(4).stores({
+      gxReturns: 'id, &returnNo, orderId, productId, status, at, pickupPartnerId, deletedAt',
+      gxShipments: 'id, &shipmentNo, orderId, partnerId, status, finalAt, deletedAt',
+      gxPartners: 'id, name, status, deletedAt',
+      gxRiderPays: 'id, &settlementNo, partnerId, at',
+      npPeople: 'id, name, deletedAt',
+      npPayments: 'id, &receiptNo, personId, at',
+    })
   }
 }
 
@@ -91,5 +107,6 @@ export const db = new AppDB()
 export const entityTables = [
   'docs', 'folders', 'projects', 'tasks', 'events', 'media', 'bookmarks', 'timerSessions', 'datasets', 'records', 'habitLogs', 'vault', 'palettes',
   'gxProducts', 'gxStock', 'gxOrders', 'gxRefunds', 'gxPeople', 'gxPayments', 'gxAdIncome', 'gxAdSpend', 'gxExpenses', 'gxSheets',
+  'gxReturns', 'gxShipments', 'gxPartners', 'gxRiderPays', 'npPeople', 'npPayments',
 ] as const
 export type EntityTableName = (typeof entityTables)[number]

@@ -6,6 +6,7 @@ import type { GxData } from '@/features/glamiex/engine'
 const TZ = 'Asia/Karachi'
 const base = { createdAt: 0, updatedAt: 0, deletedAt: null, archived: false, favorite: false, pinned: false, tags: [], version: 1 }
 const data: GxData = {
+  returns: [], shipments: [], partners: [], riderPays: [], npPeople: [], npPayments: [],
   products: [{ ...base, id: 'p', name: 'Shirt', sku: 'S', category: 'Top', description: '', buyPrice: 50000, sellPrice: 100000, lowStockAt: 2, status: 'active', supplierName: '', supplierContact: '', imageIds: [], videoIds: [], dateAdded: '2026-01-01' }],
   stock: [{ ...base, id: 'opening:p', productId: 'p', qty: 10, reason: 'opening', refId: 'p', note: '', at: wallToIso('2026-10-01', '09:00', TZ) },
     { ...base, id: 'sale:o1:p', productId: 'p', qty: -3, reason: 'sale', refId: 'o1', note: '', at: wallToIso('2026-10-05', '12:00', TZ) },

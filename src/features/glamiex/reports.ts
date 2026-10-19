@@ -31,6 +31,9 @@ export function pnlLines(d: GxData, r: DateRange, tz: string) {
     { label: 'Gross profit', cur: cur.grossProfit, prev: prev.grossProfit, kind: 'sub' },
     { label: 'Advertising income', cur: cur.adIncome, prev: prev.adIncome, kind: 'line' },
     { label: 'Advertising spend', cur: -cur.adSpend, prev: -prev.adSpend, kind: 'indent' },
+    { label: 'Delivery charges collected', cur: cur.deliveryIncome, prev: prev.deliveryIncome, kind: 'line' },
+    { label: 'Delivery costs (riders & couriers)', cur: -cur.deliveryCost, prev: -prev.deliveryCost, kind: 'indent' },
+    { label: 'Return costs (shipping, pickup, handling)', cur: -cur.returnCost, prev: -prev.returnCost, kind: 'indent' },
     ...[...cats].filter(([, v]) => v[0] || v[1]).map(([k, v]) => ({ label: `Expense: ${k}`, cur: -v[0], prev: -v[1], kind: 'indent' as const })),
     { label: 'Net profit', cur: cur.netProfit, prev: prev.netProfit, kind: 'total' },
   ]

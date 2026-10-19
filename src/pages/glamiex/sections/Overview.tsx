@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { AlertTriangle, Package, Plus, ShoppingCart } from 'lucide-react'
+import { logisticsSummary } from '@/features/glamiex/logistics'
 import { distribution, hourly, productPerformance, series, summary, weekdayTotals, orderBalance, orderTotal } from '@/features/glamiex/engine'
 import { autoGrouping, previousRange, zoned, type Grouping } from '@/features/glamiex/time'
 import { KpiCard, Money, PayBadge, RangeBar, Section, useRange } from '@/features/glamiex/ui'
@@ -21,11 +22,28 @@ export default function Overview() {
     return {
       cur, prev, series: series(data, range, g, tz), daily: series(data, range, 'day', tz), hourly: hourly(data, range, tz), weekday: weekdayTotals(data, range, tz),
       dist: distribution(data, range, tz), perf: productPerformance(data, range, tz),
+      lg: logisticsSummary(data, range, tz, cur.units), lgPrev: logisticsSummary(data, previousRange(range), tz, prev.units),
       lowStock: productPerformance(data, null, tz).filter((p) => p.product.status === 'active' && p.stock <= p.product.lowStockAt).sort((a, b) => a.stock - b.stock),
     }
   }, [data, range.from, range.to, g, tz]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const { cur, prev } = v
+  const { cur, prev, lg, lgPrev } = v
+  const lgKpis = [
+    { label: 'Total returned products', value: lg.returnedUnits, prev: lgPrev.returnedUnits, kind: 'count' as const, invert: true, to: 'returns' },
+    { label: 'Return rate', value: lg.returnRate, prev: lgPrev.returnRate ?? 0, kind: 'pct' as const, invert: true, to: 'returns', sub: 'of units sold' },
+    { label: 'Total refunds', value: cur.refunds, prev: prev.refunds, invert: true, to: 'returns' },
+    { label: 'Return shipping costs', value: lg.returnShipping, prev: lgPrev.returnShipping, invert: true, to: 'returns' },
+    { label: 'Returned stock buying cost', value: lg.returnedStockCost, prev: lgPrev.returnedStockCost, to: 'returns', sub: 'informational' },
+    { label: 'Delivered orders', value: lg.deliveredOrders, prev: lgPrev.deliveredOrders, kind: 'count' as const, to: 'deliveries' },
+    { label: 'Products delivered', value: lg.productsDelivered, prev: lgPrev.productsDelivered, kind: 'count' as const, to: 'deliveries' },
+    { label: 'Failed deliveries', value: lg.failed, prev: lgPrev.failed, kind: 'count' as const, invert: true, to: 'deliveries' },
+    { label: 'Total delivery expenses', value: lg.deliveryExpense, prev: lgPrev.deliveryExpense, invert: true, to: 'deliveries' },
+    { label: 'Rider earnings', value: lg.riderEarnings, prev: lgPrev.riderEarnings, to: 'riders' },
+    { label: 'Rider payments made', value: lg.riderPaid, prev: lgPrev.riderPaid, to: 'riders' },
+    { label: 'Outstanding rider payments', value: lg.outstanding, prev: lgPrev.outstanding, invert: true, tone: lg.outstanding > 0 ? 'warn' as const : undefined, to: 'riders' },
+    { label: 'Reverse delivery expenses', value: lg.reverseDelivery, prev: lgPrev.reverseDelivery, invert: true, to: 'returns' },
+    { label: 'Net return & delivery impact', value: lg.netImpact, prev: lgPrev.netImpact, tone: 'auto' as const, to: 'logistics-reports' },
+  ]
   const recent = useMemo(() => live(data.orders).sort((a, b) => b.at.localeCompare(a.at)).slice(0, 6), [data.orders])
   const isEmpty = !live(data.products).length && !live(data.orders).length
 
@@ -63,6 +81,12 @@ export default function Overview() {
       <div className="grid grid-cols-2 gap-3 max-[359px]:grid-cols-1 lg:grid-cols-4 2xl:grid-cols-7">
         {kpis.map((k, i) => <KpiCard key={k.label} {...k} to={`/glamiex/${k.to}`} delay={i * 25} />)}
       </div>
+      <Section title="Returns & deliveries" icon={ShoppingCart} defaultOpen={lg.returns > 0 || lg.deliveredOrders > 0 || lg.failed > 0 || live(data.shipments).length > 0}>
+        <div className="grid grid-cols-2 gap-3 max-[359px]:grid-cols-1 lg:grid-cols-4 2xl:grid-cols-7">
+          {lgKpis.map((k, i) => <KpiCard key={k.label} {...k} to={`/glamiex/${k.to}`} delay={i * 20} />)}
+        </div>
+        <p className="mt-2 text-xs text-muted">Refunds reduce net sales once; restocked returns reverse their cost once. Rider payments settle rider earnings already counted as delivery expenses.</p>
+      </Section>
       <p className="text-xs text-muted">Arrows compare with the previous equivalent period ({previousRange(range).from} → {previousRange(range).to}). Cash received this period: <Money v={cur.customerReceipts} /> from customers · tax collected <Money v={cur.tax} /> (not revenue).</p>
 
       {v.lowStock.length > 0 && (

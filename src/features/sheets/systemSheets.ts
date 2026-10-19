@@ -10,8 +10,9 @@ import { pnlLines } from '@/features/glamiex/reports'
 import { PAYMENT_TYPES } from '@/features/glamiex/types'
 import { pctChange } from '@/features/glamiex/money'
 import type { CellFmt, ColType, CondRule, SheetCol, TotalFn } from './types'
+import { buildLogisticsSheet, LOGISTICS_SHEETS, type LogisticsKey } from './logisticsSheets'
 
-export type SystemKey = 'overview' | 'products' | 'sales' | 'people' | 'payments' | 'ad-income' | 'ad-spend' | 'expenses' | 'pnl' | 'stock' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+export type SystemKey = LogisticsKey | 'overview' | 'products' | 'sales' | 'people' | 'payments' | 'ad-income' | 'ad-spend' | 'expenses' | 'pnl' | 'stock' | 'daily' | 'weekly' | 'monthly' | 'yearly'
 export const SYSTEM_SHEETS: { key: SystemKey; title: string; ranged: boolean; desc: string }[] = [
   { key: 'overview', title: 'Business Overview Sheet', ranged: true, desc: 'All key totals for the period vs the previous period' },
   { key: 'products', title: 'Products Sheet', ranged: true, desc: 'Prices, profit, stock and sales per product (prices editable)' },
@@ -27,6 +28,7 @@ export const SYSTEM_SHEETS: { key: SystemKey; title: string; ranged: boolean; de
   { key: 'weekly', title: 'Weekly Report Sheet', ranged: true, desc: 'Week-by-week totals' },
   { key: 'monthly', title: 'Monthly Report Sheet', ranged: true, desc: 'Month-by-month totals' },
   { key: 'yearly', title: 'Yearly Report Sheet', ranged: true, desc: 'Year-by-year totals' },
+  ...LOGISTICS_SHEETS,
 ]
 
 export interface LiveRow { id: string; cells: Record<string, string | number | null>; link?: string }
@@ -154,5 +156,6 @@ export function buildSystemSheet(key: SystemKey, d: GxData, r: DateRange, tz: st
         totals: sumOf(['orders', 'units', 'sales', 'cogs', 'gp', 'ai', 'as', 'exp', 'np', 'cin', 'cout', 'dep']), rules: profitRules(['gp', 'np']),
       }
     }
+    default: return buildLogisticsSheet(key, d, r, tz)
   }
 }

@@ -161,7 +161,7 @@ export interface GxExpense extends BaseEntity {
   attachmentIds: ID[]
 }
 
-export type GxEntity = 'product' | 'order' | 'refund' | 'person' | 'payment' | 'adIncome' | 'adSpend' | 'expense' | 'stock' | 'settings' | 'sheet'
+export type GxEntity = 'product' | 'order' | 'refund' | 'person' | 'payment' | 'adIncome' | 'adSpend' | 'expense' | 'stock' | 'settings' | 'sheet' | 'return' | 'shipment' | 'partner' | 'riderPayment' | 'npPerson' | 'npPayment'
 export interface GxAuditEvent { id: string; at: number; entity: GxEntity; entityId: string; action: 'create' | 'update' | 'cancel' | 'refund' | 'void' | 'delete' | 'restore' | 'adjust'; summary: string }
 
 export type GxPreset = 'neon' | 'glass' | 'executive' | 'aurora' | 'minimal'
@@ -199,3 +199,5 @@ export const PAYMENT_TYPES: { id: PaymentType; label: string; dir: 'in' | 'out' 
   { id: 'adjustment', label: 'Balance adjustment / write-off', dir: 'none', hint: 'No cash; corrects what the person owes' },
 ]
 export const DEFAULT_EXPENSE_CATEGORIES = ['Shipping', 'Packaging', 'Salaries', 'Rent', 'Utilities', 'Subscriptions', 'Marketing', 'Software', 'Bank fees', 'Miscellaneous']
+
+export * from './logisticsTypes'
