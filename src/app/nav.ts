@@ -1,6 +1,6 @@
 import {
   Banknote, BarChart3, Briefcase, Calculator, CalendarDays, CheckSquare, FileText, FolderKanban, GanttChart, Hash, Heart, Home,
-  Gem, Image, LayoutDashboard, Link2, Lock, NotebookPen, Palette, Settings, ShieldCheck, Timer, Trash2, Type, LayoutTemplate, PieChart, type LucideIcon,
+  Gem, Image, ImagePlus, LayoutDashboard, Link2, Lock, NotebookPen, Palette, Settings, ShieldCheck, Timer, Trash2, Type, LayoutTemplate, PieChart, type LucideIcon,
 } from 'lucide-react'
 
 export interface NavLeaf { id: string; label: string; path: string; icon: LucideIcon; shortcut?: string }
@@ -34,6 +34,7 @@ export const NAV: NavGroup[] = [
   {
     id: 'ml', label: 'Media & Links', icon: Image, children: [
       { id: 'media', label: 'Media Library', path: '/media', icon: Image },
+      { id: 'studio', label: 'Image Studio', path: '/studio', icon: ImagePlus },
       { id: 'links', label: 'Links & Bookmarks', path: '/links', icon: Link2 },
     ],
   },

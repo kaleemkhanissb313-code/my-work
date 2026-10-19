@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
-import { CheckCircle2, Download, FileText, FileVideo, HardDrive, Image as ImageIcon, Images, Search, Star, Trash2, Upload, X, XCircle } from 'lucide-react'
+import { CheckCircle2, Download, Wand2, FileText, FileVideo, HardDrive, Image as ImageIcon, Images, Search, Star, Trash2, Upload, X, XCircle } from 'lucide-react'
 import { db } from '@/lib/db'
 import { uid } from '@/lib/id'
 import { baseEntity } from '@/services/repo'
@@ -224,6 +224,7 @@ export function MediaPage() {
                         <IconButton icon={Star} label={m.favorite ? 'Remove from favorites' : 'Add to favorites'} active={m.favorite} className="h-8 w-8"
                           onClick={() => void safeWrite(() => mediaRepo.toggle(m.id, 'favorite'))} />
                         <IconButton icon={Download} label={`Download ${m.name}`} className="h-8 w-8" onClick={() => downloadBlob(m.blob, m.name)} />
+                        {kindOf(m.mime) === 'image' && m.mime !== 'image/svg+xml' && <Link to={`/studio?media=${m.id}`} className="btn btn-ghost h-8 w-8 rounded-xl" aria-label={`Edit ${m.name} in Image Studio`} title="Edit in Image Studio"><Wand2 className="h-4 w-4" aria-hidden /></Link>}
                         <IconButton icon={Trash2} label={`Move ${m.name} to trash`} className="ml-auto h-8 w-8" onClick={() => void trash(m)} />
                       </div>
                     </div>
@@ -292,6 +293,7 @@ function PreviewModal({ item, onClose, onTrash }: { item: MediaFile | null; onCl
       footer={<>
         <Button variant="ghost" icon={Trash2} onClick={() => onTrash(item)} className="mr-auto">Move to trash</Button>
         <Button icon={Download} onClick={() => downloadBlob(item.blob, item.name)}>Download</Button>
+        {item.mime.startsWith('image/') && item.mime !== 'image/svg+xml' && <Link to={`/studio?media=${item.id}`} className="btn btn-soft h-10 px-4 text-sm"><Wand2 className="h-4 w-4" aria-hidden />Edit in Image Studio</Link>}
         <Button variant="primary" loading={saving} onClick={() => void save()}>Save changes</Button>
       </>}>
       <div className="mb-4 overflow-hidden rounded-xl border border-line bg-raised">

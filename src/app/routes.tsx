@@ -34,6 +34,7 @@ const TrashPage = p(() => import('@/pages/TrashPage'), 'TrashPage')
 const SettingsPage = p(() => import('@/pages/SettingsPage'), 'SettingsPage')
 const AuthPage = p(() => import('@/pages/AuthPage'), 'AuthPage')
 const GlamiexPage = p(() => import('@/pages/glamiex/GlamiexPage'), 'GlamiexPage')
+const StudioPage = p(() => import('@/pages/studio/StudioPage'), 'StudioPage')
 
 export const router = createBrowserRouter([
   {
@@ -56,6 +57,7 @@ export const router = createBrowserRouter([
       { path: 'notes/:id', element: <DocEditor /> },
       { path: 'templates', element: <DocsPage kind="template" /> },
       { path: 'media', element: <MediaPage /> },
+      { path: 'studio', element: <StudioPage /> },
       { path: 'links', element: <LinksPage /> },
       { path: 'time', element: <TimePage /> },
       { path: 'calculator', element: <CalculatorPage /> },
