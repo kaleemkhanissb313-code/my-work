@@ -2,7 +2,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
-import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 export default defineConfig({
   plugins: [
@@ -14,18 +14,23 @@ export default defineConfig({
         name: 'workMYwork — Basic to Advanced',
         short_name: 'workMYwork',
         description: 'All-in-one workspace for life, home, work, projects, files, time and data.',
-        theme_color: '#0b1020',
-        background_color: '#0b1020',
+        theme_color: '#111317',
+        background_color: '#111317',
         display: 'standalone',
         start_url: '/',
         icons: [
           { src: 'icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'any maskable' },
         ],
       },
-      workbox: { globPatterns: ['**/*.{js,css,html,svg,woff2}'], maximumFileSizeToCacheInBytes: 5 * 1024 * 1024 },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,woff2}'],
+        // Only Latin font files are needed offline; other scripts still load on demand via unicode-range.
+        globIgnores: ['**/*-{cyrillic,cyrillic-ext,greek,greek-ext,vietnamese}-*.woff2'],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024,
+      },
     }),
   ],
-  resolve: { alias: { '@': path.resolve(__dirname, 'src') } },
+  resolve: { alias: { '@': fileURLToPath(new URL('./src', import.meta.url)) } },
   server: { port: 5173, strictPort: true },
   build: {
     chunkSizeWarningLimit: 1500,

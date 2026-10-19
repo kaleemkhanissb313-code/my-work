@@ -23,6 +23,7 @@ import { trackRecent } from '@/services/recents'
 import { ColorPicker, docPath } from '@/features/docs/shared'
 import { cn } from '@/lib/cn'
 import type { Area, Doc } from '@/types/models'
+import { escapeHtml } from '@/lib/html'
 
 const AUTOSAVE_MS = 800
 const AREAS: Area[] = ['personal', 'work', 'home', 'life']
@@ -41,7 +42,6 @@ const readDraft = (id: string): Draft | null => {
 const writeDraft = (id: string, d: Draft) => { try { localStorage.setItem(draftKey(id), JSON.stringify(d)) } catch { /* quota / private mode */ } }
 const clearDraft = (id: string) => { try { localStorage.removeItem(draftKey(id)) } catch { /* ignore */ } }
 
-const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 const isSafeHref = (href: string | null | undefined) => !!href && /^(https?:\/\/|mailto:)/i.test(href.trim())
 const fileBase = (title: string) => (title.trim() || 'document').replace(/[\\/:*?"<>|]+/g, '-').slice(0, 80)
 const fmtTime = (t: number) => new Date(t).toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })

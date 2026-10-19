@@ -5,8 +5,8 @@ import { parseDate, toISODate } from '@/lib/dates'
 import { baseEntity, docsRepo, projectsRepo } from '@/services/repo'
 import type { Area, Project, Task } from '@/types/models'
 import type { ProjectTemplate } from './templates'
+import { escapeHtml } from '@/lib/html'
 
-const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))
 
 /** Pure: build the task rows for a template starting on `start` (yyyy-MM-dd). */
 export function planTasks(tpl: ProjectTemplate, start: string, projectId: string, area: Area): Task[] {
@@ -39,7 +39,7 @@ export async function createProjectFromTemplate(tpl: ProjectTemplate, opts: { na
     await db.tasks.bulkAdd(tasks)
     if (opts.withBrief) {
       const phases = [...new Set(tpl.tasks.map((x) => x.phase))]
-      const content = `<p>${esc(tpl.description)}</p>${tpl.brief.map((h) => `<h2>${esc(h)}</h2><p></p>`).join('')}<h2>Phases</h2><ol>${phases.map((p) => `<li><p>${esc(p)}</p></li>`).join('')}</ol>`
+      const content = `<p>${escapeHtml(tpl.description)}</p>${tpl.brief.map((h) => `<h2>${escapeHtml(h)}</h2><p></p>`).join('')}<h2>Phases</h2><ol>${phases.map((p) => `<li><p>${escapeHtml(p)}</p></li>`).join('')}</ol>`
       await docsRepo.create({ title: `${project.name} — Brief`, description: `Project brief (${tpl.name} template)`, content, projectId: project.id, area: opts.area, tags: [tpl.category.toLowerCase(), 'brief'] })
     }
   })

@@ -13,29 +13,29 @@ import { printHtml } from '@/lib/markdown'
 import { cn } from '@/lib/cn'
 import { useGx, live } from '../context'
 import { nowLocal } from './shared'
+import { escapeHtml } from '@/lib/html'
 
 type Tab = 'people' | 'history' | 'reports'
 const methodLabel = (m: PaymentMethod) => PAYMENT_METHODS.find((x) => x.id === m)?.label ?? m
-const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))
 
 export function printReceipt(p: NpPayment, person: NpPerson | undefined, tz: string, balanceAfter: { paid: number; remaining: number }) {
   const z = zoned(p.at, tz)
   printHtml(`Receipt ${p.receiptNo}`, `
     <h1>Payment receipt</h1>
-    <p><b>Receipt no.</b> ${esc(p.receiptNo)}${p.voided ? ' — <b style="color:#b91c1c">VOID</b>' : ''}</p>
+    <p><b>Receipt no.</b> ${escapeHtml(p.receiptNo)}${p.voided ? ' — <b style="color:#b91c1c">VOID</b>' : ''}</p>
     <table>
-      <tr><th style="text-align:left">Received from</th><td>${esc(person?.name ?? '—')}</td></tr>
-      <tr><th style="text-align:left">Amount</th><td><b>${esc(pkr(p.amount))}</b></td></tr>
-      <tr><th style="text-align:left">Date & time</th><td>${esc(`${z.weekday}, ${z.date} ${z.time}`)} (${esc(tz)})</td></tr>
-      <tr><th style="text-align:left">Payment method</th><td>${esc(methodLabel(p.method))}</td></tr>
-      <tr><th style="text-align:left">Transaction reference</th><td>${esc(p.reference || '—')}</td></tr>
-      ${p.linkedRef ? `<tr><th style="text-align:left">Linked transaction</th><td>${esc(p.linkedRef)}</td></tr>` : ''}
-      <tr><th style="text-align:left">Total payment amount</th><td>${esc(pkr(person?.obligation ?? 0))}</td></tr>
-      <tr><th style="text-align:left">Paid to date</th><td>${esc(pkr(balanceAfter.paid))}</td></tr>
-      <tr><th style="text-align:left">Remaining balance</th><td>${esc(pkr(balanceAfter.remaining))}</td></tr>
+      <tr><th style="text-align:left">Received from</th><td>${escapeHtml(person?.name ?? '—')}</td></tr>
+      <tr><th style="text-align:left">Amount</th><td><b>${escapeHtml(pkr(p.amount))}</b></td></tr>
+      <tr><th style="text-align:left">Date & time</th><td>${escapeHtml(`${z.weekday}, ${z.date} ${z.time}`)} (${escapeHtml(tz)})</td></tr>
+      <tr><th style="text-align:left">Payment method</th><td>${escapeHtml(methodLabel(p.method))}</td></tr>
+      <tr><th style="text-align:left">Transaction reference</th><td>${escapeHtml(p.reference || '—')}</td></tr>
+      ${p.linkedRef ? `<tr><th style="text-align:left">Linked transaction</th><td>${escapeHtml(p.linkedRef)}</td></tr>` : ''}
+      <tr><th style="text-align:left">Total payment amount</th><td>${escapeHtml(pkr(person?.obligation ?? 0))}</td></tr>
+      <tr><th style="text-align:left">Paid to date</th><td>${escapeHtml(pkr(balanceAfter.paid))}</td></tr>
+      <tr><th style="text-align:left">Remaining balance</th><td>${escapeHtml(pkr(balanceAfter.remaining))}</td></tr>
     </table>
-    ${p.notes ? `<p>${esc(p.notes)}</p>` : ''}
-    <p style="margin-top:2em;color:#666">GLAMIEX · Names & Payments · generated ${esc(new Date().toLocaleString())}</p>`)
+    ${p.notes ? `<p>${escapeHtml(p.notes)}</p>` : ''}
+    <p style="margin-top:2em;color:#666">GLAMIEX · Names & Payments · generated ${escapeHtml(new Date().toLocaleString())}</p>`)
 }
 
 export default function NamesPayments() {

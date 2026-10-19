@@ -41,9 +41,15 @@ export function CommandMenu({ open, onClose }: { open: boolean; onClose: () => v
     ]
     const pages: Cmd[] = ALL_LEAVES.map((l) => ({ id: `go-${l.id}`, label: `Go to ${l.label}`, icon: l.icon, group: 'Navigate', run: go(() => nav(l.path)) }))
     const term = q.toLowerCase().trim()
-    const filtered = [...actions, ...pages].filter((c) => !term || c.label.toLowerCase().includes(term))
+    if (!term) return [...actions, ...pages]
+    // "Quick add: <text>" always contains the query, so it goes last; otherwise Enter would never open a matching page.
+    const [quickAdd, ...rest] = actions
+    const matches = [...rest, ...pages].filter((c) => c.label.toLowerCase().includes(term))
+    const name = (c: Cmd) => c.label.toLowerCase().replace(/^(go to|create) /, '')
+    const strong = matches.filter((c) => name(c).startsWith(term) || name(c).split(/\s+/).some((w) => w.startsWith(term)))
+    const weak = matches.filter((c) => !strong.includes(c))
     const results: Cmd[] = hits.map((h) => ({ id: `hit-${h.type}-${h.id}`, label: h.title, hint: h.subtitle, icon: ArrowRight, group: 'Results', run: go(() => nav(h.path)) }))
-    return term ? [...results, ...filtered.slice(0, 8)] : filtered
+    return [...strong.slice(0, 6), ...results, ...weak.slice(0, 4), quickAdd]
   }, [q, hits, nav, onClose])
 
   useEffect(() => { setActive(0) }, [q])

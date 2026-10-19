@@ -18,6 +18,7 @@ import { objectsToCSV } from '@/lib/csv'
 import { downloadText } from '@/services/backup'
 import { printHtml } from '@/lib/markdown'
 import { cn } from '@/lib/cn'
+import { escapeHtml } from '@/lib/html'
 
 type SortKey = 'due' | 'updated' | 'title' | 'amount' | 'priority'
 const PRIORITY_ORDER: Record<Priority, number> = { urgent: 0, high: 1, medium: 2, low: 3 }
@@ -118,7 +119,7 @@ export function RecordManager({ collection, areas, defaultArea, title, defaults,
   }
 
   const print = () => {
-    const rows = items.map(({ r }) => `<tr><td>${esc(r.title)}</td><td>${esc(r.category)}</td><td>${r.dueDate ?? ''}</td><td>${r.amount != null ? esc(money(r.amount, settings.currency)) : ''}</td><td>${def.core.done ? (r.done ? '✓' : '') : ''}</td></tr>`).join('')
+    const rows = items.map(({ r }) => `<tr><td>${escapeHtml(r.title)}</td><td>${escapeHtml(r.category)}</td><td>${escapeHtml(r.dueDate ?? '')}</td><td>${r.amount != null ? escapeHtml(money(r.amount, settings.currency)) : ''}</td><td>${def.core.done ? (r.done ? '✓' : '') : ''}</td></tr>`).join('')
     printHtml(title ?? def.label, `<table><thead><tr><th>${def.titleLabel}</th><th>Category</th><th>${def.core.due ?? 'Date'}</th><th>${def.core.amount ?? 'Amount'}</th><th>${def.core.done ?? ''}</th></tr></thead><tbody>${rows}</tbody></table>`)
   }
 
@@ -215,7 +216,6 @@ export function RecordManager({ collection, areas, defaultArea, title, defaults,
   )
 }
 
-const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))
 
 function fmtField(v: FieldValue | undefined, f?: FieldDef): string {
   if (v == null || v === '') return ''

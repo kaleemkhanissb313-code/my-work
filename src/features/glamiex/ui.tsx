@@ -18,6 +18,7 @@ import { pctChange, pkr, pkrCompact, parseRupees, toRupees } from './money'
 import { presetRange, RANGE_PRESETS, zoned, type DateRange, type RangePreset } from './time'
 import type { Paisa } from './types'
 import type { MediaFile } from '@/types/models'
+import { escapeHtml } from '@/lib/html'
 
 /* ---------------- Date range ---------------- */
 export interface RangeState { preset: RangePreset; custom: DateRange }
@@ -207,9 +208,8 @@ export function exportFiles(name: string, period: string, sheets: Sheet[]) {
     csv: () => downloadText(toCSV([...meta, [], ...sheets[0].rows]), `${name.toLowerCase().replace(/\W+/g, '-')}.csv`, 'text/csv;charset=utf-8'),
     xlsx: () => downloadBlob(xlsxBlob([{ name: 'Info', rows: meta }, ...sheets]), `${name.toLowerCase().replace(/\W+/g, '-')}.xlsx`),
     print: () => {
-      const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))
-      const tables = sheets.map((s) => `<h2>${esc(s.name)}</h2><table><thead><tr>${(s.rows[0] ?? []).map((h) => `<th>${esc(String(h ?? ''))}</th>`).join('')}</tr></thead><tbody>${s.rows.slice(1).map((r) => `<tr>${r.map((c) => `<td${typeof c === 'number' ? ' style="text-align:right"' : ''}>${esc(typeof c === 'number' ? c.toLocaleString('en-PK') : String(c ?? ''))}</td>`).join('')}</tr>`).join('')}</tbody></table>`).join('')
-      printHtml(`GLAMIEX — ${name}`, `<p>Period: ${esc(period)} · Currency: PKR · Generated ${esc(new Date().toLocaleString())}</p>${tables}`)
+      const tables = sheets.map((s) => `<h2>${escapeHtml(s.name)}</h2><table><thead><tr>${(s.rows[0] ?? []).map((h) => `<th>${escapeHtml(String(h ?? ''))}</th>`).join('')}</tr></thead><tbody>${s.rows.slice(1).map((r) => `<tr>${r.map((c) => `<td${typeof c === 'number' ? ' style="text-align:right"' : ''}>${escapeHtml(typeof c === 'number' ? c.toLocaleString('en-PK') : String(c ?? ''))}</td>`).join('')}</tr>`).join('')}</tbody></table>`).join('')
+      printHtml(`GLAMIEX — ${name}`, `<p>Period: ${escapeHtml(period)} · Currency: PKR · Generated ${escapeHtml(new Date().toLocaleString())}</p>${tables}`)
     },
   }
 }

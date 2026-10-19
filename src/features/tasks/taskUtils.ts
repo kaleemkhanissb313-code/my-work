@@ -117,4 +117,4 @@ export function useTaskFilters(all: Task[] | undefined, fixedProjectId?: string,
   return { filters, set, reset: () => setFilters({ ...DEFAULT_FILTERS, sort: filters.sort }), tasks, allTags, active: !!active }
 }
 
-export const escHtml = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]!))
+export { escapeHtml as escHtml } from '@/lib/html'

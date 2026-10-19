@@ -1,5 +1,6 @@
 import { downloadBlob, downloadText } from '@/services/backup'
 import { resolveChartTheme } from './theme'
+import { escapeHtml } from '@/lib/html'
 
 /**
  * Serialise the Recharts SVG inside `container` into a standalone SVG document. Recharts renders its legend as HTML,
@@ -18,17 +19,16 @@ export function chartToSvg(container: HTMLElement | null, opts: { title?: string
   clone.setAttribute('x', '8')
   clone.setAttribute('y', String(top))
   const ns = 'http://www.w3.org/2000/svg'
-  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))
   let legend = ''
   if (opts.legend?.length) {
     let x = 12
     const y = top + h + 18
     for (const l of opts.legend) {
-      legend += `<rect x="${x}" y="${y - 9}" width="10" height="10" rx="2" fill="${esc(l.color)}"/><text x="${x + 14}" y="${y}" font-size="12" fill="${theme.fg}">${esc(l.name)}</text>`
+      legend += `<rect x="${x}" y="${y - 9}" width="10" height="10" rx="2" fill="${escapeHtml(l.color)}"/><text x="${x + 14}" y="${y}" font-size="12" fill="${theme.fg}">${escapeHtml(l.name)}</text>`
       x += 26 + l.name.length * 7
     }
   }
-  const title = opts.title ? `<text x="${W / 2}" y="24" text-anchor="middle" font-size="16" font-weight="600" fill="${theme.fg}">${esc(opts.title)}</text>` : ''
+  const title = opts.title ? `<text x="${W / 2}" y="24" text-anchor="middle" font-size="16" font-weight="600" fill="${theme.fg}">${escapeHtml(opts.title)}</text>` : ''
   const inner = new XMLSerializer().serializeToString(clone)
   return `<svg xmlns="${ns}" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" font-family="Inter, Segoe UI, sans-serif"><rect width="100%" height="100%" fill="${theme.surface}"/>${title}${inner}${legend}</svg>`
 }

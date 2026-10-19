@@ -14,6 +14,7 @@ import { cn } from '@/lib/cn'
 import { useGx, live } from '../context'
 import { BackLink, Stat, nowLocal } from './shared'
 import { ShipBadge, shipLabel } from './Deliveries'
+import { escapeHtml } from '@/lib/html'
 
 const ruleLabel = (r: RateRule) => RATE_RULES.find((x) => x.id === r)?.label ?? r
 const rateText = (p: GxPartner) => p.rateRule === 'per_order' ? `${pkr(p.perOrder)} / delivery` : p.rateRule === 'per_product' ? `${pkr(p.perProduct)} / product` : `${pkr(p.perKm)} / km`
@@ -83,13 +84,12 @@ function RiderDetail({ id }: { id: string }) {
   const pays = data.riderPays.filter((x) => x.partnerId === p.id && !x.deletedAt).sort((x, y) => y.at.localeCompare(x.at))
   const period = all ? 'All time' : `${range.from} to ${range.to}`
   const statement = () => {
-    const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))
-    const row = (k: string, v: string) => `<tr><th style="text-align:left">${esc(k)}</th><td style="text-align:right">${esc(v)}</td></tr>`
-    printHtml(`Settlement statement — ${p.name}`, `<h1>Rider settlement statement</h1><p><b>${esc(p.name)}</b>${p.code ? ` (${esc(p.code)})` : ''} · ${esc(period)} · rate: ${esc(rateText(p))}</p>
+    const row = (k: string, v: string) => `<tr><th style="text-align:left">${escapeHtml(k)}</th><td style="text-align:right">${escapeHtml(v)}</td></tr>`
+    printHtml(`Settlement statement — ${p.name}`, `<h1>Rider settlement statement</h1><p><b>${escapeHtml(p.name)}</b>${p.code ? ` (${escapeHtml(p.code)})` : ''} · ${escapeHtml(period)} · rate: ${escapeHtml(rateText(p))}</p>
       <table>${row('Products assigned', String(a.assignedUnits))}${row('Products picked up', String(a.pickedUpUnits))}${row('Products delivered', `${a.deliveredUnits} (${a.deliveredOrders} orders)`)}${row('Failed / cancelled / returned', `${a.failed} / ${a.cancelled} / ${a.returned}`)}
       ${row('Delivery earnings', pkr(a.shipmentEarnings))}${row('Return pickups', `${a.pickups} · ${pkr(a.pickupEarnings)}`)}${row('Additional charges', pkr(a.additions))}${row('Deductions', `−${pkr(a.deductions)}`)}${row('Total earned', pkr(a.earned))}${row('Paid in period', pkr(a.paid))}${row('Outstanding balance (all time)', pkr(due))}</table>
-      <h2>Deliveries</h2><table><thead><tr><th>Delivery</th><th>Date</th><th>Customer</th><th>Units</th><th>Status</th><th>Earning</th></tr></thead><tbody>${ships.map((s) => `<tr><td>${esc(s.shipmentNo)}</td><td>${esc(s.finalAt ? zoned(s.finalAt, tz).date : '')}</td><td>${esc(s.customerName)}</td><td>${shipmentUnits(s)}</td><td>${esc(shipLabel(s.status))}</td><td style="text-align:right">${esc(pkr(shipmentEarning(s)))}</td></tr>`).join('')}</tbody></table>
-      <h2>Payments</h2><table><thead><tr><th>Settlement</th><th>Date</th><th>Method</th><th>Reference</th><th>Paid</th></tr></thead><tbody>${pays.filter((x) => !x.voided).map((x) => `<tr><td>${esc(x.settlementNo)}</td><td>${esc(zoned(x.at, tz).date)}</td><td>${esc(x.method)}</td><td>${esc(x.reference)}</td><td style="text-align:right">${esc(pkr(x.amountPaid))}</td></tr>`).join('')}</tbody></table>`)
+      <h2>Deliveries</h2><table><thead><tr><th>Delivery</th><th>Date</th><th>Customer</th><th>Units</th><th>Status</th><th>Earning</th></tr></thead><tbody>${ships.map((s) => `<tr><td>${escapeHtml(s.shipmentNo)}</td><td>${escapeHtml(s.finalAt ? zoned(s.finalAt, tz).date : '')}</td><td>${escapeHtml(s.customerName)}</td><td>${shipmentUnits(s)}</td><td>${escapeHtml(shipLabel(s.status))}</td><td style="text-align:right">${escapeHtml(pkr(shipmentEarning(s)))}</td></tr>`).join('')}</tbody></table>
+      <h2>Payments</h2><table><thead><tr><th>Settlement</th><th>Date</th><th>Method</th><th>Reference</th><th>Paid</th></tr></thead><tbody>${pays.filter((x) => !x.voided).map((x) => `<tr><td>${escapeHtml(x.settlementNo)}</td><td>${escapeHtml(zoned(x.at, tz).date)}</td><td>${escapeHtml(x.method)}</td><td>${escapeHtml(x.reference)}</td><td style="text-align:right">${escapeHtml(pkr(x.amountPaid))}</td></tr>`).join('')}</tbody></table>`)
   }
   const payCols: Col<GxRiderPayment>[] = [
     { key: 'no', label: 'Settlement', render: (x) => <span className={cn('font-mono text-xs', x.voided && 'line-through')}>{x.settlementNo}</span>, sort: (x) => x.settlementNo, text: (x) => `${x.settlementNo} ${x.reference} ${x.notes}` },

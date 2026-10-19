@@ -6,14 +6,16 @@ test.describe('core workflows', () => {
     await expect(page.getByRole('heading', { level: 1 })).toContainText(/Good (morning|afternoon|evening|night)/)
     if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click()
     await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Projects & Tasks' }).click()
-    await page.getByRole('link', { name: 'Tasks' }).click()
+    await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Tasks', exact: true }).click()
     await expect(page).toHaveURL(/\/tasks/)
   })
 
   test('a task persists after reload', async ({ page }) => {
     await page.goto('/')
     await page.keyboard.press('Alt+t')
-    await expect(page).toHaveURL(/\/tasks\?open=/)
+    // The Tasks page opens the editor for ?open=<id>, then removes the parameter from the address.
+    await expect(page).toHaveURL(/\/tasks/)
+    await expect(page.getByRole('dialog')).toBeVisible()
     const title = page.getByLabel(/title/i).first()
     await title.fill('E2E persisted task')
     await page.getByRole('button', { name: /save/i }).click()
@@ -45,7 +47,7 @@ test.describe('core workflows', () => {
     await expect(page.getByRole('heading', { name: /is locked/ })).toBeVisible()
     await expect(page.getByRole('navigation', { name: 'Main' })).toHaveCount(0)
     await page.getByLabel('PIN or password').fill('4826')
-    await page.getByRole('button', { name: 'Unlock' }).click()
+    await page.getByRole('button', { name: 'Unlock', exact: true }).click()
     await expect(page.getByRole('heading', { name: 'Security Center' })).toBeVisible()
   })
 })

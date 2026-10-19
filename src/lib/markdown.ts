@@ -1,5 +1,5 @@
+import { escapeHtml } from '@/lib/html'
 /** Minimal, safe Markdown ⇄ HTML conversion for document import/export. Input text is always HTML-escaped. */
-const escapeHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
 function inline(md: string) {
   let s = escapeHtml(md)

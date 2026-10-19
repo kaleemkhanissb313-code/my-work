@@ -22,6 +22,7 @@ import type { CellFmt, GxSheet, NumFmt } from '@/features/sheets/types'
 import { cn } from '@/lib/cn'
 import { useGx, live } from '../context'
 import { AttachmentModal, ChartModal, ColumnModal, LinkPicker, RulesModal } from './SheetParts'
+import { escapeHtml } from '@/lib/html'
 
 type Status = 'saved' | 'saving' | 'error' | 'dirty'
 const pick = (s: GxSheet): SheetData => ({ columns: s.columns, rows: s.rows, fmt: s.fmt, colFmt: s.colFmt, rowFmt: s.rowFmt, freezeCols: s.freezeCols, showTotals: s.showTotals, totals: s.totals, rules: s.rules })
@@ -177,9 +178,8 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
     if (k === 'csv') downloadText(toCSV(exportRows(false) as unknown[][]), `${file}.csv`, 'text/csv;charset=utf-8')
     else if (k === 'xlsx') downloadBlob(xlsxBlob([{ name, rows: exportRows(true), colWidths: data.columns.map((c) => Math.round(c.width / 7)) }]), `${file}.xlsx`)
     else {
-      const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]!))
-      const body = data.rows.map((row, ri) => `<tr>${data.columns.map((c, ci) => { const v = values[ri][ci]; const f = effectiveFmt(data, row.id, c, v); const st = [f.b && 'font-weight:700', f.i && 'font-style:italic', f.color && `color:${f.color}`, f.bg && `background:${f.bg}`, f.align && `text-align:${f.align}`].filter(Boolean).join(';'); return `<td style="${st}">${f.ruleLabel ? esc(f.ruleLabel) + ' ' : ''}${esc(formatValue(v, f.fmt ?? 'auto'))}</td>` }).join('')}</tr>`).join('')
-      printHtml(name, `<p>GLAMIEX sheet · currency PKR · generated ${esc(new Date().toLocaleString())}</p><table><thead><tr>${data.columns.map((c) => `<th>${esc(c.name)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`)
+      const body = data.rows.map((row, ri) => `<tr>${data.columns.map((c, ci) => { const v = values[ri][ci]; const f = effectiveFmt(data, row.id, c, v); const st = [f.b && 'font-weight:700', f.i && 'font-style:italic', f.color && `color:${f.color}`, f.bg && `background:${f.bg}`, f.align && `text-align:${f.align}`].filter(Boolean).join(';'); return `<td style="${st}">${f.ruleLabel ? escapeHtml(f.ruleLabel) + ' ' : ''}${escapeHtml(formatValue(v, f.fmt ?? 'auto'))}</td>` }).join('')}</tr>`).join('')
+      printHtml(name, `<p>GLAMIEX sheet · currency PKR · generated ${escapeHtml(new Date().toLocaleString())}</p><table><thead><tr>${data.columns.map((c) => `<th>${escapeHtml(c.name)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`)
     }
   }
 
