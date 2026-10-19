@@ -106,7 +106,7 @@ export const NATO_MAP: Record<string, string> = Object.fromEntries(ALPHABETS.nat
 export const toNato = (s: string) => [...s].map((c) => NATO_MAP[c.toLowerCase()] ?? (c.trim() ? c : '')).filter(Boolean).join(' ')
 
 /** Collapse runs of spaces/tabs, trim each line, and limit blank lines to one. */
-export const removeExtraSpaces = (s: string) => lines(s).map((l) => l.replace(/[ \t00a0]+/g, ' ').trim()).join('\n').replace(/\n{3,}/g, '\n\n')
+export const removeExtraSpaces = (s: string) => lines(s).map((l) => l.replace(/[^\S\r\n]+/g, ' ').trim()).join('\n').replace(/\n{3,}/g, '\n\n')
 
 /** Capitalize the first letter of every word (keeps the rest of each word unchanged). */
 export const capitalizeWords = (s: string) => s.replace(/(^|[\s\-(“"'])(\p{Ll})/gu, (_m, p: string, c: string) => p + c.toUpperCase())
