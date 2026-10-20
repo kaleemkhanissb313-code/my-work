@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { addDays } from 'date-fns'
 import { Banknote, ChevronLeft, ChevronRight, Download, LayoutDashboard, PiggyBank, Receipt, TrendingUp, Wallet } from 'lucide-react'

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   Archive, ArchiveRestore, Copy, Download, ExternalLink, FileUp, Layers, Link2, List, Pencil, Plus, Search, Star, Trash2,

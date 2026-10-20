@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { CheckCircle2, Download, Wand2, FileText, FileVideo, HardDrive, Image as ImageIcon, Images, Search, Star, Trash2, Upload, X, XCircle } from 'lucide-react'
 import { db } from '@/lib/db'

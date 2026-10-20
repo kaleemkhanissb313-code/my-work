@@ -1,4 +1,4 @@
-import type { NavigateFunction } from 'react-router-dom'
+import type { NavigateFunction } from 'react-router'
 import { docsRepo, eventsRepo, projectsRepo, tasksRepo } from './repo'
 import { safeWrite } from '@/components/feedback'
 import { db } from '@/lib/db'

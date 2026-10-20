@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { ArchiveRestore, ArrowDown, ArrowUp, Copy, FileSpreadsheet, FileUp, Lock, Plus, Sheet, Trash2 } from 'lucide-react'
 import { Badge, Button, EmptyState, IconButton, Modal, Spinner } from '@/components/ui'

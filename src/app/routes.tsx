@@ -1,5 +1,5 @@
 import { lazy } from 'react'
-import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router'
 import { AppShell } from './AppShell'
 import { RouteError } from './RouteError'
 
@@ -76,7 +76,4 @@ export const router = createBrowserRouter([
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },
-], {
-  // Opt in to React Router v7 behaviour now (silences the upgrade warnings and eases a future v7 migration).
-  future: { v7_relativeSplatPath: true, v7_fetcherPersist: true, v7_normalizeFormMethod: true, v7_partialHydration: true, v7_skipActionErrorRevalidation: true },
-})
+])

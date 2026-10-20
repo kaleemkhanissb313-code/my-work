@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Bookmark, Cloud, Database, Eye, EyeOff, LayoutGrid, Palette, RefreshCw, Settings as SettingsIcon, Sparkles, Trash2, User } from 'lucide-react'
 import { db } from '@/lib/db'

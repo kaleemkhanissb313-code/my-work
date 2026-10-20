@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { AlertTriangle, Package, Plus, ShoppingCart } from 'lucide-react'
 import { logisticsSummary } from '@/features/glamiex/logistics'
 import { distribution, hourly, productPerformance, series, summary, weekdayTotals, orderBalance, orderTotal } from '@/features/glamiex/engine'

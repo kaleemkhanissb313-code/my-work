@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { KeyRound, LogIn, Mail, UserPlus } from 'lucide-react'
 import { Button, Card, Field, Input, PageHeader, Tabs } from '@/components/ui'
 import { toast } from '@/components/feedback'

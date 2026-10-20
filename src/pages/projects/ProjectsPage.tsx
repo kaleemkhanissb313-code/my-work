@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useNavigate, useSearchParams } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Archive, ArchiveRestore, CalendarClock, FolderKanban, LayoutTemplate, Pencil, Plus, Search, Star, Trash2 } from 'lucide-react'
 import { db } from '@/lib/db'

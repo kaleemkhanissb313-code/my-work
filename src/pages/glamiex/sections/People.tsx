@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Pencil, Plus, Trash2, User, Users, Wallet } from 'lucide-react'
 import { Badge, Button, EmptyState, Field, Input, Modal, Select, Textarea } from '@/components/ui'
 import { safeWrite, toast } from '@/components/feedback'

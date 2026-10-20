@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router'
 import { recordsRepo, tasksRepo } from '@/services/repo'
 import { safeWrite, toast } from '@/components/feedback'
 import { fmtDate, nextOccurrence, todayISO } from '@/lib/dates'

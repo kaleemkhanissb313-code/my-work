@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router'
 import { Ban, Plus, Wallet } from 'lucide-react'
 import { Badge, Button, EmptyState, Field, Input, Select, Textarea } from '@/components/ui'
 import { toast } from '@/components/feedback'

@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
-import { NavLink, useNavigate, useParams } from 'react-router-dom'
+import { NavLink, useNavigate, useParams } from 'react-router'
 import {
   ArrowLeftRight, BarChart3, CalendarDays, CalendarRange, Calendar as CalendarIcon, ChevronsLeft, ChevronsRight, FileBarChart, Gem, Images, LayoutDashboard,
   LayoutGrid, Megaphone, Bike, HandCoins, Truck, Undo2, ClipboardList, Package, Receipt, Scale, Settings2, Sheet, ShoppingCart, TrendingUp, Users, Wallet, X,

@@ -1,4 +1,4 @@
-import { NavLink } from 'react-router-dom'
+import { NavLink } from 'react-router'
 import { CalendarDays, CheckSquare, LayoutDashboard, Menu, Wand2 } from 'lucide-react'
 import { openQuickAdd } from '@/features/quickadd/QuickAdd'
 import { cn } from '@/lib/cn'

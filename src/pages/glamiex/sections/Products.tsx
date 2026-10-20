@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/lib/db'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { Archive, ArchiveRestore, Package, PackagePlus, Pencil, Plus, Trash2 } from 'lucide-react'
 import { Badge, Button, EmptyState, Field, Input, Modal, Select, TagInput, Textarea } from '@/components/ui'
 import { safeWrite, toast } from '@/components/feedback'

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { ArrowRight, Wand2, CalendarPlus, CheckSquare, FileText, FolderPlus, Lock, Moon, NotebookPen, Search, Timer } from 'lucide-react'
 import { Modal } from '@/components/ui'
 import { searchAll, type SearchHit } from '@/services/search'

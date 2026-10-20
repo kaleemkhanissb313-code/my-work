@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { CalendarDays, CheckSquare, Columns3, List, Plus } from 'lucide-react'
 import { db } from '@/lib/db'

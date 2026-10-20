@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react'
 import { ArrowLeft } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import type { GxData } from '@/features/glamiex/engine'
 import { zoned } from '@/features/glamiex/time'
 import { cn } from '@/lib/cn'

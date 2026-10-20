@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router'
 import { CalendarDays, CheckSquare, Diamond, LayoutTemplate, Search } from 'lucide-react'
 import { Badge, Button, Checkbox, Field, Input, Modal, Select } from '@/components/ui'
 import { safeWrite } from '@/components/feedback'

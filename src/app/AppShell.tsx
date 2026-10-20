@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate } from 'react-router'
 import { MotionConfig, motion } from 'framer-motion'
 import { Sidebar } from './layout/Sidebar'
 import { Topbar } from './layout/Topbar'

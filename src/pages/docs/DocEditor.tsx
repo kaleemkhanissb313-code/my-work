@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link as RouterLink, useBlocker, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link as RouterLink, useBlocker, useLocation, useNavigate, useParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { EditorContent, useEditor, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
@@ -126,7 +126,7 @@ function DocEditorInner({ id }: { id: string }) {
 
   const editor = useEditor({
     extensions: [
-      StarterKit.configure({ heading: { levels: [1, 2, 3] } }),
+      StarterKit.configure({ heading: { levels: [1, 2, 3] }, link: false, underline: false }),
       SafeLink,
       Placeholder.configure({ placeholder: 'Start writing…' }),
     ],
@@ -146,7 +146,7 @@ function DocEditorInner({ id }: { id: string }) {
     latest.current = { title: doc.title, description: doc.description, content: doc.content }
     setTitle(doc.title)
     setDescription(doc.description)
-    editor.commands.setContent(doc.content || '', false)
+    editor.commands.setContent(doc.content || '', { emitUpdate: false })
     loaded.current = true
     setSavedAt(doc.updatedAt)
     const draft = readDraft(id)
@@ -193,7 +193,7 @@ function DocEditorInner({ id }: { id: string }) {
     if (!draftOffer || !editor) return
     setTitle(draftOffer.title); setDescription(draftOffer.description)
     latest.current = { title: draftOffer.title, description: draftOffer.description, content: draftOffer.content }
-    editor.commands.setContent(draftOffer.content, false)
+    editor.commands.setContent(draftOffer.content, { emitUpdate: false })
     setDraftOffer(null)
     markChanged()
     toast('Draft restored — saving…', 'info')

@@ -8,7 +8,7 @@ import { buildReport } from '@/features/glamiex/reports'
 import { parseDate, toISODate } from '@/lib/dates'
 import { ExportButtons, KpiCard, Money, PayBadge, Section } from '@/features/glamiex/ui'
 import { MoneyDistributionChart, ProductPerformanceChart, RevenueGrowthChart, SalesComparisonChart, TrendsChart } from '@/features/glamiex/charts'
-import { Link } from 'react-router-dom'
+import { Link } from 'react-router'
 import { useGx, live } from '../context'
 import { PeriodTable, periodRows } from './Analytics'
 

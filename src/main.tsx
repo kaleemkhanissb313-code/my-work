@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { RouterProvider } from 'react-router-dom'
+import { RouterProvider } from 'react-router'
 import { router } from './app/routes'
 import { initLock } from './services/security'
 import { initAuth } from './services/auth'
@@ -19,6 +19,6 @@ void navigator.storage?.persist?.()
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <RouterProvider router={router} future={{ v7_startTransition: true }} />
+    <RouterProvider router={router} />
   </StrictMode>,
 )

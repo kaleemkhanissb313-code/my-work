@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   AlertTriangle, CheckCircle2, ChevronDown, Columns2, Crop as CropIcon, Download, Eye, FlipHorizontal2, FlipVertical2, FolderOpen, ImagePlus, Maximize, Minus,

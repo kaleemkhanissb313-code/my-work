@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { useSearchParams } from 'react-router'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { addDays, startOfWeek } from 'date-fns'
 import { ArrowDown, ArrowUp, BarChart3, Columns3, Copy, Download, FileUp, Image as ImageIcon, Plus, Rows3, Search, Sparkles, Trash2, X } from 'lucide-react'
