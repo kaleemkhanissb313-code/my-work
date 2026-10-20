@@ -24,7 +24,7 @@ export function openPaymentImage(t: BpTxn, byId: Map<string, BpPartner>, nav: (t
     ? [person(t.toId, t.amount, `Received from ${byId.get(t.fromId)?.name ?? ''}`)]
     : t.lines.filter((l) => l.amount > 0).slice(0, 5).map((l) => person(l.partnerId, l.amount, txnLabel(t.type)))
   setPrefill({ ...newDesign(t.date), title: `${txnLabel(t.type)} · ${t.txnNo}`.slice(0, 60), people })
-  nav('/glamiex/payment-image')
+  nav('/glamiex/payment-image/group')
 }
 
 export function TxnDetail({ t, onClose }: { t: BpTxn; onClose: () => void }) {

@@ -161,7 +161,7 @@ export interface GxExpense extends BaseEntity {
   attachmentIds: ID[]
 }
 
-export type GxEntity = 'product' | 'order' | 'refund' | 'person' | 'payment' | 'adIncome' | 'adSpend' | 'expense' | 'stock' | 'settings' | 'sheet' | 'return' | 'shipment' | 'partner' | 'riderPayment' | 'npPerson' | 'npPayment' | 'bpPartner' | 'bpTxn'
+export type GxEntity = 'product' | 'order' | 'refund' | 'person' | 'payment' | 'adIncome' | 'adSpend' | 'expense' | 'stock' | 'settings' | 'sheet' | 'return' | 'shipment' | 'partner' | 'riderPayment' | 'npPerson' | 'npPayment' | 'bpPartner' | 'bpTxn' | 'payRecord'
 export interface GxAuditEvent { id: string; at: number; entity: GxEntity; entityId: string; action: 'create' | 'update' | 'cancel' | 'refund' | 'void' | 'delete' | 'restore' | 'adjust'; summary: string }
 
 export type GxPreset = 'neon' | 'glass' | 'executive' | 'aurora' | 'minimal'

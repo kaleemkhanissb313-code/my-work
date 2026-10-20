@@ -61,7 +61,7 @@ const Returns = lazy(() => import('./sections/Returns'))
 const Deliveries = lazy(() => import('./sections/Deliveries'))
 const Riders = lazy(() => import('./sections/Riders'))
 const LogisticsReports = lazy(() => import('./sections/LogisticsReports'))
-const PaymentImage = lazy(() => import('./sections/PaymentImage'))
+const PaymentImageCreator = lazy(() => import('./sections/payrecords'))
 const Partners = lazy(() => import('./sections/partners'))
 
 const typing = (t: EventTarget | null) => { const el = t as HTMLElement | null; return !!el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) }
@@ -115,7 +115,7 @@ export function GlamiexPage() {
       case 'deliveries': return <Deliveries id={id} />
       case 'riders': return <Riders id={id} />
       case 'logistics-reports': return <LogisticsReports />
-      case 'payment-image': return <PaymentImage />
+      case 'payment-image': return <PaymentImageCreator id={id} />
       case 'partners': return <Partners id={id} />
     }
   }

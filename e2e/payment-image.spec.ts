@@ -5,7 +5,7 @@ import path from 'node:path'
 const fixture = (f: string) => path.join('e2e', 'fixtures', f)
 
 test('payment image creator: upload, edit, totals, save and PNG download', async ({ page }) => {
-  await page.goto('/glamiex/payment-image')
+  await page.goto('/glamiex/payment-image/group')
   const pw = page.getByLabel('Password', { exact: true })
   await pw.fill('0211')
   await pw.press('Enter')
