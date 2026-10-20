@@ -1,5 +1,6 @@
 import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router'
+import { GlamiexLock } from '@/features/glamiex/GlamiexLock'
 import { AppShell } from './AppShell'
 import { RouteError } from './RouteError'
 
@@ -72,7 +73,7 @@ export const router = createBrowserRouter([
       { path: 'trash', element: <TrashPage /> },
       { path: 'settings', element: <SettingsPage /> },
       { path: 'auth', element: <AuthPage /> },
-      { path: 'glamiex/:section?/:id?', element: <GlamiexPage /> },
+      { path: 'glamiex/:section?/:id?', element: <GlamiexLock><GlamiexPage /></GlamiexLock> },
       { path: '*', element: <Navigate to="/" replace /> },
     ],
   },

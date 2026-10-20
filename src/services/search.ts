@@ -1,6 +1,7 @@
 import { db } from '@/lib/db'
 import type { EntityType, RecordItem } from '@/types/models'
 import { COLLECTIONS } from '@/features/records/collections'
+import { isGlamiexUnlocked } from '@/features/glamiex/lockState'
 
 export interface SearchHit { type: EntityType; id: string; title: string; subtitle: string; path: string; score: number }
 
@@ -44,7 +45,8 @@ export async function searchAll(q: string, limit = 50): Promise<SearchHit[]> {
   live(bookmarks).forEach((b) => push({ type: 'bookmark', id: b.id, title: b.title || b.url, subtitle: `Link · ${b.category}`, path: `/links?open=${b.id}` }, `${b.url} ${b.description} ${b.notes} ${b.tags.join(' ')}`))
   live(records).forEach((r) => push({ type: 'record', id: r.id, title: r.title, subtitle: COLLECTIONS[r.collection]?.label ?? r.collection, path: `${recordPath(r)}?open=${r.id}` }, `${r.category} ${r.tags.join(' ')} ${Object.values(r.fields).join(' ')}`))
   live(datasets).forEach((d) => push({ type: 'dataset', id: d.id, title: d.name, subtitle: 'Dataset', path: `/graphs?open=${d.id}` }, d.columns.join(' ')))
-  // GLAMIEX
+  // GLAMIEX (hidden from search while the section is password-locked)
+  if (!isGlamiexUnlocked()) return hits.sort((a, b) => b.score - a.score).slice(0, limit)
   const peopleById = new Map(gxPeople.map((p) => [p.id, p.name]))
   live(gxProducts).forEach((p) => push({ type: 'gx', id: p.id, title: p.name, subtitle: `GLAMIEX product · ${p.sku}`, path: `/glamiex/products/${p.id}` }, `${p.sku} ${p.category} ${p.description} ${p.tags.join(' ')}`))
   live(gxOrders).forEach((o) => push({ type: 'gx', id: o.id, title: o.orderNo, subtitle: `GLAMIEX sale · ${o.status}`, path: `/glamiex/sales/${o.id}` }, `${peopleById.get(o.personId ?? '') ?? ''} ${o.items.map((i) => i.name).join(' ')} ${o.notes}`))
