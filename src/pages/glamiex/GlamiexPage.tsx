@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router'
 import {
-  ArrowLeftRight, BarChart3, CalendarDays, CalendarRange, Calendar as CalendarIcon, ChevronsLeft, ChevronsRight, FileBarChart, Gem, Images, LayoutDashboard,
+  ArrowLeftRight, BarChart3, CalendarDays, CalendarRange, Calendar as CalendarIcon, ChevronsLeft, ChevronsRight, FileBarChart, Gem, ImageDown, Images, LayoutDashboard,
   LayoutGrid, Megaphone, Bike, HandCoins, Truck, Undo2, ClipboardList, Package, Receipt, Scale, Settings2, Sheet, ShoppingCart, TrendingUp, Users, Wallet, X,
 } from 'lucide-react'
 import { Spinner } from '@/components/ui'
@@ -17,6 +17,7 @@ export const GX_SECTIONS = [
   { id: 'people', label: 'Customers & People', icon: Users },
   { id: 'payments', label: 'Deposits & Payments', icon: Wallet },
   { id: 'names', label: 'Names & Payments', icon: HandCoins },
+  { id: 'payment-image', label: 'Payment Image Creator', icon: ImageDown },
   { id: 'returns', label: 'Returns and Refunds', icon: Undo2 },
   { id: 'deliveries', label: 'Deliveries and Shipments', icon: Truck },
   { id: 'riders', label: 'Delivery Partners & Riders', icon: Bike },
@@ -59,6 +60,7 @@ const Returns = lazy(() => import('./sections/Returns'))
 const Deliveries = lazy(() => import('./sections/Deliveries'))
 const Riders = lazy(() => import('./sections/Riders'))
 const LogisticsReports = lazy(() => import('./sections/LogisticsReports'))
+const PaymentImage = lazy(() => import('./sections/PaymentImage'))
 
 const typing = (t: EventTarget | null) => { const el = t as HTMLElement | null; return !!el && (el.isContentEditable || ['INPUT', 'TEXTAREA', 'SELECT'].includes(el.tagName)) }
 
@@ -111,6 +113,7 @@ export function GlamiexPage() {
       case 'deliveries': return <Deliveries id={id} />
       case 'riders': return <Riders id={id} />
       case 'logistics-reports': return <LogisticsReports />
+      case 'payment-image': return <PaymentImage />
     }
   }
 

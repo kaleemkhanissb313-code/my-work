@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
+import type { GxPayImage } from '@/features/glamiex/payImage/model'
 import type {
   AuditEvent, Bookmark, CalcHistory, CalendarEvent, CrossLink, Dataset, Doc, Folder, HabitLog, MediaFile,
   Palette, Project, RecentItem, RecordItem, RunningTimer, SavedView, Task, TimerSession, VaultItem,
@@ -49,6 +50,7 @@ export class AppDB extends Dexie {
   gxRiderPays!: EntityTable<GxRiderPayment, 'id'>
   npPeople!: EntityTable<NpPerson, 'id'>
   npPayments!: EntityTable<NpPayment, 'id'>
+  gxPayImages!: EntityTable<GxPayImage, 'id'>
 
   constructor(name = 'basic-to-advanced') {
     super(name)
@@ -98,6 +100,8 @@ export class AppDB extends Dexie {
       npPeople: 'id, name, deletedAt',
       npPayments: 'id, &receiptNo, personId, at',
     })
+    // v5: GLAMIEX Payment Image Creator designs. Local only: not in entityTables, so never synced or backed up.
+    this.version(5).stores({ gxPayImages: 'id, name, updatedAt' })
   }
 }
 
