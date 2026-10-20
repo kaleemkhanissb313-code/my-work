@@ -7,7 +7,7 @@ import { cn } from '@/lib/cn'
 import { db } from '@/lib/db'
 import { pkr } from '@/features/glamiex/money'
 import {
-  IMAGE_TYPES, MAX_PEOPLE, TEMPLATES, imageFileError, newDesign, newPerson, totals, validateDesign,
+  IMAGE_TYPES, MAX_PEOPLE, TEMPLATES, imageFileError, newDesign, newPerson, takePrefill, totals, validateDesign,
   type GxPayImage, type PayDesign, type PayPerson,
 } from '@/features/glamiex/payImage/model'
 import { cropToSquare, renderPaymentImage } from '@/features/glamiex/payImage/render'
@@ -19,9 +19,12 @@ const uid = () => crypto.randomUUID()
 export default function PaymentImage() {
   const { tz } = useGx()
   const today = nowLocal(tz).date
-  const [design, setDesign] = useState<PayDesign>(() => newDesign(today))
+  // A design handed over from the partner ledger replaces the blank one (and counts as unsaved).
+  const [prefilled] = useState(takePrefill)
+  const [design, setDesign] = useState<PayDesign>(() => prefilled ?? newDesign(today))
   const [savedId, setSavedId] = useState<string | null>(null)
-  const [dirty, setDirty] = useState(false)
+  const [dirty, setDirty] = useState(!!prefilled)
+  const partners = useLiveQuery(() => db.bpPartners.orderBy('order').toArray(), [])
   const [showErrors, setShowErrors] = useState(false)
   const [photoErrors, setPhotoErrors] = useState<Record<string, string>>({})
   const [busy, setBusy] = useState(false)
@@ -46,6 +49,14 @@ export default function PaymentImage() {
     update({ people: design.people.map((p) => (p.key === key ? { ...p, ...patch } : p)) })
 
   const addPerson = () => { if (design.people.length < MAX_PEOPLE) update({ people: [...design.people, newPerson(today)] }) }
+  /** Adds a business partner (name + photo), reusing an empty row when there is one. */
+  const addPartner = (id: string) => {
+    const bp = partners?.find((x) => x.id === id)
+    if (!bp) return
+    const empty = design.people.find((p) => !p.name.trim() && !p.amount.trim())
+    if (empty) updatePerson(empty.key, { name: bp.name, photo: bp.photo })
+    else if (design.people.length < MAX_PEOPLE) update({ people: [...design.people, { ...newPerson(today), name: bp.name, photo: bp.photo }] })
+  }
   const removePerson = async (p: PayPerson) => {
     if (design.people.length === 1) return
     if ((p.name || p.amount || p.photo) && !(await confirm({ title: 'Remove this person?', body: `${p.name.trim() || 'This person'} will be removed from the design.`, confirmLabel: 'Remove', danger: true }))) return
@@ -162,7 +173,16 @@ export default function PaymentImage() {
         <section className="card p-4 sm:p-5" aria-labelledby="pi-people">
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 id="pi-people" className="font-semibold">People <span className="text-sm font-normal text-muted">({design.people.length}/{MAX_PEOPLE})</span></h2>
-            <Button icon={Plus} onClick={addPerson} disabled={design.people.length >= MAX_PEOPLE}>Add person</Button>
+            <div className="flex flex-wrap gap-2">
+              {!!partners?.length && (
+                <Select aria-label="Add a business partner" className="h-10 w-auto" value="" disabled={design.people.length >= MAX_PEOPLE && !design.people.some((p) => !p.name.trim() && !p.amount.trim())}
+                  onChange={(e) => addPartner(e.target.value)}>
+                  <option value="">Add partner…</option>
+                  {partners.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
+                </Select>
+              )}
+              <Button icon={Plus} onClick={addPerson} disabled={design.people.length >= MAX_PEOPLE}>Add person</Button>
+            </div>
           </div>
           <ol className="space-y-3">
             {design.people.map((p, i) => {
@@ -195,7 +215,10 @@ export default function PaymentImage() {
                           <option value="paid">Paid</option><option value="pending">Pending</option>
                         </Select>
                       </Field>
-                      <Field label="Note (optional)" htmlFor={fid('note')} className="sm:col-span-2">
+                      <Field label="Transaction reference (optional)" htmlFor={fid('ref')}>
+                        <Input id={fid('ref')} value={p.reference ?? ''} maxLength={40} autoComplete="off" onChange={(e) => updatePerson(p.key, { reference: e.target.value })} />
+                      </Field>
+                      <Field label="Note (optional)" htmlFor={fid('note')}>
                         <Input id={fid('note')} value={p.note} maxLength={80} autoComplete="off" onChange={(e) => updatePerson(p.key, { note: e.target.value })} />
                       </Field>
                     </div>

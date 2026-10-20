@@ -1,5 +1,6 @@
 import Dexie, { type EntityTable } from 'dexie'
 import type { GxPayImage } from '@/features/glamiex/payImage/model'
+import type { BpPartner, BpTxn } from '@/features/glamiex/partners/types'
 import type {
   AuditEvent, Bookmark, CalcHistory, CalendarEvent, CrossLink, Dataset, Doc, Folder, HabitLog, MediaFile,
   Palette, Project, RecentItem, RecordItem, RunningTimer, SavedView, Task, TimerSession, VaultItem,
@@ -51,6 +52,8 @@ export class AppDB extends Dexie {
   npPeople!: EntityTable<NpPerson, 'id'>
   npPayments!: EntityTable<NpPayment, 'id'>
   gxPayImages!: EntityTable<GxPayImage, 'id'>
+  bpPartners!: EntityTable<BpPartner, 'id'>
+  bpTxns!: EntityTable<BpTxn, 'id'>
 
   constructor(name = 'basic-to-advanced') {
     super(name)
@@ -102,6 +105,8 @@ export class AppDB extends Dexie {
     })
     // v5: GLAMIEX Payment Image Creator designs. Local only: not in entityTables, so never synced or backed up.
     this.version(5).stores({ gxPayImages: 'id, name, updatedAt' })
+    // v6: business partners (investment, profit/loss and settlement ledger). Ledger entries are never hard-deleted.
+    this.version(6).stores({ bpPartners: 'id, order, deletedAt', bpTxns: 'id, &txnNo, type, date, updatedAt, deletedAt' })
   }
 }
 
@@ -112,5 +117,6 @@ export const entityTables = [
   'docs', 'folders', 'projects', 'tasks', 'events', 'media', 'bookmarks', 'timerSessions', 'datasets', 'records', 'habitLogs', 'vault', 'palettes',
   'gxProducts', 'gxStock', 'gxOrders', 'gxRefunds', 'gxPeople', 'gxPayments', 'gxAdIncome', 'gxAdSpend', 'gxExpenses', 'gxSheets',
   'gxReturns', 'gxShipments', 'gxPartners', 'gxRiderPays', 'npPeople', 'npPayments',
+  'bpPartners', 'bpTxns',
 ] as const
 export type EntityTableName = (typeof entityTables)[number]

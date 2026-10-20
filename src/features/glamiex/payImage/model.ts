@@ -20,6 +20,8 @@ export interface PayPerson {
   photo: string | null
   date: string
   note: string
+  /** Optional transaction reference shown on the image (older saved designs may lack it). */
+  reference?: string
   status: PayStatus
 }
 
@@ -45,7 +47,7 @@ export const TEMPLATES: { id: PayTemplate; label: string; bg: string; fg: string
 const uid = () => (crypto.randomUUID?.() ?? `${Date.now()}-${Math.random()}`)
 
 export function newPerson(date: string): PayPerson {
-  return { key: uid(), name: '', amount: '', photo: null, date, note: '', status: 'paid' }
+  return { key: uid(), name: '', amount: '', photo: null, date, note: '', reference: '', status: 'paid' }
 }
 
 export function newDesign(date: string): PayDesign {
@@ -89,3 +91,10 @@ export function imageFileError(file: { type: string; size: number }) {
 }
 
 export const initials = (name: string) => name.trim().split(/\s+/).slice(0, 2).map((w) => w[0]?.toUpperCase() ?? '').join('') || '?'
+
+const PREFILL_KEY = 'gx-payimage-prefill'
+/** Hands a design to the Payment Image Creator (used by the partner ledger). Session-only, never persisted. */
+export function setPrefill(d: PayDesign) { try { sessionStorage.setItem(PREFILL_KEY, JSON.stringify(d)) } catch { /* ignore */ } }
+export function takePrefill(): PayDesign | null {
+  try { const v = sessionStorage.getItem(PREFILL_KEY); sessionStorage.removeItem(PREFILL_KEY); return v ? (JSON.parse(v) as PayDesign) : null } catch { return null }
+}

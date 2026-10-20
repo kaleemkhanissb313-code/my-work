@@ -160,7 +160,7 @@ export async function renderPaymentImage(canvas: HTMLCanvasElement, d: PayDesign
       ctx.font = font(700, 32, true); ctx.fillStyle = d.fg
       ctx.fillText(fitText(ctx, p.name.trim() || 'Unnamed', textW), textX, y + 60)
       ctx.font = font(500, 22); ctx.fillStyle = muted
-      const meta = [fmtDate(p.date), p.note.trim()].filter(Boolean).join('  ·  ')
+      const meta = [fmtDate(p.date), p.reference?.trim() ? `Ref ${p.reference.trim()}` : '', p.note.trim()].filter(Boolean).join('  ·  ')
       ctx.fillText(fitText(ctx, meta, textW), textX, y + 100)
       y += ROW_H + ROW_GAP
     })
@@ -180,7 +180,7 @@ export async function renderPaymentImage(canvas: HTMLCanvasElement, d: PayDesign
       const amt = pkr(amountOf(p))
       fitSize(ctx, amt, 800, 38, 24, inner); ctx.fillText(amt, mid, cy + 226)
       ctx.font = font(500, 21); ctx.fillStyle = muted
-      ctx.fillText(fitText(ctx, [fmtDate(p.date), p.note.trim()].filter(Boolean).join(' · '), inner), mid, cy + 260)
+      ctx.fillText(fitText(ctx, [fmtDate(p.date), p.reference?.trim() ? `Ref ${p.reference.trim()}` : '', p.note.trim()].filter(Boolean).join(' · '), inner), mid, cy + 260)
       statusPill(ctx, p.status, mid, cy + 276, 'center')
     })
   }
