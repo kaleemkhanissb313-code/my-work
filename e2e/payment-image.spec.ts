@@ -9,7 +9,7 @@ test('payment image creator: upload, edit, totals, save and PNG download', async
   const pw = page.getByLabel('Password', { exact: true })
   await pw.fill('0211')
   await pw.press('Enter')
-  await expect(page.getByRole('heading', { name: 'Payment Image Creator' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '5 Payments' })).toBeVisible()
 
   // Validation before anything is filled in.
   await page.getByRole('button', { name: 'Download Image' }).click()

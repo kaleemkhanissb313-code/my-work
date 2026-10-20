@@ -105,7 +105,7 @@ export default function PartnerReports() {
         <li className="card flex flex-col gap-3 p-4">
           <div><h3 className="flex items-center gap-2 font-semibold"><ImageDown className="h-4 w-4 text-accent" aria-hidden />Payment summary image (PNG)</h3>
             <p className="text-xs text-muted">Open any ledger entry and choose <b>Payment image</b>, or build one for selected partners.</p></div>
-          <Link to="/glamiex/payment-image/group" className="btn btn-soft h-8 w-fit px-3 text-xs">Open Payment Image Creator</Link>
+          <Link to="/glamiex/payment-image/group" className="btn btn-soft h-8 w-fit px-3 text-xs">Open 5 Payments</Link>
         </li>
       </ul>
     </div>

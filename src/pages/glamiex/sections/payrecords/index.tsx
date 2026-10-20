@@ -52,7 +52,7 @@ export default function PaymentImageCreator({ id }: { id?: string }) {
     setEditing(r); setEditorKey((k) => k + 1); window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  if (!bp || partners.length < 5 || !records) return <Spinner label="Loading Payment Image Creator" />
+  if (!bp || partners.length < 5 || !records) return <Spinner label="Loading 5 Payments" />
   const n = nowLocal(tz)
   const tab = (key: string, label: React.ReactNode, active: boolean, count?: number) => (
     <button key={key} type="button" role="tab" aria-selected={active} onClick={() => void go(key)}

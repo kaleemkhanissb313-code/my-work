@@ -18,7 +18,7 @@ export const GX_SECTIONS = [
   { id: 'payments', label: 'Deposits & Payments', icon: Wallet },
   { id: 'names', label: 'Names & Payments', icon: HandCoins },
   { id: 'partners', label: 'Business Partners', icon: Handshake },
-  { id: 'payment-image', label: 'Payment Image Creator', icon: ImageDown },
+  { id: 'payment-image', label: '5 Payments', icon: ImageDown },
   { id: 'returns', label: 'Returns and Refunds', icon: Undo2 },
   { id: 'deliveries', label: 'Deliveries and Shipments', icon: Truck },
   { id: 'riders', label: 'Delivery Partners & Riders', icon: Bike },

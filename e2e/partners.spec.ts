@@ -105,7 +105,7 @@ test('business partner accounting: invest, settle, allocate, pay out, reverse an
   await page.getByRole('button', { name: 'Profits' }).click()
   await page.getByRole('row', { name: /Profit distribution/ }).click()
   await dialog(page).getByRole('button', { name: 'Payment image' }).click()
-  await expect(page.getByRole('heading', { name: 'Payment Image Creator' })).toBeVisible()
+  await expect(page.getByRole('heading', { name: '5 Payments' })).toBeVisible()
   await expect(page.getByRole('listitem', { name: 'Person 5' }).getByLabel('Full name')).toHaveValue('Hasnain')
   await expect(page.getByRole('listitem', { name: 'Person 1' }).getByLabel('Transaction reference (optional)')).toHaveValue(/^BP-/)
   await expect(page.getByLabel('Preview').getByText('Rs 50,000')).toBeVisible()
