@@ -140,7 +140,7 @@ export function SettingsPage() {
               if (!ok) return
               const typed = prompt('Type ERASE to confirm')
               if (typed !== 'ERASE') return toast('Cancelled', 'info')
-              await db.delete(); localStorage.clear(); sessionStorage.clear(); location.href = '/'
+              await db.delete(); localStorage.clear(); sessionStorage.clear(); location.href = import.meta.env.BASE_URL
             }}>Erase local data</Button>
           </div>
         </Card>
