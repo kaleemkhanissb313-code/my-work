@@ -18,6 +18,7 @@ import { addWorkingDays, daysBetween, parseDate, toISODate, todayISO, workingDay
 import { cn } from '@/lib/cn'
 import { copyText, loadPref, num, savePref } from '@/features/tools/clipboard'
 import { time12 } from '@/lib/time12'
+import { removeLastItem } from '@/lib/calcEdit'
 
 type TabId = 'standard' | 'scientific' | 'percentage' | 'discount' | 'ratio' | 'stats' | 'datetime' | 'units'
 type Places = number | 'auto'
@@ -120,6 +121,8 @@ function CalculatorTool({ scientific, show }: { scientific: boolean; show: (n: n
     } else setExpr((cur) => cur + s)
   }
   const clear = () => { setExpr(''); setResult(null); setError(null); setJustEvaluated(false) }
+  /** ✕ Clear entry: remove the last whole number, function, constant or operator. */
+  const clearEntry = () => { setJustEvaluated(false); setResult(null); setError(null); setExpr((c) => removeLastItem(c)) }
   const back = () => { setJustEvaluated(false); setExpr((c) => c.replace(/(sin|cos|tan|asin|acos|atan|sqrt|ln|log|abs|exp|Ans)\($|Ans$|.$/, '')) }
   const currentValue = (): number | null => {
     try { return expr.trim() ? tryEval(expr) : ans } catch (e) { setError(e instanceof MathError ? e.message : 'Invalid expression'); return null }
@@ -134,6 +137,7 @@ function CalculatorTool({ scientific, show }: { scientific: boolean; show: (n: n
     let handled = true
     if (/^[0-9.]$/.test(k) || '+-*/^%()!'.includes(k)) insert(k)
     else if (k === 'Enter' || k === '=') void run()
+    else if (k === 'Backspace' && e.shiftKey) clearEntry()
     else if (k === 'Backspace') back()
     else if (k === 'Escape' || k === 'Delete') clear()
     else handled = false
@@ -141,28 +145,30 @@ function CalculatorTool({ scientific, show }: { scientific: boolean; show: (n: n
   }
 
   const fnKey = (f: string) => ({ label: f, run: () => insert(`${f}(`) })
-  const std: { label: string; run: () => void; tone?: 'op' | 'eq' | 'mem'; aria?: string }[] = [
+  // Phone-style layout, 4 columns: memory · clear keys · digits with operators · extras · full-width equals.
+  const std: { label: string; run: () => void; tone?: 'op' | 'eq' | 'mem' | 'clear'; aria?: string; wide?: boolean; title?: string }[] = [
     { label: 'MC', run: () => setMemory(0), tone: 'mem', aria: 'Memory clear' },
     { label: 'MR', run: () => insert(formatResult(memory)), tone: 'mem', aria: 'Memory recall' },
     { label: 'M+', run: () => { const v = currentValue(); if (v != null) setMemory(memory + v) }, tone: 'mem', aria: 'Add to memory' },
     { label: 'M−', run: () => { const v = currentValue(); if (v != null) setMemory(memory - v) }, tone: 'mem', aria: 'Subtract from memory' },
-    { label: 'C', run: clear, tone: 'op', aria: 'Clear' },
-    { label: '⌫', run: back, tone: 'op', aria: 'Backspace' },
-    { label: '(', run: () => insert('(') , tone: 'op' },
-    { label: ')', run: () => insert(')'), tone: 'op' },
-    { label: '7', run: () => insert('7') }, { label: '8', run: () => insert('8') }, { label: '9', run: () => insert('9') },
+    { label: 'C', run: clear, tone: 'clear', aria: 'Clear all', title: 'Clear the whole calculation (Esc)' },
+    { label: '✕', run: clearEntry, tone: 'clear', aria: 'Clear entry: remove the last number or operator', title: 'Remove the last number or operator (Shift+Backspace)' },
+    { label: '⌫', run: back, tone: 'clear', aria: 'Backspace: delete the last character', title: 'Delete the last character (Backspace)' },
     { label: '÷', run: () => insert('/'), tone: 'op', aria: 'Divide' },
-    { label: '4', run: () => insert('4') }, { label: '5', run: () => insert('5') }, { label: '6', run: () => insert('6') },
+    { label: '7', run: () => insert('7') }, { label: '8', run: () => insert('8') }, { label: '9', run: () => insert('9') },
     { label: '×', run: () => insert('*'), tone: 'op', aria: 'Multiply' },
-    { label: '1', run: () => insert('1') }, { label: '2', run: () => insert('2') }, { label: '3', run: () => insert('3') },
+    { label: '4', run: () => insert('4') }, { label: '5', run: () => insert('5') }, { label: '6', run: () => insert('6') },
     { label: '−', run: () => insert('-'), tone: 'op', aria: 'Minus' },
+    { label: '1', run: () => insert('1') }, { label: '2', run: () => insert('2') }, { label: '3', run: () => insert('3') },
+    { label: '+', run: () => insert('+'), tone: 'op', aria: 'Plus' },
+    { label: '(', run: () => insert('('), tone: 'op', aria: 'Open bracket' },
+    { label: ')', run: () => insert(')'), tone: 'op', aria: 'Close bracket' },
     { label: '0', run: () => insert('0') }, { label: '.', run: () => insert('.'), aria: 'Decimal point' },
     { label: '%', run: () => insert('%'), tone: 'op', aria: 'Percent or modulo' },
-    { label: '+', run: () => insert('+'), tone: 'op', aria: 'Plus' },
-    { label: 'Ans', run: () => insert('Ans'), tone: 'mem', aria: 'Insert previous answer' },
     { label: '^', run: () => insert('^'), tone: 'op', aria: 'Power' },
     { label: '±', run: () => { setJustEvaluated(false); setExpr((c) => (c ? `-(${c})` : '-')) }, tone: 'op', aria: 'Negate' },
-    { label: '=', run: () => void run(), tone: 'eq', aria: 'Equals' },
+    { label: 'Ans', run: () => insert('Ans'), tone: 'mem', aria: 'Insert previous answer' },
+    { label: '=', run: () => void run(), tone: 'eq', aria: 'Equals', wide: true },
   ]
   const sci = [
     ...['sin', 'cos', 'tan', 'asin', 'acos', 'atan', 'sqrt', 'ln', 'log', 'abs', 'exp'].map(fnKey),
@@ -210,14 +216,14 @@ function CalculatorTool({ scientific, show }: { scientific: boolean; show: (n: n
           )}
           <div className="grid grid-cols-4 gap-2">
             {std.map((k) => (
-              <button key={k.label} type="button" onClick={k.run} aria-label={k.aria ?? k.label}
-                className={cn('btn h-12 text-base font-semibold', k.tone === 'eq' ? 'btn-3d' : k.tone === 'op' ? 'btn-soft text-accent' : k.tone === 'mem' ? 'btn-soft text-sm text-muted' : 'btn-soft')}>
+              <button key={k.label} type="button" onClick={k.run} aria-label={k.aria ?? k.label} title={k.title}
+                className={cn('btn h-12 text-base font-semibold', k.wide && 'col-span-4', k.tone === 'eq' ? 'btn-3d' : k.tone === 'op' ? 'btn-soft text-accent' : k.tone === 'clear' ? 'btn-soft text-danger' : k.tone === 'mem' ? 'btn-soft text-sm text-muted' : 'btn-soft')}>
                 {k.label}
               </button>
             ))}
           </div>
           <p className="mt-3 text-xs text-muted">
-            Click the calculator to use your keyboard: digits, + − * / ^ % ( ) !, Enter to evaluate, Backspace, Esc to clear. “50%” means 0.5; “7 % 3” is modulo.
+            Click the calculator to use your keyboard: digits, + − * / ^ % ( ) !, Enter to evaluate. ⌫ Backspace deletes one character, ✕ (Shift+Backspace) removes the last number or operator, C (Esc) clears everything. “50%” means 0.5; “7 % 3” is modulo.
           </p>
         </div>
       </Card>
