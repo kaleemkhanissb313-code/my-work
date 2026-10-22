@@ -192,7 +192,7 @@ function RecordsDueWidget({ collection, title, icon, path, days }: { collection:
             <span className="min-w-0 flex-1 truncate">{r.title}</span>{r.amount != null && <span className="tabular-nums">{money(r.amount, s.currency)}</span>}
           </Link></li>
         ))}</ul>
-        {collection === 'bills' && <p className="mt-2 text-right text-xs text-muted">Total: <b className="text-fg">{money(total, s.currency)}</b></p>}
+        {collection === 'bills' && <p className="mt-2 text-end text-xs text-muted">Total: <b className="text-fg">{money(total, s.currency)}</b></p>}
       </>}
     </Card>
   )
@@ -268,7 +268,7 @@ function CalcWidget() {
     <Card><CardTitle icon={Calculator} action={<Link to="/calculator" className="text-xs text-accent">Full calculator</Link>}>Quick calculator</CardTitle>
       <label htmlFor="qc" className="sr-only">Expression</label>
       <input id="qc" className="input font-mono" placeholder="e.g. (1200*0.15)+sqrt(81)" value={expr} onChange={(e) => setExpr(e.target.value)} />
-      <div className="mt-2 min-h-7 text-right font-mono text-xl font-semibold tabular-nums" aria-live="polite">{err ? <span className="text-sm text-danger">{err}</span> : out && `= ${out}`}</div>
+      <div className="mt-2 min-h-7 text-end font-mono text-xl font-semibold tabular-nums" aria-live="polite">{err ? <span className="text-sm text-danger">{err}</span> : out && `= ${out}`}</div>
     </Card>
   )
 }
@@ -311,8 +311,8 @@ function QuickWidget() {
   return (
     <Card><CardTitle icon={Zap}>Quick actions</CardTitle>
       <form className="relative mb-3" onSubmit={(e) => { e.preventDefault(); const v = new FormData(e.currentTarget).get('qa'); openQuickAdd(String(v ?? '')); e.currentTarget.reset() }}>
-        <Wand2 className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-accent" aria-hidden />
-        <input name="qa" className="input pl-9" aria-label="Smart quick add" placeholder="Pay rent tomorrow 5pm #bills…" />
+        <Wand2 className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-accent" aria-hidden />
+        <input name="qa" className="input ps-9" aria-label="Smart quick add" placeholder="Pay rent tomorrow 5pm #bills…" />
       </form>
       <div className="grid grid-cols-2 gap-2">{items.map(([l, I, run]) => <Button key={l} size="sm" icon={I} onClick={run} className="justify-start">{l}</Button>)}</div>
     </Card>
@@ -352,7 +352,7 @@ function LiveClock({ now }: { now: number }) {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
   const c = clock12(now, tz)
   return (
-    <div className="text-right">
+    <div className="text-end">
       <time dateTime={new Date(now).toISOString()} className="block whitespace-nowrap font-mono text-3xl font-bold tabular-nums sm:text-4xl" aria-label={`Current time ${c.text}`}>
         {c.hh}:{c.mm}<span className="text-xl text-muted">:{c.ss}</span> <span className="font-sans text-lg font-semibold text-muted sm:text-xl">{c.period}</span>
       </time>
@@ -384,11 +384,12 @@ export function Dashboard() {
   return (
     <div>
       <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card relative mb-6 overflow-hidden p-4 sm:p-6">
-        <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-40 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--accent)), transparent 70%)' }} />
+        <div className="pointer-events-none absolute -end-16 -top-16 h-56 w-56 rounded-full opacity-40 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--accent)), transparent 70%)' }} />
         <div className="relative flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm text-muted">{format(now, 'EEEE, MMMM d, yyyy')}</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">{greet}{s.displayName ? `, ${s.displayName}` : ''}.</h1>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Hi {s.displayName.trim() || 'Kaleem'}</h1>
+            <p className="text-sm text-muted">{greet}.</p>
             <p className="mt-1 text-sm text-muted">
               {counts ? `${counts.tasks} open task${counts.tasks === 1 ? '' : 's'} · ${counts.projects} active project${counts.projects === 1 ? '' : 's'} · ${counts.docs} document${counts.docs === 1 ? '' : 's'}` : ' '}
             </p>
@@ -401,7 +402,7 @@ export function Dashboard() {
                 <motion.circle cx="22" cy="22" r="18" fill="none" stroke="url(#ring)" strokeWidth="5" strokeLinecap="round" strokeDasharray={113.1}
                   initial={{ strokeDashoffset: 113.1 }} animate={{ strokeDashoffset: 113.1 * (1 - pct / 100) }} transition={{ duration: 0.9, ease: 'easeOut' }} />
               </svg>
-              <div className="hidden text-left sm:block"><div className="text-xl font-bold tabular-nums">{planned ? `${pct}%` : '—'}</div><div className="text-xs text-muted">{planned ? `${doneToday}/${planned} due today` : 'Nothing due today'}</div></div>
+              <div className="hidden text-start sm:block"><div className="text-xl font-bold tabular-nums">{planned ? `${pct}%` : '—'}</div><div className="text-xs text-muted">{planned ? `${doneToday}/${planned} due today` : 'Nothing due today'}</div></div>
             </Link>
           <LiveClock now={now} />
           </div>
@@ -414,7 +415,7 @@ export function Dashboard() {
               <span className="tile-label">{a === 'life' ? 'My Life' : AREA_LABEL[a]}</span>
             </Link>
           ))}
-          {canCustomize && <button type="button" onClick={() => setCustomize(true)} className="btn btn-soft h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:ml-auto sm:h-10 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-0 sm:text-sm">
+          {canCustomize && <button type="button" onClick={() => setCustomize(true)} className="btn btn-soft h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:ms-auto sm:h-10 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-0 sm:text-sm">
             <LayoutGrid className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden /><span className="tile-label">Customize</span>
           </button>}
         </nav>

@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test'
 test.describe('core workflows', () => {
   test('navigation works on desktop and mobile', async ({ page, isMobile }) => {
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(/Good (morning|afternoon|evening|night)/)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/^Hi /)
     if (isMobile) await page.getByRole('button', { name: 'Open menu' }).click()
     await page.getByRole('navigation', { name: 'Main' }).getByRole('button', { name: 'Projects & Tasks' }).click()
     await page.getByRole('navigation', { name: 'Main' }).getByRole('link', { name: 'Tasks', exact: true }).click()
