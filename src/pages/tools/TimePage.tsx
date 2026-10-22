@@ -24,6 +24,7 @@ import {
   POMODORO_ID, ProgressRing, TRACKING_ID, addTaskMinutes, stopTracking, useNow, useTimerAlarms, type TrackingTimer,
 } from '@/features/tools/timers'
 import type { Area, ID, Project, RunningTimer, Task, TimerSession } from '@/types/models'
+import { time12 } from '@/lib/time12'
 
 type TabId = 'timers' | 'pomodoro' | 'tracking' | 'history'
 const AREAS: Area[] = ['personal', 'work', 'home', 'life']
@@ -559,8 +560,8 @@ function HistoryTab({ tasks, projects }: { tasks: Task[]; projects: Project[] })
   const exportCsv = () => {
     downloadText(objectsToCSV(filtered, [
       { key: (s) => format(s.startedAt, 'yyyy-MM-dd'), label: 'Date' },
-      { key: (s) => format(s.startedAt, 'HH:mm'), label: 'Start' },
-      { key: (s) => format(s.endedAt, 'HH:mm'), label: 'End' },
+      { key: (s) => time12(s.startedAt), label: 'Start' },
+      { key: (s) => time12(s.endedAt), label: 'End' },
       { key: (s) => (s.durationMs / 60_000).toFixed(1), label: 'Minutes' },
       { key: 'label', label: 'Label' },
       { key: 'kind', label: 'Type' },
@@ -637,7 +638,7 @@ function HistoryTab({ tasks, projects }: { tasks: Task[]; projects: Project[] })
                 <div className="min-w-0 flex-1">
                   <div className="truncate font-medium">{s.label}</div>
                   <div className="mt-0.5 flex flex-wrap items-center gap-1.5 text-xs text-muted">
-                    <span>{format(s.startedAt, 'EEE, MMM d · HH:mm')}–{format(s.endedAt, 'HH:mm')}</span>
+                    <span>{format(s.startedAt, 'EEE, MMM d')} · {time12(s.startedAt)}–{time12(s.endedAt)}</span>
                     <Badge tone={AREA_TONE[s.area]}>{AREA_LABEL[s.area]}</Badge>
                     <Badge>{s.kind}</Badge>
                     {s.projectId && <Badge>{projectName(s.projectId)}</Badge>}

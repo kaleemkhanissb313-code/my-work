@@ -17,6 +17,7 @@ import {
 import { addWorkingDays, daysBetween, parseDate, toISODate, todayISO, workingDaysBetween } from '@/lib/dates'
 import { cn } from '@/lib/cn'
 import { copyText, loadPref, num, savePref } from '@/features/tools/clipboard'
+import { time12 } from '@/lib/time12'
 
 type TabId = 'standard' | 'scientific' | 'percentage' | 'discount' | 'ratio' | 'stats' | 'datetime' | 'units'
 type Places = number | 'auto'
@@ -242,7 +243,7 @@ function HistoryPanel({ history, onReuse }: { history: { id: string; at: number;
               <button type="button" onClick={() => onReuse(h)} className="w-full rounded-xl px-2 py-1.5 text-right hover:bg-raised" title="Reuse this expression">
                 <div className="truncate font-mono text-xs text-muted">{h.expression}</div>
                 <div className="truncate font-mono font-semibold">= {h.result}</div>
-                <div className="text-[10px] text-muted">{h.tool} · {format(h.at, 'MMM d, HH:mm')}</div>
+                <div className="text-[10px] text-muted">{h.tool} · {format(h.at, 'MMM d')}, {time12(h.at)}</div>
               </button>
             </li>
           ))}

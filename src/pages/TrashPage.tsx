@@ -7,6 +7,7 @@ import { Badge, Button, EmptyState, Input, PageHeader, Select, Spinner } from '@
 import { confirm, safeWrite } from '@/components/feedback'
 import { COLLECTIONS } from '@/features/records/collections'
 import type { BaseEntity } from '@/types/models'
+import { time12 } from '@/lib/time12'
 
 const TABLES = {
   docs: 'Document', projects: 'Project', tasks: 'Task', events: 'Event', media: 'Media', bookmarks: 'Link',
@@ -97,7 +98,7 @@ export function TrashPage() {
                   <td className="p-3"><input type="checkbox" aria-label={`Select ${i.title}`} checked={selected.has(i.key)} onChange={() => toggle(i.key)} /></td>
                   <td className="max-w-[16rem] truncate p-3 font-medium">{i.title}</td>
                   <td className="p-3"><Badge>{i.type}</Badge></td>
-                  <td className="whitespace-nowrap p-3 text-muted">{format(i.deletedAt, 'MMM d, yyyy HH:mm')}</td>
+                  <td className="whitespace-nowrap p-3 text-muted">{format(i.deletedAt, 'MMM d, yyyy')} {time12(i.deletedAt)}</td>
                   <td className="whitespace-nowrap p-3 text-right">
                     <Button size="sm" variant="ghost" icon={RotateCcw} onClick={() => void restore([i])}>Restore</Button>
                     <Button size="sm" variant="ghost" icon={Trash2} onClick={() => void purge([i])} aria-label={`Delete ${i.title} permanently`}>Delete</Button>

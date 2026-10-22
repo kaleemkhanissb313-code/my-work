@@ -23,6 +23,7 @@ import { cloudConfigured } from '@/services/supabase'
 import { authState } from '@/services/auth'
 import { vaultState } from '@/services/vault'
 import { cn } from '@/lib/cn'
+import { clock12 } from '@/lib/time12'
 import type { Task } from '@/types/models'
 
 const PRI: Record<Task['priority'], number> = { urgent: 0, high: 1, medium: 2, low: 3 }
@@ -345,6 +346,20 @@ const WIDGETS: Record<string, () => JSX.Element> = {
   quick: QuickWidget, security: SecurityWidget,
 }
 
+/** 12-hour live clock (hh:mm:ss AM/PM) in the device time zone; updated every second by useNow. */
+function LiveClock({ now }: { now: number }) {
+  const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
+  const c = clock12(now, tz)
+  return (
+    <div className="text-right">
+      <time dateTime={new Date(now).toISOString()} className="block whitespace-nowrap font-mono text-3xl font-bold tabular-nums sm:text-4xl" aria-label={`Current time ${c.text}`}>
+        {c.hh}:{c.mm}<span className="text-xl text-muted">:{c.ss}</span> <span className="font-sans text-lg font-semibold text-muted sm:text-xl">{c.period}</span>
+      </time>
+      <div className="text-xs text-muted">{tz}</div>
+    </div>
+  )
+}
+
 export function Dashboard() {
   const s = useSettings()
   const now = useNow(1000)
@@ -366,7 +381,7 @@ export function Dashboard() {
 
   return (
     <div>
-      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card relative mb-6 overflow-hidden p-6">
+      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card relative mb-6 overflow-hidden p-4 sm:p-6">
         <div className="pointer-events-none absolute -right-16 -top-16 h-56 w-56 rounded-full opacity-40 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--accent)), transparent 70%)' }} />
         <div className="relative flex flex-wrap items-end justify-between gap-4">
           <div>
@@ -386,20 +401,21 @@ export function Dashboard() {
               </svg>
               <div className="hidden text-left sm:block"><div className="text-xl font-bold tabular-nums">{planned ? `${pct}%` : '—'}</div><div className="text-xs text-muted">{planned ? `${doneToday}/${planned} due today` : 'Nothing due today'}</div></div>
             </Link>
-          <div className="text-right">
-            <div className="font-mono text-4xl font-bold tabular-nums" aria-label="Current time">{format(now, 'HH:mm')}<span className="text-xl text-muted">:{format(now, 'ss')}</span></div>
-            <div className="text-xs text-muted">{Intl.DateTimeFormat().resolvedOptions().timeZone}</div>
-          </div>
+          <LiveClock now={now} />
           </div>
         </div>
-        <div className="relative mt-4 flex flex-wrap gap-2">
+        {/* Four equal tiles in ONE row on every screen: icon above a short label on phones, inline on larger screens. */}
+        <nav aria-label="Areas" className="relative mt-4 grid grid-cols-4 gap-1 sm:flex sm:flex-wrap sm:gap-2">
           {(['life', 'home', 'work'] as const).map((a) => (
-            <Link key={a} to={`/${a}`} className="btn btn-soft h-9 px-3 text-sm">
-              {a === 'life' ? <Heart className="h-4 w-4 text-life" /> : a === 'home' ? <Home className="h-4 w-4 text-home" /> : <Briefcase className="h-4 w-4 text-work" />}{a === 'life' ? 'My Life' : AREA_LABEL[a]}
+            <Link key={a} to={`/${a}`} className="btn btn-soft h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:h-9 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-3 sm:py-0 sm:text-sm">
+              {a === 'life' ? <Heart className="h-5 w-5 text-life sm:h-4 sm:w-4" aria-hidden /> : a === 'home' ? <Home className="h-5 w-5 text-home sm:h-4 sm:w-4" aria-hidden /> : <Briefcase className="h-5 w-5 text-work sm:h-4 sm:w-4" aria-hidden />}
+              <span className="tile-label">{a === 'life' ? 'My Life' : AREA_LABEL[a]}</span>
             </Link>
           ))}
-          <Button size="md" icon={LayoutGrid} onClick={() => setCustomize(true)} className="ml-auto">Customize</Button>
-        </div>
+          <button type="button" onClick={() => setCustomize(true)} className="btn btn-soft h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:ml-auto sm:h-10 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-0 sm:text-sm">
+            <LayoutGrid className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden /><span className="tile-label">Customize</span>
+          </button>
+        </nav>
       </motion.section>
 
       {isEmpty && (

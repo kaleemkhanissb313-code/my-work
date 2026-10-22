@@ -4,6 +4,7 @@ import { db } from '@/lib/db'
 import { expandOccurrences, todayISO, toISODate } from '@/lib/dates'
 import { addDays } from 'date-fns'
 import { toast } from '@/components/feedback'
+import { time12 } from '@/lib/time12'
 
 export interface AppNotification { id: string; title: string; detail: string; path: string; tone: 'danger' | 'warn' | 'info' }
 
@@ -29,7 +30,7 @@ export function useNotifications(): AppNotification[] {
     for (const e of events) {
       const d = e.allDay ? e.start.slice(0, 10) : toISODate(new Date(e.start))
       if (expandOccurrences(d, e.recurrence, today, today).length)
-        out.push({ id: `e${e.id}`, title: `Today: ${e.title}`, detail: e.allDay ? 'All day' : new Date(e.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }), path: `/calendar?date=${today}`, tone: 'info' })
+        out.push({ id: `e${e.id}`, title: `Today: ${e.title}`, detail: e.allDay ? 'All day' : time12(new Date(e.start)), path: `/calendar?date=${today}`, tone: 'info' })
     }
     return out.slice(0, 30)
   }, []) ?? []
@@ -56,7 +57,7 @@ export function useReminderLoop() {
           const key = `${e.id}@${d}`
           if (remindAt <= now && at > now - 3_600_000 && !fired.has(key)) {
             fired.add(key); changed = true
-            const msg = `${e.title} — ${new Date(at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`
+            const msg = `${e.title} — ${time12(new Date(at))}`
             toast(`Reminder: ${msg}`, 'info', undefined, 10000)
             if ('Notification' in window && Notification.permission === 'granted') {
               try { new Notification('Basic to Advanced reminder', { body: msg, tag: key }) } catch { /* some platforms require SW notifications */ }

@@ -127,6 +127,9 @@
     min-height: 2.5rem;
   }
   textarea.input { line-height: 1.5; }
+  /* Compact tile labels: wrap to at most two lines instead of truncating (long translations, 320px phones). */
+  .tile-label { @apply max-w-full whitespace-normal text-center leading-tight; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; overflow-wrap: normal; word-break: keep-all; }
+  @media (max-width: 359px) { .tile-label { font-size: 11px; letter-spacing: -0.02em; } }
   .label { @apply mb-1.5 block text-xs font-medium tracking-[0.01em] text-muted; }
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border; }
   .kbd { @apply inline-flex items-center rounded-md border border-line bg-raised px-1.5 text-[10px] font-mono text-muted; box-shadow: 0 1px 0 rgb(var(--line)); }
