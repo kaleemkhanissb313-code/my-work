@@ -6,6 +6,7 @@ import { Topbar } from './layout/Topbar'
 import { BottomNav } from './layout/BottomNav'
 import { CommandMenu } from './layout/CommandMenu'
 import { LockScreen } from './layout/LockScreen'
+import { AccessGate } from '@/features/access/AccessGate'
 import { ConfirmHost, Toaster } from '@/components/feedback'
 import { Spinner } from '@/components/ui'
 import { applyAppearance, useSettings } from '@/services/settings'
@@ -90,7 +91,7 @@ export function AppShell() {
           <main id="main" className="mx-auto w-full max-w-[1400px] flex-1 px-4 pb-28 pt-6 sm:px-6 lg:pb-8">
             {/* Subtle page transition (disabled automatically with reduced motion) */}
             <motion.div key={loc.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: 'easeOut' }}>
-              <Suspense fallback={<Spinner />}><Outlet /></Suspense>
+              <Suspense fallback={<Spinner />}><AccessGate><Outlet /></AccessGate></Suspense>
             </motion.div>
           </main>
         </div>

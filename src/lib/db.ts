@@ -1,4 +1,5 @@
 import Dexie, { type EntityTable } from 'dexie'
+import { currentDbName } from './accountScope'
 import type { GxPayImage } from '@/features/glamiex/payImage/model'
 import type { BpPartner, BpTxn } from '@/features/glamiex/partners/types'
 import type { PayRecord } from '@/features/glamiex/payRecords/model'
@@ -114,7 +115,8 @@ export class AppDB extends Dexie {
   }
 }
 
-export const db = new AppDB()
+// Each signed-in account has its own on-device database (see accountScope).
+export const db = new AppDB(currentDbName())
 
 /** Tables whose rows extend BaseEntity (trash, sync and backup apply to these). */
 export const entityTables = [

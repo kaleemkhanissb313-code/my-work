@@ -2,14 +2,20 @@ import type { Session } from '@supabase/supabase-js'
 import { createStore } from '@/lib/store'
 import { cloudConfigured, friendlyAuthError, supabase } from './supabase'
 import { audit } from './audit'
+import { switchAccount } from '@/lib/accountScope'
 
 export const authState = createStore<{ session: Session | null; ready: boolean }>({ session: null, ready: !cloudConfigured })
 
 export function initAuth() {
   const sb = supabase()
   if (!sb) return
-  sb.auth.getSession().then(({ data }) => authState.set({ session: data.session, ready: true }))
-  sb.auth.onAuthStateChange((_evt, session) => authState.set({ session, ready: true }))
+  // Switching accounts reopens the app on that account's own local database (never another account's data).
+  const apply = (session: Session | null) => {
+    if (switchAccount(session?.user.id ?? null)) { location.reload(); return }
+    authState.set({ session, ready: true })
+  }
+  sb.auth.getSession().then(({ data }) => apply(data.session))
+  sb.auth.onAuthStateChange((_evt, session) => apply(session))
 }
 
 const need = () => {

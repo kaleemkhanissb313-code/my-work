@@ -1,6 +1,7 @@
 import {
   Banknote, BarChart3, Briefcase, Calculator, CalendarDays, CheckSquare, FileText, FolderKanban, GanttChart, Hash, Heart, Home,
   Gem, Image, ImagePlus, LayoutDashboard, Link2, Lock, NotebookPen, Palette, Settings, ShieldCheck, Timer, Trash2, Type, LayoutTemplate, PieChart, type LucideIcon,
+  Share2, UserCheck,
 } from 'lucide-react'
 
 export interface NavLeaf { id: string; label: string; path: string; icon: LucideIcon; shortcut?: string }
@@ -60,6 +61,8 @@ export const NAV: NavGroup[] = [
   {
     id: 'settings-group', label: 'Settings', icon: Settings, children: [
       { id: 'settings', label: 'Settings', path: '/settings', icon: Settings },
+      { id: 'privacy', label: 'Privacy & Sharing', path: '/privacy', icon: Share2 },
+      { id: 'access', label: 'Access Control', path: '/access', icon: UserCheck },
       { id: 'trash', label: 'Trash', path: '/trash', icon: Trash2 },
     ],
   },
@@ -67,4 +70,4 @@ export const NAV: NavGroup[] = [
 
 export const ALL_LEAVES: NavLeaf[] = NAV.flatMap((g) => (g.children ? g.children : [{ id: g.id, label: g.label, path: g.path!, icon: g.icon }]))
 /** Modules that can be hidden in Settings (core navigation is always available). */
-export const HIDEABLE = ALL_LEAVES.filter((l) => !['dashboard', 'settings', 'trash', 'security'].includes(l.id))
+export const HIDEABLE = ALL_LEAVES.filter((l) => !['dashboard', 'settings', 'trash', 'security', 'privacy', 'access'].includes(l.id))

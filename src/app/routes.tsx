@@ -36,6 +36,9 @@ const SettingsPage = p(() => import('@/pages/SettingsPage'), 'SettingsPage')
 const AuthPage = p(() => import('@/pages/AuthPage'), 'AuthPage')
 const GlamiexPage = p(() => import('@/pages/glamiex/GlamiexPage'), 'GlamiexPage')
 const StudioPage = p(() => import('@/pages/studio/StudioPage'), 'StudioPage')
+const AccessPage = p(() => import('@/pages/AccessPage'), 'AccessPage')
+const PrivacyPage = p(() => import('@/pages/PrivacyPage'), 'PrivacyPage')
+const SharedItemPage = p(() => import('@/pages/SharedItemPage'), 'SharedItemPage')
 
 export const router = createBrowserRouter([
   {
@@ -59,6 +62,10 @@ export const router = createBrowserRouter([
       { path: 'templates', element: <DocsPage kind="template" /> },
       { path: 'media', element: <MediaPage /> },
       { path: 'studio', element: <StudioPage /> },
+      { path: 'access', element: <AccessPage /> },
+      { path: 'privacy', element: <PrivacyPage /> },
+      { path: 'shared/:id', element: <SharedItemPage /> },
+      { path: 's/:token', element: <SharedItemPage /> },
       { path: 'links', element: <LinksPage /> },
       { path: 'time', element: <TimePage /> },
       { path: 'calculator', element: <CalculatorPage /> },

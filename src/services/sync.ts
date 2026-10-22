@@ -4,6 +4,8 @@ import { createStore } from '@/lib/store'
 import { uid } from '@/lib/id'
 import { supabase } from './supabase'
 import { audit } from './audit'
+import { accessState, can, refreshAccess } from './access'
+import { recordFeature, tableFeature } from '@/features/access/features'
 import type { Doc, MediaFile } from '@/types/models'
 
 /** Local table → remote Postgres table (see supabase/migrations). */
@@ -46,7 +48,13 @@ export async function syncNow(): Promise<{ pushed: number; pulled: number; confl
   const now = Date.now()
   let pushed = 0, pulled = 0, conflicts = 0
   try {
+    // Only sync features this account is allowed to use (the database refuses the rest anyway).
+    await refreshAccess()
+    const access = accessState.get()
+    if (access.error) throw new Error(access.error)
     for (const [local, remote] of Object.entries(SYNC_TABLES) as [EntityTableName, string][]) {
+      const feature = tableFeature(remote)
+      if (feature !== 'records' && !can(feature, access)) continue
       const table = db.table(local)
       // 1) Pull remote changes since our server-time cursor (server time avoids client clock skew).
       let cursor = ((await db.kv.get(cursorKey(remote)))?.value as string) ?? '1970-01-01T00:00:00Z'
@@ -80,7 +88,7 @@ export async function syncNow(): Promise<{ pushed: number; pulled: number; confl
       await db.kv.put({ key: cursorKey(remote), value: cursor })
 
       // 2) Push local dirty rows.
-      const dirty = (await table.filter((r: SyncRow) => r.syncedAt == null).toArray()) as (SyncRow & Record<string, unknown>)[]
+      const dirty = (await table.filter((r: SyncRow & Record<string, unknown>) => r.syncedAt == null && (feature !== 'records' || can(recordFeature(r.collection as string), access))).toArray()) as (SyncRow & Record<string, unknown>)[]
       if (dirty.length) {
         if (local === 'media') for (const m of dirty as unknown as MediaFile[]) if (!m.deletedAt) await uploadMedia(user.id, m)
         for (let i = 0; i < dirty.length; i += 200) {

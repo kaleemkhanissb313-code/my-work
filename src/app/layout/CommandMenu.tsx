@@ -4,6 +4,8 @@ import { ArrowRight, Wand2, CalendarPlus, CheckSquare, FileText, FolderPlus, Loc
 import { Modal } from '@/components/ui'
 import { searchAll, type SearchHit } from '@/services/search'
 import { ALL_LEAVES } from '../nav'
+import { can } from '@/services/access'
+import { featureForPath } from '@/features/access/features'
 import { quick } from '@/services/quick'
 import { openQuickAdd } from '@/features/quickadd/QuickAdd'
 import { lockApp } from '@/services/security'
@@ -39,7 +41,7 @@ export function CommandMenu({ open, onClose }: { open: boolean; onClose: () => v
       { id: 'theme', label: 'Toggle dark / light theme', icon: Moon, group: 'Actions', run: go(async () => { const s = await getSettings(); await updateSettings({ theme: s.theme === 'dark' ? 'light' : 'dark' }) }) },
       { id: 'lock', label: 'Lock app', hint: 'Ctrl Shift L', icon: Lock, group: 'Actions', run: go(() => void lockApp('manual')) },
     ]
-    const pages: Cmd[] = ALL_LEAVES.map((l) => ({ id: `go-${l.id}`, label: `Go to ${l.label}`, icon: l.icon, group: 'Navigate', run: go(() => nav(l.path)) }))
+    const pages: Cmd[] = ALL_LEAVES.filter((l) => can(featureForPath(l.path))).map((l) => ({ id: `go-${l.id}`, label: `Go to ${l.label}`, icon: l.icon, group: 'Navigate', run: go(() => nav(l.path)) }))
     const term = q.toLowerCase().trim()
     if (!term) return [...actions, ...pages]
     // "Quick add: <text>" always contains the query, so it goes last; otherwise Enter would never open a matching page.

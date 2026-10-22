@@ -2,7 +2,9 @@ import { useEffect, useState } from 'react'
 import { NavLink, useLocation } from 'react-router'
 import { ChevronDown, PanelLeftClose, PanelLeftOpen, X } from 'lucide-react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { NAV, type NavGroup } from '../nav'
+import { ALL_LEAVES, NAV, type NavGroup } from '../nav'
+import { can, useAccess } from '@/services/access'
+import { featureForPath } from '@/features/access/features'
 import { useSettings } from '@/services/settings'
 import { cn } from '@/lib/cn'
 import { BrandMark, Wordmark } from '@/components/Logo'
@@ -78,7 +80,9 @@ function Group({ g, hidden, onNavigate, compact }: { g: NavGroup; hidden: Set<st
 
 export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose: () => void }) {
   const s = useSettings()
-  const hidden = new Set(s.hiddenModules)
+  const access = useAccess()
+  // Hidden = turned off in Settings, or not permitted for this account (the database enforces the latter too).
+  const hidden = new Set([...s.hiddenModules, ...ALL_LEAVES.filter((l) => !can(featureForPath(l.path), access)).map((l) => l.id), ...NAV.filter((g) => g.path && !can(featureForPath(g.path), access)).map((g) => g.id)])
   const [collapsed, setCollapsed] = useState(readCollapsed)
   const toggle = () => setCollapsed((c) => { try { localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1') } catch { /* per-device preference only */ } return !c })
 

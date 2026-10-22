@@ -50,9 +50,29 @@ Requires Node 20+.
 3. Copy `.env.example` → `.env.local` and set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (the **anon/publishable** key only — never the service-role key).
 4. In Supabase Auth settings set the Site URL / redirect URLs to your app origin (`/auth` is used for password reset). Enable TOTP MFA if you want 2FA.
 5. (Optional) AI: `supabase functions deploy ai` and `supabase secrets set ANTHROPIC_API_KEY=...` (optionally `AI_MODEL`). The key only lives on the server.
-6. Verify RLS: `supabase test db` runs `supabase/tests/rls.test.sql` (pgTAP).
+6. Verify RLS: `supabase test db` runs `supabase/tests/rls.test.sql` (pgTAP). Without Docker, `npx vitest run supabase/tests` applies every migration to an in-process Postgres (PGlite) and runs the two-user security tests.
 
 Then sign in from **Settings → Cloud sync / Profile menu** and press **Sync now**. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for the sync and conflict strategy.
+
+## Accounts & permissions
+
+With the cloud backend configured, every account is private, new accounts start with **no features**, and only the owner (and administrators the owner appoints) decide who may use what. All rules are enforced by the database (row-level security + checked functions in `supabase/migrations/20261025000001_access_control.sql`), not just hidden in the interface.
+
+1. Apply the migrations (`supabase db push`).
+2. In the Supabase **SQL editor** (never from the app), set the owner's email once:
+   ```sql
+   insert into public.app_config (key, value) values ('owner_email', 'you@example.com');
+   ```
+3. Sign up / sign in with that email (it must be **confirmed**), open **Settings → Access Control** and press **Claim ownership**. Only that email can claim, and only once.
+4. Other people sign up normally. They see "Access to this feature has not been granted…" with a **Request access** button. In **Access Control** you allow/deny each feature per person (Save changes), approve or reject requests, make administrators, and read the audit log.
+5. **Privacy & Sharing**: share one document, record, project, task, event or dataset with a specific person's email (view or edit) or as a view-only link, optionally expiring; revoke at any time. The plain link is shown once; only its hash is stored.
+
+What is and isn't covered:
+- Feature permissions protect the synced data on the server and the private file store. On a device, each account opens its **own local database**; the first account to sign in on a device keeps that device's existing data, and other accounts (and signed-out visitors afterwards) get separate, empty storage.
+- If an account is denied a feature, its data for that feature stays on that person's own device but no longer syncs and cannot be read from the server.
+- The "Customize dashboard" permission only controls the interface (dashboard layout is a device preference).
+- File attachments are not part of item sharing; shared items show their text content.
+- Without the cloud backend (the default build) the app is single-user: nothing is shared and the Access Control / Privacy pages explain this.
 
 ## Desktop & mobile
 
@@ -66,7 +86,7 @@ See [docs/PLATFORMS.md](docs/PLATFORMS.md). In short:
 - Reminders and timer alarms fire **only while the app is open** (in-app toast + desktop notification if permitted). There is no push/email delivery.
 - The app lock is a **privacy screen**; it does not encrypt non-vault local data. Use the **Private Vault** for sensitive content.
 - Biometric unlock is only possible in native builds and is not wired up yet (disabled in the UI).
-- Shared household lists / multi-user collaboration are not implemented (sync is single-user).
+- Multi-user collaboration is limited to sharing single items (view or edit); there is no real-time co-editing — an editor's change reaches the owner on their next sync.
 - Invoices, meetings and contacts are records — nothing is emailed or sent.
 - Word export produces an HTML-based `.doc` that Word opens; true `.docx` generation is not included. PDF uses the browser's print dialog.
 - Cloud sync and the AI function are implemented against Supabase's APIs but must be tested against your own project; they are disabled when not configured.

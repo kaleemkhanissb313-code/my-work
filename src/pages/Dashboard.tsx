@@ -24,6 +24,7 @@ import { authState } from '@/services/auth'
 import { vaultState } from '@/services/vault'
 import { cn } from '@/lib/cn'
 import { clock12 } from '@/lib/time12'
+import { can, useAccess } from '@/services/access'
 import type { Task } from '@/types/models'
 
 const PRI: Record<Task['priority'], number> = { urgent: 0, high: 1, medium: 2, low: 3 }
@@ -364,6 +365,7 @@ export function Dashboard() {
   const s = useSettings()
   const now = useNow(1000)
   const [customize, setCustomize] = useState(false)
+  const canCustomize = can('customize', useAccess())
   const counts = useLiveQuery(async () => ({
     tasks: await db.tasks.filter((t) => !t.deletedAt && t.status !== 'completed').count(),
     docs: await db.docs.filter((d) => !d.deletedAt).count(),
@@ -412,9 +414,9 @@ export function Dashboard() {
               <span className="tile-label">{a === 'life' ? 'My Life' : AREA_LABEL[a]}</span>
             </Link>
           ))}
-          <button type="button" onClick={() => setCustomize(true)} className="btn btn-soft h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:ml-auto sm:h-10 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-0 sm:text-sm">
+          {canCustomize && <button type="button" onClick={() => setCustomize(true)} className="btn btn-soft h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:ml-auto sm:h-10 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-0 sm:text-sm">
             <LayoutGrid className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden /><span className="tile-label">Customize</span>
-          </button>
+          </button>}
         </nav>
       </motion.section>
 
