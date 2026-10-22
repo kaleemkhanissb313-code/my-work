@@ -116,7 +116,7 @@ export function LinkPicker({ type, options, current, onPick, onClose }: { type: 
     <Modal open onClose={onClose} title={`Link to ${type}`} footer={<><Button onClick={() => { onPick(null); onClose() }}>Clear link</Button><Button onClick={onClose}>Cancel</Button></>}>
       <Input autoFocus aria-label="Search" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} />
       <ul className="mt-2 max-h-80 overflow-y-auto">{list.map((o) => (
-        <li key={o.id}><button type="button" className={`flex min-h-[44px] w-full items-center rounded-xl px-3 text-left text-sm hover:bg-raised ${o.id === current ? 'font-semibold text-accent' : ''}`} onClick={() => { onPick(o.id); onClose() }}>{o.label}</button></li>
+        <li key={o.id}><button type="button" className={`flex min-h-[44px] w-full items-center rounded-xl px-3 text-start text-sm hover:bg-raised ${o.id === current ? 'font-semibold text-accent' : ''}`} onClick={() => { onPick(o.id); onClose() }}>{o.label}</button></li>
       ))}{!list.length && <li className="p-3 text-sm text-muted">No matches.</li>}</ul>
     </Modal>
   )

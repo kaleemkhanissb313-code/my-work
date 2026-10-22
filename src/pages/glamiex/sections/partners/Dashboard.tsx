@@ -56,12 +56,12 @@ export default function Dashboard() {
                 </div>
                 <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-raised" aria-hidden><div className="h-full rounded-full bg-accent" style={{ width: `${(Math.max(0, x.capital) / maxCap) * 100}%` }} /></div>
                 <dl className="mt-3 grid grid-cols-2 gap-x-3 gap-y-1.5 text-xs">
-                  <dt className="text-muted">Invested capital</dt><dd className="text-right font-medium tabular-nums">{pkr(x.capital)}</dd>
-                  <dt className="text-muted">Profit / loss</dt><dd className={cn('text-right font-medium tabular-nums', pl > 0 && 'text-ok', pl < 0 && 'text-danger')}>{pkr(pl)}</dd>
-                  <dt className="text-muted">Money received</dt><dd className="text-right tabular-nums">{pkr(x.received)}</dd>
-                  <dt className="text-muted">Money paid</dt><dd className="text-right tabular-nums">{pkr(x.paid)}</dd>
-                  <dt className="text-muted">Unpaid profit</dt><dd className="text-right tabular-nums">{pkr(x.profitPayable)}</dd>
-                  <dt className="text-muted">{x.settlement >= 0 ? 'Owed by partners' : 'Owes partners'}</dt><dd className={cn('text-right tabular-nums', x.settlement < 0 && 'text-warn')}>{pkr(Math.abs(x.settlement))}</dd>
+                  <dt className="text-muted">Invested capital</dt><dd className="text-end font-medium tabular-nums">{pkr(x.capital)}</dd>
+                  <dt className="text-muted">Profit / loss</dt><dd className={cn('text-end font-medium tabular-nums', pl > 0 && 'text-ok', pl < 0 && 'text-danger')}>{pkr(pl)}</dd>
+                  <dt className="text-muted">Money received</dt><dd className="text-end tabular-nums">{pkr(x.received)}</dd>
+                  <dt className="text-muted">Money paid</dt><dd className="text-end tabular-nums">{pkr(x.paid)}</dd>
+                  <dt className="text-muted">Unpaid profit</dt><dd className="text-end tabular-nums">{pkr(x.profitPayable)}</dd>
+                  <dt className="text-muted">{x.settlement >= 0 ? 'Owed by partners' : 'Owes partners'}</dt><dd className={cn('text-end tabular-nums', x.settlement < 0 && 'text-warn')}>{pkr(Math.abs(x.settlement))}</dd>
                 </dl>
               </Link>
             )

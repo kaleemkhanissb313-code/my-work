@@ -167,7 +167,7 @@ function LifeOverview() {
           <div>
             <div className="mb-1 text-sm font-medium">{data.journal.title} <span className="text-xs font-normal text-muted">· {fmtDate(data.journal.dueDate)}</span></div>
             {hide ? (
-              <button type="button" onClick={() => setReveal(true)} className="w-full rounded-lg text-left" aria-label="Reveal journal entry (hidden by sensitive-content setting)">
+              <button type="button" onClick={() => setReveal(true)} className="w-full rounded-lg text-start" aria-label="Reveal journal entry (hidden by sensitive-content setting)">
                 <p className="select-none text-sm text-muted blur-sm" aria-hidden>{(entry || 'No text').slice(0, 220)}</p>
                 <span className="mt-1 block text-xs text-accent">Hidden — click to reveal</span>
               </button>
@@ -189,7 +189,7 @@ function LifeOverview() {
 
       <Card>
         <CardTitle icon={Dumbbell} tone="text-life" action={<Link className="text-xs text-accent hover:underline" to="/life/fitness">Fitness</Link>}>Fitness this week</CardTitle>
-        <div className="text-3xl font-bold tabular-nums">{data.fitnessMins}<span className="ml-1 text-base font-normal text-muted">min</span></div>
+        <div className="text-3xl font-bold tabular-nums">{data.fitnessMins}<span className="ms-1 text-base font-normal text-muted">min</span></div>
         <p className="text-sm text-muted">{data.fitness.length} log{data.fitness.length === 1 ? '' : 's'} this week</p>
       </Card>
 
@@ -199,7 +199,7 @@ function LifeOverview() {
           <p className="text-sm"><span className="font-semibold">{data.current.title}</span> — you're on this trip now (back {fmtDate(String(data.current.fields.returnDate))}).</p>
         ) : data.next ? (
           <div>
-            <div className="text-3xl font-bold tabular-nums">{daysBetween(today, data.next.dueDate!)}<span className="ml-1 text-base font-normal text-muted">days</span></div>
+            <div className="text-3xl font-bold tabular-nums">{daysBetween(today, data.next.dueDate!)}<span className="ms-1 text-base font-normal text-muted">days</span></div>
             <p className="text-sm text-muted">until <span className="text-fg">{data.next.title}</span> · {fmtDate(data.next.dueDate)}</p>
           </div>
         ) : <p className="text-sm text-muted">No upcoming trips planned.</p>}
@@ -331,7 +331,7 @@ function TodayEntry({ existing, today }: { existing: RecordItem | null; today: s
         </Field>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-1" role="radiogroup" aria-label="Mood (1–5)">
-            <span className="mr-1 text-sm text-muted">Mood</span>
+            <span className="me-1 text-sm text-muted">Mood</span>
             {[1, 2, 3, 4, 5].map((n) => (
               <button key={n} type="button" role="radio" aria-checked={mood === n} aria-label={`Mood ${n} of 5`} onClick={() => setMood(mood === n ? null : n)}
                 className={cn('h-9 w-9 rounded-lg border', mood != null && mood >= n ? 'border-warn text-warn' : 'border-line text-muted')}>
@@ -339,7 +339,7 @@ function TodayEntry({ existing, today }: { existing: RecordItem | null; today: s
               </button>
             ))}
           </div>
-          <Button type="submit" variant="primary" icon={Save} loading={saving} disabled={!dirty} className="ml-auto">{existing ? 'Update entry' : 'Save entry'}</Button>
+          <Button type="submit" variant="primary" icon={Save} loading={saving} disabled={!dirty} className="ms-auto">{existing ? 'Update entry' : 'Save entry'}</Button>
         </div>
         <p className="text-xs text-muted">Very private thoughts? Use the <Link to="/vault" className="text-accent hover:underline">encrypted Private Vault</Link> instead.</p>
       </form>
@@ -394,7 +394,7 @@ function ReviewsTab() {
         {(Object.keys(REVIEW_TEMPLATES) as (keyof typeof REVIEW_TEMPLATES)[]).map((k) => (
           <Card key={k} className="flex flex-col">
             <CardTitle icon={Sparkles} tone="text-life">{k} review</CardTitle>
-            <ul className="mb-3 list-disc space-y-0.5 pl-5 text-xs text-muted">
+            <ul className="mb-3 list-disc space-y-0.5 ps-5 text-xs text-muted">
               {Object.values(REVIEW_TEMPLATES[k]).map((p) => <li key={p}>{p.split('\n')[0]}</li>)}
             </ul>
             <Button className="mt-auto" icon={Plus} loading={busy === k} onClick={() => void start(k)}>Start {k.toLowerCase()} review</Button>
@@ -440,7 +440,7 @@ function PackingTab() {
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {groups.map(([name, g]) => (
             <button key={name} type="button" aria-pressed={sel === name} onClick={() => setSel(sel === name ? '' : name)}
-              className={cn('card card-hover p-3 text-left', sel === name && 'ring-2 ring-life/60')}>
+              className={cn('card card-hover p-3 text-start', sel === name && 'ring-2 ring-life/60')}>
               <div className="mb-1 flex items-center justify-between gap-2 text-sm">
                 <span className="truncate font-medium">{name === NO_TRIP ? 'No trip' : name}</span>
                 <span className="shrink-0 text-xs text-muted">{g.packed}/{g.total} packed</span>

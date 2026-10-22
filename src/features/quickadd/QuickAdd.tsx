@@ -88,15 +88,15 @@ export function QuickAddDialog() {
 
   return (
     <Modal open={open} onClose={close} title="Smart quick add" wide footer={<>
-      <span className="mr-auto hidden text-xs text-muted sm:block"><span className="kbd">Enter</span> add · <span className="kbd">Shift Enter</span> add & keep open · <span className="kbd">Esc</span> close</span>
+      <span className="me-auto hidden text-xs text-muted sm:block"><span className="kbd">Enter</span> add · <span className="kbd">Shift Enter</span> add & keep open · <span className="kbd">Esc</span> close</span>
       <Button onClick={close}>Cancel</Button>
       <Button variant="primary" icon={CornerDownLeft} loading={busy} disabled={!parsed.title} onClick={() => void submit(false)}>Add {effKind}</Button>
     </>}>
       <div className="relative">
-        <Wand2 className="pointer-events-none absolute left-3 top-1/2 h-5 w-5 -translate-y-1/2 text-accent" aria-hidden />
+        <Wand2 className="pointer-events-none absolute start-3 top-1/2 h-5 w-5 -translate-y-1/2 text-accent" aria-hidden />
         <input ref={inputRef} autoFocus value={text} onChange={(e) => setText(e.target.value)} aria-label="Describe a task or event"
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); if (parsed.title) void submit(e.shiftKey) } }}
-          placeholder='Try "Pay rent tomorrow 5pm #bills !high @home"' className="input h-12 pl-11 text-base" />
+          placeholder='Try "Pay rent tomorrow 5pm #bills !high @home"' className="input h-12 ps-11 text-base" />
       </div>
 
       <div className="mt-4 rounded-2xl border border-line bg-raised/40 p-4" aria-live="polite">

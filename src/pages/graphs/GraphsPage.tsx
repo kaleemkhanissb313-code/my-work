@@ -107,13 +107,13 @@ function DatasetEditor({ ds }: { ds: Dataset }) {
           <Button size="sm" icon={Columns3} onClick={addCol}>Column</Button>
           <Button size="sm" icon={Download} onClick={() => downloadText(toCSV([ds.columns, ...ds.rows]), `${slug(ds.name)}.csv`, 'text/csv;charset=utf-8')}>CSV</Button>
         </div>}>Data ({ds.rows.length} rows)</CardTitle>
-        <div className="relative mb-2 sm:max-w-xs"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-          <Input aria-label="Filter rows" className="pl-9" placeholder="Filter rows…" value={filter} onChange={(e) => setFilter(e.target.value)} /></div>
+        <div className="relative mb-2 sm:max-w-xs"><Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+          <Input aria-label="Filter rows" className="ps-9" placeholder="Filter rows…" value={filter} onChange={(e) => setFilter(e.target.value)} /></div>
         <div className="max-h-[480px] overflow-auto rounded-xl border border-line">
           <table className="w-full text-sm">
             <thead className="sticky top-0 z-10 bg-raised">
               <tr>{ds.columns.map((c, ci) => (
-                <th key={c + ci} className="min-w-[8rem] border-b border-line p-1 text-left">
+                <th key={c + ci} className="min-w-[8rem] border-b border-line p-1 text-start">
                   <div className="flex items-center gap-1">
                     <input aria-label={`Column ${ci + 1} name`} defaultValue={c} key={c} onBlur={(e) => e.target.value !== c && renameCol(ci, e.target.value)} className="w-full min-w-0 rounded bg-transparent px-1 py-1 font-semibold outline-none focus:bg-bg" />
                     <IconButton icon={sortCol?.i === ci && sortCol.dir === -1 ? ArrowDown : ArrowUp} label={`Sort by ${c}`} active={sortCol?.i === ci} className="h-7 w-7"
@@ -129,7 +129,7 @@ function DatasetEditor({ ds }: { ds: Dataset }) {
                   {ds.columns.map((c, ci) => (
                     <td key={ci} className="p-0">
                       <input aria-label={`Row ${i + 1}, ${c}`} defaultValue={String(r[ci] ?? '')} key={`${i}-${ci}-${r[ci]}`} onBlur={(e) => e.target.value !== String(r[ci] ?? '') && setCell(i, ci, e.target.value)}
-                        className={cn('w-full bg-transparent px-2 py-1.5 outline-none focus:bg-bg', typeof r[ci] === 'number' && 'text-right tabular-nums')} />
+                        className={cn('w-full bg-transparent px-2 py-1.5 outline-none focus:bg-bg', typeof r[ci] === 'number' && 'text-end tabular-nums')} />
                     </td>
                   ))}
                   <td><IconButton icon={Trash2} label={`Delete row ${i + 1}`} className="h-7 w-7" onClick={() => save({ rows: ds.rows.filter((_, j) => j !== i) })} /></td>
@@ -264,7 +264,7 @@ export function GraphsPage() {
               {list?.map((d) => (
                 <li key={d.id}>
                   <button type="button" onClick={() => setActiveId(d.id)} aria-current={active?.id === d.id}
-                    className={cn('w-full rounded-xl px-3 py-2 text-left text-sm', active?.id === d.id ? 'bg-raised font-medium' : 'hover:bg-raised/60')}>
+                    className={cn('w-full rounded-xl px-3 py-2 text-start text-sm', active?.id === d.id ? 'bg-raised font-medium' : 'hover:bg-raised/60')}>
                     <div className="truncate">{d.name}</div><div className="text-xs text-muted">{d.rows.length} rows · {d.chart.type}{d.sample ? ' · sample' : ''}</div>
                   </button>
                 </li>

@@ -1,0 +1,8 @@
+User-agent: *
+Allow: /my-work/$
+Allow: /my-work/og-image.jpg
+# Private app: share links and in-app pages are not for search results
+Disallow: /my-work/s/
+Disallow: /my-work/shared/
+
+Sitemap: https://kaleemkhanissb313-code.github.io/my-work/sitemap.xml

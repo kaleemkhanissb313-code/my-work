@@ -110,9 +110,9 @@ function VaultItems() {
   return (
     <div>
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <div className="relative flex-1 sm:max-w-xs"><Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-          <Input aria-label="Search vault" className="pl-9" placeholder="Search (decrypted in memory only)…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
-        <Button variant="primary" icon={Plus} onClick={() => setEditing('new')} className="ml-auto">New private item</Button>
+        <div className="relative flex-1 sm:max-w-xs"><Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+          <Input aria-label="Search vault" className="ps-9" placeholder="Search (decrypted in memory only)…" value={q} onChange={(e) => setQ(e.target.value)} /></div>
+        <Button variant="primary" icon={Plus} onClick={() => setEditing('new')} className="ms-auto">New private item</Button>
         <Button icon={Lock} onClick={() => { lockVault(); toast('Vault locked') }}>Lock vault</Button>
       </div>
       {!list?.length ? (

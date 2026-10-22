@@ -67,8 +67,8 @@ export function CommandMenu({ open, onClose }: { open: boolean; onClose: () => v
   return (
     <Modal open={open} onClose={onClose} title="Search & commands" wide>
       <div className="relative">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={onKey} className="input h-11 pl-9 text-base"
+        <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+        <input autoFocus value={q} onChange={(e) => setQ(e.target.value)} onKeyDown={onKey} className="input h-11 ps-9 text-base"
           placeholder="Search documents, tasks, projects, events, media, links… or type a command"
           role="combobox" aria-expanded="true" aria-controls="cmd-list" aria-activedescendant={commands[active] ? `cmd-${commands[active].id}` : undefined} />
       </div>
@@ -80,7 +80,7 @@ export function CommandMenu({ open, onClose }: { open: boolean; onClose: () => v
             <li key={c.id}>
               {header && <div className="px-3 pb-1 pt-3 text-[11px] font-semibold uppercase tracking-wide text-muted">{header}</div>}
               <button id={`cmd-${c.id}`} data-idx={i} role="option" aria-selected={i === active} type="button" onMouseEnter={() => setActive(i)} onClick={c.run}
-                className={cn('flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm', i === active ? 'bg-raised text-fg' : 'text-muted')}>
+                className={cn('flex w-full items-center gap-3 rounded-xl px-3 py-2 text-start text-sm', i === active ? 'bg-raised text-fg' : 'text-muted')}>
                 <c.icon className="h-4 w-4 shrink-0" aria-hidden />
                 <span className="flex-1 truncate text-fg">{c.label}</span>
                 {c.hint && <span className={c.group === 'Results' ? 'text-xs text-muted' : 'kbd'}>{c.hint}</span>}

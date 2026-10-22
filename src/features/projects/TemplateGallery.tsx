@@ -38,7 +38,7 @@ export function TemplateGallery({ open, onClose }: { open: boolean; onClose: () 
   return (
     <Modal open={open} onClose={close} wide title={picked ? `Template: ${picked.name}` : 'Start from a template'}
       footer={picked ? <>
-        <Button className="mr-auto" onClick={() => setPicked(null)}>← All templates</Button>
+        <Button className="me-auto" onClick={() => setPicked(null)}>← All templates</Button>
         <Button onClick={close}>Cancel</Button>
         <Button variant="primary" loading={busy} disabled={!start} onClick={create}>Create project</Button>
       </> : <Button onClick={close}>Close</Button>}>
@@ -46,8 +46,8 @@ export function TemplateGallery({ open, onClose }: { open: boolean; onClose: () 
         <>
           <div className="mb-3 flex flex-wrap gap-2">
             <div className="relative min-w-[12rem] flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-              <Input aria-label="Search templates" className="pl-9" placeholder="Search templates…" value={q} onChange={(e) => setQ(e.target.value)} />
+              <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+              <Input aria-label="Search templates" className="ps-9" placeholder="Search templates…" value={q} onChange={(e) => setQ(e.target.value)} />
             </div>
           </div>
           <div className="mb-4 flex flex-wrap gap-1.5" role="group" aria-label="Template category">
@@ -61,7 +61,7 @@ export function TemplateGallery({ open, onClose }: { open: boolean; onClose: () 
               const Icon = projectIcon(t.icon)
               return (
                 <li key={t.id}>
-                  <button type="button" onClick={() => pick(t)} className="card card-hover flex h-full w-full flex-col p-4 text-left">
+                  <button type="button" onClick={() => pick(t)} className="card card-hover flex h-full w-full flex-col p-4 text-start">
                     <div className="mb-2 flex items-center gap-3">
                       <span className="grid h-10 w-10 shrink-0 place-items-center rounded-xl text-white shadow" style={{ background: t.color }}><Icon className="h-5 w-5" aria-hidden /></span>
                       <div className="min-w-0"><div className="truncate font-semibold">{t.name}</div><Badge>{t.category}</Badge></div>

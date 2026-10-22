@@ -66,7 +66,7 @@ function SheetsHome({ archived, openNew }: { archived: boolean; openNew: boolean
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="mr-auto text-lg font-semibold">{archived ? 'Archived sheets' : 'Overall Sheets'}</h2>
+        <h2 className="me-auto text-lg font-semibold">{archived ? 'Archived sheets' : 'Overall Sheets'}</h2>
         {!archived && <><Button icon={FileUp} loading={importing} onClick={() => fileRef.current?.click()}>Import CSV / Excel</Button><Button variant="primary" icon={Plus} onClick={() => setNewOpen(true)}>New sheet</Button></>}
         <input ref={fileRef} type="file" hidden accept=".csv,.tsv,.txt,.xlsx,text/csv,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" onChange={(e) => { const f = e.target.files?.[0]; if (f) void importFile(f) }} />
         <Link to={archived ? '/glamiex/sheets/all' : '/glamiex/sheets/archived'} className="btn btn-soft h-10 px-3 text-sm">{archived ? 'All sheets' : 'Archived'}</Link>
@@ -117,7 +117,7 @@ function SheetsHome({ archived, openNew }: { archived: boolean; openNew: boolean
         <p className="mb-3 text-sm text-muted">Templates contain column headers and formulas only — no sample numbers.</p>
         <ul className="grid gap-2 sm:grid-cols-2">
           {SHEET_TEMPLATES.map((t) => (
-            <li key={t.id}><button type="button" className="card card-hover flex min-h-[64px] w-full flex-col items-start p-3 text-left" onClick={async () => { const s = await createSheet(t.id === 'blank' ? 'Untitled sheet' : t.name, t.build()); setNewOpen(false); go(`sheets/${s.id}`) }}>
+            <li key={t.id}><button type="button" className="card card-hover flex min-h-[64px] w-full flex-col items-start p-3 text-start" onClick={async () => { const s = await createSheet(t.id === 'blank' ? 'Untitled sheet' : t.name, t.build()); setNewOpen(false); go(`sheets/${s.id}`) }}>
               <span className="font-semibold">{t.name}</span><span className="text-xs text-muted">{t.desc}</span>
             </button></li>
           ))}

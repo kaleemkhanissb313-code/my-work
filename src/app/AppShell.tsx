@@ -83,7 +83,7 @@ export function AppShell() {
 
   return (
     <MotionConfig reducedMotion={s.reduceMotion ? 'always' : 'user'}>
-      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:left-2 focus:top-2 focus:z-[70] focus:rounded-xl focus:bg-surface focus:p-2">Skip to content</a>
+      <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-[70] focus:rounded-xl focus:bg-surface focus:p-2">Skip to content</a>
       <div className="flex min-h-screen">
         <Sidebar mobileOpen={menu} onClose={() => setMenu(false)} />
         <div className="flex min-w-0 flex-1 flex-col">

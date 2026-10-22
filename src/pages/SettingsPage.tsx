@@ -56,7 +56,7 @@ function SavedViews() {
       <ul className="mt-3 space-y-1">
         {views?.map((v) => (
           <li key={v.id} className="flex items-center gap-2 rounded-xl px-2 py-1 hover:bg-raised">
-            <button className="flex-1 text-left text-sm" onClick={() => nav(v.path)}>{v.name} <span className="text-xs text-muted">{v.path}</span></button>
+            <button className="flex-1 text-start text-sm" onClick={() => nav(v.path)}>{v.name} <span className="text-xs text-muted">{v.path}</span></button>
             <IconButton icon={Trash2} label={`Delete view ${v.name}`} onClick={() => void db.savedViews.delete(v.id)} />
           </li>
         ))}

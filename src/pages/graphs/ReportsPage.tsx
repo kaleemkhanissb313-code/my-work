@@ -126,11 +126,11 @@ export function ReportsPage() {
             <Section icon={FolderKanban} title="Project progress" onCsv={() => csv(`project-progress-${tag}`, r.projects)} empty={!r.projects.length && <>No projects yet. <Link className="text-accent" to="/projects">Create one</Link>.</> }>
               <div className="overflow-x-auto">
                 <table className="w-full text-sm">
-                  <thead className="text-left text-xs text-muted"><tr><th className="py-1 pr-3">Project</th><th className="pr-3">Status</th><th className="w-40 pr-3">Progress</th><th className="pr-3 text-right">Tasks</th><th className="pr-3 text-right">Overdue</th><th className="text-right">Hours</th></tr></thead>
+                  <thead className="text-start text-xs text-muted"><tr><th className="py-1 pe-3">Project</th><th className="pe-3">Status</th><th className="w-40 pe-3">Progress</th><th className="pe-3 text-end">Tasks</th><th className="pe-3 text-end">Overdue</th><th className="text-end">Hours</th></tr></thead>
                   <tbody>{r.projects.map((p) => (
-                    <tr key={p.Project} className="border-t border-line/60"><td className="py-2 pr-3 font-medium">{p.Project}</td><td className="pr-3 text-muted">{p.Status.replace('_', ' ')}</td>
-                      <td className="pr-3"><div className="flex items-center gap-2"><Progress value={p.Percent} label={`${p.Project} progress`} /><span className="w-9 text-right text-xs">{p.Percent}%</span></div></td>
-                      <td className="pr-3 text-right tabular-nums">{p.Done}/{p.Total}</td><td className={`pr-3 text-right tabular-nums ${p.Overdue ? 'text-danger' : ''}`}>{p.Overdue}</td><td className="text-right tabular-nums">{p.Hours}</td></tr>
+                    <tr key={p.Project} className="border-t border-line/60"><td className="py-2 pe-3 font-medium">{p.Project}</td><td className="pe-3 text-muted">{p.Status.replace('_', ' ')}</td>
+                      <td className="pe-3"><div className="flex items-center gap-2"><Progress value={p.Percent} label={`${p.Project} progress`} /><span className="w-9 text-end text-xs">{p.Percent}%</span></div></td>
+                      <td className="pe-3 text-end tabular-nums">{p.Done}/{p.Total}</td><td className={`pe-3 text-end tabular-nums ${p.Overdue ? 'text-danger' : ''}`}>{p.Overdue}</td><td className="text-end tabular-nums">{p.Hours}</td></tr>
                   ))}</tbody>
                 </table>
               </div>
@@ -154,9 +154,9 @@ export function ReportsPage() {
           <Section icon={Clock} title="Work timesheet" onCsv={() => csv(`timesheet-${tag}`, r.timesheet)} empty={!r.timesheet.length && 'No work-area time entries in this range.'}>
             <div className="max-h-64 overflow-auto">
               <table className="w-full text-sm">
-                <thead className="text-left text-xs text-muted"><tr><th className="py-1">Date</th><th>Entry</th><th>Project</th><th className="text-right">Hours</th></tr></thead>
-                <tbody>{r.timesheet.map((x, i) => <tr key={i} className="border-t border-line/60"><td className="py-1.5 pr-2">{x.Date}</td><td className="pr-2">{x.Label}{x.Billable === 'yes' && ' 💲'}</td><td className="pr-2 text-muted">{x.Project}</td><td className="text-right tabular-nums">{x.Hours}</td></tr>)}</tbody>
-                <tfoot><tr className="border-t border-line font-semibold"><td colSpan={3} className="py-1.5">Total</td><td className="text-right tabular-nums">{r.timesheet.reduce((a, x) => a + x.Hours, 0).toFixed(2)}</td></tr></tfoot>
+                <thead className="text-start text-xs text-muted"><tr><th className="py-1">Date</th><th>Entry</th><th>Project</th><th className="text-end">Hours</th></tr></thead>
+                <tbody>{r.timesheet.map((x, i) => <tr key={i} className="border-t border-line/60"><td className="py-1.5 pe-2">{x.Date}</td><td className="pe-2">{x.Label}{x.Billable === 'yes' && ' 💲'}</td><td className="pe-2 text-muted">{x.Project}</td><td className="text-end tabular-nums">{x.Hours}</td></tr>)}</tbody>
+                <tfoot><tr className="border-t border-line font-semibold"><td colSpan={3} className="py-1.5">Total</td><td className="text-end tabular-nums">{r.timesheet.reduce((a, x) => a + x.Hours, 0).toFixed(2)}</td></tr></tfoot>
               </table>
             </div>
           </Section>

@@ -116,7 +116,7 @@ export default function Overview() {
                   <span className="min-w-0 flex-1 truncate">{o.items.map((i) => `${i.qty}× ${i.name}`).join(', ')}</span>
                   <span className="text-xs text-muted">{zoned(o.at, tz).date}</span>
                   <PayBadge s={b.status} />
-                  <span className="w-28 text-right font-semibold"><Money v={orderTotal(o)} /></span>
+                  <span className="w-28 text-end font-semibold"><Money v={orderTotal(o)} /></span>
                 </Link></li>
               )
             })}

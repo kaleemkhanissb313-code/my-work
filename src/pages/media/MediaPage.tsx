@@ -172,8 +172,8 @@ export function MediaPage() {
         <section aria-label="Media files" className="min-w-0">
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <div className="relative min-w-[180px] flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-              <Input type="search" className="pl-9" placeholder="Search media…" aria-label="Search media" value={q} onChange={(e) => setQ(e.target.value)} />
+              <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+              <Input type="search" className="ps-9" placeholder="Search media…" aria-label="Search media" value={q} onChange={(e) => setQ(e.target.value)} />
             </div>
             <Select aria-label="Filter by type" className="w-auto" value={kind} onChange={(e) => setKind(e.target.value as MediaKind | '')}>
               <option value="">All types</option>
@@ -213,8 +213,8 @@ export function MediaPage() {
                       {m.thumbnail
                         ? <img src={m.thumbnail} alt="" className="h-full w-full object-cover" loading="lazy" />
                         : <span className="grid h-full w-full place-items-center text-muted"><Icon className="h-10 w-10" aria-hidden /></span>}
-                      <span className="absolute left-2 top-2"><Badge className="bg-bg/80">{typeLabel(m.mime, m.name)}</Badge></span>
-                      {m.favorite && <Star className="absolute right-2 top-2 h-4 w-4 fill-current text-warn" aria-label="Favorite" />}
+                      <span className="absolute start-2 top-2"><Badge className="bg-bg/80">{typeLabel(m.mime, m.name)}</Badge></span>
+                      {m.favorite && <Star className="absolute end-2 top-2 h-4 w-4 fill-current text-warn" aria-label="Favorite" />}
                     </button>
                     <div className="flex flex-1 flex-col p-2.5">
                       <p className="truncate text-sm font-medium" title={m.name}>{m.name}</p>
@@ -225,7 +225,7 @@ export function MediaPage() {
                           onClick={() => void safeWrite(() => mediaRepo.toggle(m.id, 'favorite'))} />
                         <IconButton icon={Download} label={`Download ${m.name}`} className="h-8 w-8" onClick={() => downloadBlob(m.blob, m.name)} />
                         {kindOf(m.mime) === 'image' && m.mime !== 'image/svg+xml' && <Link to={`/studio?media=${m.id}`} className="btn btn-ghost h-8 w-8 rounded-xl" aria-label={`Edit ${m.name} in Image Studio`} title="Edit in Image Studio"><Wand2 className="h-4 w-4" aria-hidden /></Link>}
-                        <IconButton icon={Trash2} label={`Move ${m.name} to trash`} className="ml-auto h-8 w-8" onClick={() => void trash(m)} />
+                        <IconButton icon={Trash2} label={`Move ${m.name} to trash`} className="ms-auto h-8 w-8" onClick={() => void trash(m)} />
                       </div>
                     </div>
                   </li>
@@ -291,7 +291,7 @@ function PreviewModal({ item, onClose, onTrash }: { item: MediaFile | null; onCl
   return (
     <Modal open wide onClose={onClose} title={item.name}
       footer={<>
-        <Button variant="ghost" icon={Trash2} onClick={() => onTrash(item)} className="mr-auto">Move to trash</Button>
+        <Button variant="ghost" icon={Trash2} onClick={() => onTrash(item)} className="me-auto">Move to trash</Button>
         <Button icon={Download} onClick={() => downloadBlob(item.blob, item.name)}>Download</Button>
         {item.mime.startsWith('image/') && item.mime !== 'image/svg+xml' && <Link to={`/studio?media=${item.id}`} className="btn btn-soft h-10 px-4 text-sm"><Wand2 className="h-4 w-4" aria-hidden />Edit in Image Studio</Link>}
         <Button variant="primary" loading={saving} onClick={() => void save()}>Save changes</Button>

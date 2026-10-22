@@ -41,7 +41,7 @@ export default function MediaSection() {
       </div>
       <div className="flex flex-wrap items-center gap-2">
         <Select aria-label="Kind" className="w-auto" value={kind} onChange={(e) => setKind(e.target.value)}><option value="">All files</option>{Object.entries(KINDS).map(([k, l]) => <option key={k} value={k}>{l}</option>)}</Select>
-        <span className="ml-auto text-xs text-muted">{list.length} files · {fileSize(total)} · stored privately on this device</span>
+        <span className="ms-auto text-xs text-muted">{list.length} files · {fileSize(total)} · stored privately on this device</span>
       </div>
       {!list.length ? <EmptyState icon={Images} title="No files yet">Photos, videos and receipts you attach to products, sales, payments, ads and expenses appear here.</EmptyState> : (
         <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4 2xl:grid-cols-6">

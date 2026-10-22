@@ -134,7 +134,7 @@ function Alphabets() {
         <label htmlFor="alpha" className="text-sm text-muted">Alphabet</label>
         <Select id="alpha" className="w-auto" value={key} onChange={(e) => setKey(e.target.value)}>{Object.entries(SETS).map(([k, v]) => <option key={k} value={k}>{v.name}</option>)}</Select>
         <span className="text-sm text-muted">{a.letters.length} letters{a.note ? ` · ${a.note}` : ''}</span>
-        <Button size="sm" icon={Copy} className="ml-auto" onClick={() => void copyText(a.letters.join(key === 'nato' ? '\n' : ' '), a.name)}>Copy all</Button>
+        <Button size="sm" icon={Copy} className="ms-auto" onClick={() => void copyText(a.letters.join(key === 'nato' ? '\n' : ' '), a.name)}>Copy all</Button>
       </div>
       <ol dir={rtl ? 'rtl' : 'ltr'} className={cn('grid gap-2', key === 'nato' ? 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-6' : 'grid-cols-4 sm:grid-cols-6 lg:grid-cols-10')}>
         {a.letters.map((l, i) => (

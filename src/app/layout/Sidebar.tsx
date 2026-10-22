@@ -58,13 +58,13 @@ function Group({ g, hidden, onNavigate, compact }: { g: NavGroup; hidden: Set<st
   return (
     <div>
       <button type="button" className={cn('nav-item w-full', containsActive && 'text-fg')} aria-expanded={open} onClick={() => setOpen(!open)}>
-        <g.icon className="h-4 w-4 shrink-0" aria-hidden /><span className="flex-1 text-left">{g.label}</span>
+        <g.icon className="h-4 w-4 shrink-0" aria-hidden /><span className="flex-1 text-start">{g.label}</span>
         <ChevronDown className={cn('h-4 w-4 transition-transform', open && 'rotate-180')} aria-hidden />
       </button>
       <AnimatePresence initial={false}>
         {open && (
           <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
-            <div className="ml-5 mt-0.5 space-y-0.5 border-l border-line pl-2">
+            <div className="ms-5 mt-0.5 space-y-0.5 border-s border-line ps-2">
               {children.map((c) => (
                 <NavLink key={c.id} to={c.path} onClick={onNavigate} className={({ isActive }) => cn('nav-item py-1.5', isActive && 'active')}>
                   <c.icon className="h-4 w-4 shrink-0" aria-hidden />{c.label}
@@ -104,14 +104,14 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
   )
   return (
     <>
-      <aside className={cn('glass sticky top-0 hidden h-screen shrink-0 border-y-0 border-l-0 transition-[width] duration-300 ease-out lg:block', collapsed ? 'w-[72px]' : 'w-64')}>
+      <aside className={cn('glass sticky top-0 hidden h-screen shrink-0 border-y-0 border-s-0 transition-[width] duration-300 ease-out lg:block', collapsed ? 'w-[72px]' : 'w-64')}>
         {nav(collapsed, false)}
       </aside>
       <AnimatePresence>
         {mobileOpen && (
           <div className="fixed inset-0 z-40 lg:hidden">
             <motion.div className="absolute inset-0 bg-black/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
-            <motion.aside className="glass absolute inset-y-0 left-0 w-72 max-w-[85vw]" initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }} transition={{ type: 'spring', stiffness: 400, damping: 40 }}>
+            <motion.aside className="glass absolute inset-y-0 start-0 w-72 max-w-[85vw]" initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }} transition={{ type: 'spring', stiffness: 400, damping: 40 }}>
               {nav(false, true)}
             </motion.aside>
           </div>

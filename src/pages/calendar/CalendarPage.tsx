@@ -227,7 +227,7 @@ function EventModal({ event, draft, onClose }: { event: CalendarEvent | null; dr
 
   return (
     <Modal open onClose={onClose} title={event ? 'Edit event' : 'New event'} wide footer={<>
-      {event && <Button variant="ghost" icon={Trash2} className="mr-auto" onClick={async () => {
+      {event && <Button variant="ghost" icon={Trash2} className="me-auto" onClick={async () => {
         await safeWrite(() => eventsRepo.trash(event.id))
         toast('Event moved to trash', 'success', { label: 'Undo', run: () => void eventsRepo.restore(event.id) })
         onClose()

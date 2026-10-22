@@ -165,7 +165,7 @@ export function Grid(p: GridProps) {
     }
     if (c.type === 'link' && typeof v === 'string' && /^https?:\/\//i.test(v)) return <a href={v} target="_blank" rel="noopener noreferrer" className="text-accent underline" onClick={(e) => e.stopPropagation()}>{v.replace(/^https?:\/\//, '')}</a>
     const text = formatValue(v, f.fmt ?? 'auto')
-    return <>{f.ruleLabel && <span className="mr-1 text-[10px] font-semibold" aria-label={f.ruleLabel}>{f.ruleLabel}</span>}{text}</>
+    return <>{f.ruleLabel && <span className="me-1 text-[10px] font-semibold" aria-label={f.ruleLabel}>{f.ruleLabel}</span>}{text}</>
   }
 
   return (
@@ -177,12 +177,12 @@ export function Grid(p: GridProps) {
         <colgroup><col style={{ width: GUTTER }} />{p.columns.map((c) => <col key={c.id} style={{ width: c.width }} />)}</colgroup>
         <thead>
           <tr>
-            <th className="sticky left-0 top-0 z-30 border-b border-r border-line bg-raised text-[10px] text-muted" style={{ height: 34 }} aria-label="Row numbers">#</th>
+            <th className="sticky start-0 top-0 z-30 border-b border-e border-line bg-raised text-[10px] text-muted" style={{ height: 34 }} aria-label="Row numbers">#</th>
             {p.columns.map((c, ci) => (
-              <th key={c.id} role="columnheader" scope="col" className={cn('sticky top-0 z-20 select-none border-b border-r border-line bg-raised px-2 text-left text-xs font-semibold', ci >= b.left && ci <= b.right && 'bg-accent/15')}
+              <th key={c.id} role="columnheader" scope="col" className={cn('sticky top-0 z-20 select-none border-b border-e border-line bg-raised px-2 text-start text-xs font-semibold', ci >= b.left && ci <= b.right && 'bg-accent/15')}
                 style={{ ...(ci < p.freezeCols ? { left: leftOffsets[ci], zIndex: 25 } : {}), height: 34 }}>
                 <div className="flex items-center gap-1 overflow-hidden"><span className="text-[10px] font-normal text-muted">{colLetter(ci)}</span><span className="truncate" title={c.name}>{c.name}</span></div>
-                {p.onResize && <span role="separator" aria-orientation="vertical" aria-label={`Resize ${c.name}`} onPointerDown={(e) => resizeStart(e, ci)} className="absolute right-0 top-0 h-full w-2 cursor-col-resize touch-none hover:bg-accent/40" />}
+                {p.onResize && <span role="separator" aria-orientation="vertical" aria-label={`Resize ${c.name}`} onPointerDown={(e) => resizeStart(e, ci)} className="absolute end-0 top-0 h-full w-2 cursor-col-resize touch-none hover:bg-accent/40" />}
               </th>
             ))}
           </tr>
@@ -193,7 +193,7 @@ export function Grid(p: GridProps) {
             const link = p.rowLink?.(r)
             return (
               <tr key={p.rowIds[r]} style={{ height: rowH }} role="row">
-                <td className={cn('sticky left-0 z-10 border-b border-r border-line bg-raised text-center text-[11px] text-muted', r >= b.top && r <= b.bottom && 'bg-accent/15 text-fg')}>
+                <td className={cn('sticky start-0 z-10 border-b border-e border-line bg-raised text-center text-[11px] text-muted', r >= b.top && r <= b.bottom && 'bg-accent/15 text-fg')}>
                   {link ? <Link to={link} className="underline" title="Open record">{p.rowNumber(r)}</Link> : p.rowNumber(r)}
                 </td>
                 {p.columns.map((c, ci) => {
@@ -208,7 +208,7 @@ export function Grid(p: GridProps) {
                     <td key={c.id} role="gridcell" aria-selected={selected}
                       onPointerDown={(e) => cellDown(e, r, ci)} onPointerEnter={() => { if (dragging.current) p.setSel({ ...p.sel, r2: r, c2: ci }) }}
                       onDoubleClick={() => startEdit(r, ci)}
-                      className={cn('relative overflow-hidden border-b border-r border-line/70 px-2', !f.wrap && 'whitespace-nowrap text-ellipsis', f.border && 'outline outline-1 -outline-offset-1 outline-fg/60',
+                      className={cn('relative overflow-hidden border-b border-e border-line/70 px-2', !f.wrap && 'whitespace-nowrap text-ellipsis', f.border && 'outline outline-1 -outline-offset-1 outline-fg/60',
                         selected && !active && 'bg-accent/10', active && 'outline outline-2 -outline-offset-2 outline-accent', hit && 'bg-warn/25', isError(v) && 'text-danger')}
                       style={{
                         ...sticky(ci), background: f.bg && !selected ? f.bg : sticky(ci) && !selected ? 'rgb(var(--surface))' : undefined, color: f.color,
@@ -239,10 +239,10 @@ export function Grid(p: GridProps) {
         {totals && totals.some(Boolean) && (
           <tfoot>
             <tr>
-              <td className="sticky bottom-0 left-0 z-20 border-t-2 border-line bg-raised px-1 text-center text-[10px] font-semibold text-muted" style={{ height: 34 }}>Σ</td>
+              <td className="sticky bottom-0 start-0 z-20 border-t-2 border-line bg-raised px-1 text-center text-[10px] font-semibold text-muted" style={{ height: 34 }}>Σ</td>
               {totals.map((t, ci) => (
-                <td key={ci} className="sticky bottom-0 z-10 border-r border-t-2 border-line bg-raised px-2 text-right text-xs font-bold tabular-nums" style={ci < p.freezeCols ? { left: leftOffsets[ci], zIndex: 15 } : undefined}>
-                  {t ? <><span className="mr-1 text-[10px] font-normal uppercase text-muted">{t.fn}</span>{t.v == null ? '—' : formatValue(t.v, t.fn === 'count' ? 'number' : p.fmtOf(0, ci, t.v).fmt ?? 'auto')}</> : ''}
+                <td key={ci} className="sticky bottom-0 z-10 border-e border-t-2 border-line bg-raised px-2 text-end text-xs font-bold tabular-nums" style={ci < p.freezeCols ? { left: leftOffsets[ci], zIndex: 15 } : undefined}>
+                  {t ? <><span className="me-1 text-[10px] font-normal uppercase text-muted">{t.fn}</span>{t.v == null ? '—' : formatValue(t.v, t.fn === 'count' ? 'number' : p.fmtOf(0, ci, t.v).fmt ?? 'auto')}</> : ''}
                 </td>
               ))}
             </tr>

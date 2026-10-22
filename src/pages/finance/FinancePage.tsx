@@ -73,7 +73,7 @@ function Overview() {
         <span className="min-w-[8rem] text-center font-semibold" aria-live="polite">{monthLabel(month, 'MMMM yyyy')}</span>
         <IconButton icon={ChevronRight} label="Next month" onClick={() => setMonth(shiftMonth(month, 1))} />
         {month !== monthKey() && <Button size="sm" onClick={() => setMonth(monthKey())}>This month</Button>}
-        <Select aria-label="Filter by area" className="ml-auto w-auto" value={area} onChange={(e) => setArea(e.target.value as Area | '')}>
+        <Select aria-label="Filter by area" className="ms-auto w-auto" value={area} onChange={(e) => setArea(e.target.value as Area | '')}>
           <option value="">All areas</option>{(Object.keys(AREA_LABEL) as Area[]).map((a) => <option key={a} value={a}>{AREA_LABEL[a]}</option>)}
         </Select>
         <Select aria-label="Currency" className="w-auto" value={s.currency} onChange={(e) => void safeWrite(() => updateSettings({ currency: e.target.value }))}>

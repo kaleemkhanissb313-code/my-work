@@ -40,7 +40,7 @@ export default function PeriodReport({ unit }: { unit: Unit }) {
         <div className="min-w-[10rem] text-center"><div className="font-semibold">{label}</div><div className="text-xs text-muted">{range.from} → {range.to}</div></div>
         <IconButton icon={ChevronRight} label={`Next ${unit}`} className="border border-line" onClick={() => setOffset(offset + 1)} disabled={offset >= 0} />
         {offset !== 0 && <Button size="sm" onClick={() => setOffset(0)}>Current {unit}</Button>}
-        <div className="ml-auto"><ExportButtons name={`${unit[0].toUpperCase()}${unit.slice(1)}ly report — ${label}`} period={`${range.from} to ${range.to}`}
+        <div className="ms-auto"><ExportButtons name={`${unit[0].toUpperCase()}${unit.slice(1)}ly report — ${label}`} period={`${range.from} to ${range.to}`}
           sheets={() => [{ name: 'Summary', rows: periodRows(v.series) }, ...buildReport('pnl', data, range, tz), ...buildReport('sales', data, range, tz), ...buildReport('products', data, range, tz)]} /></div>
       </div>
       <div className="grid grid-cols-2 gap-3 max-[359px]:grid-cols-1 lg:grid-cols-4">

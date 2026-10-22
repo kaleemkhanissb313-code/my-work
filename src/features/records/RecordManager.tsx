@@ -129,10 +129,10 @@ export function RecordManager({ collection, areas, defaultArea, title, defaults,
   return (
     <section aria-label={title ?? def.label}>
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        {!compact && <h2 className="mr-auto text-base font-semibold">{title ?? def.label}</h2>}
+        {!compact && <h2 className="me-auto text-base font-semibold">{title ?? def.label}</h2>}
         <div className="relative min-w-[160px] flex-1 sm:max-w-xs">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-          <Input aria-label={`Search ${def.label}`} placeholder="Search…" className="pl-9" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+          <Input aria-label={`Search ${def.label}`} placeholder="Search…" className="ps-9" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         {def.core.category && (
           <Select aria-label="Filter by category" className="w-auto" value={cat} onChange={(e) => setCat(e.target.value)}>
@@ -174,7 +174,7 @@ export function RecordManager({ collection, areas, defaultArea, title, defaults,
                   <input type="checkbox" className="h-5 w-5 shrink-0 cursor-pointer accent-[rgb(var(--accent))]" checked={r.done}
                     aria-label={`${def.core.done}: ${r.title}`} onChange={() => void toggleDone(r)} />
                 )}
-                <button type="button" className="min-w-0 flex-1 text-left" onClick={() => setEditing(r)}>
+                <button type="button" className="min-w-0 flex-1 text-start" onClick={() => setEditing(r)}>
                   <div className={cn('flex items-center gap-2 font-medium', r.done && 'line-through')}>
                     {r.pinned && <Pin className="h-3.5 w-3.5 text-accent" aria-label="Pinned" />}
                     <span className="truncate">{r.title || '(untitled)'}</span>
@@ -206,7 +206,7 @@ export function RecordManager({ collection, areas, defaultArea, title, defaults,
               </li>
             ))}
           </ul>
-          {def.core.amount && <p className="mt-3 text-right text-sm text-muted">Total shown: <span className="font-semibold text-fg">{money(total, settings.currency)}</span></p>}
+          {def.core.amount && <p className="mt-3 text-end text-sm text-muted">Total shown: <span className="font-semibold text-fg">{money(total, settings.currency)}</span></p>}
         </>
       )}
 

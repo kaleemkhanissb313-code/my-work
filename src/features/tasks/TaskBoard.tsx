@@ -160,7 +160,7 @@ export function TaskListTable({ tasks, projects, onOpen, showProject = true }: {
   return (
     <div className="card overflow-x-auto p-0">
       <table className="w-full min-w-[520px] text-sm">
-        <thead className="border-b border-line text-left text-xs text-muted">
+        <thead className="border-b border-line text-start text-xs text-muted">
           <tr>
             <th className="w-8 p-2"><span className="sr-only">Done</span></th>
             {cols.map((c) => {
@@ -189,10 +189,10 @@ export function TaskListTable({ tasks, projects, onOpen, showProject = true }: {
                     onChange={() => void changeStatus(t, t.status === 'completed' ? 'todo' : 'completed')} />
                 </td>
                 <td className="max-w-[260px] p-2">
-                  <button type="button" className={cn('text-left font-medium hover:text-accent', t.status === 'completed' && 'line-through opacity-70')} onClick={() => onOpen(t)}>
+                  <button type="button" className={cn('text-start font-medium hover:text-accent', t.status === 'completed' && 'line-through opacity-70')} onClick={() => onOpen(t)}>
                     {t.isMilestone && '◆ '}{t.title || '(untitled)'}
                   </button>
-                  {sp.total > 0 && <span className="ml-2 text-xs text-muted">{sp.done}/{sp.total}</span>}
+                  {sp.total > 0 && <span className="ms-2 text-xs text-muted">{sp.done}/{sp.total}</span>}
                 </td>
                 <td className="p-2">
                   <select aria-label={`Status of ${t.title}`} value={t.status} onChange={(e) => void changeStatus(t, e.target.value as TaskStatus)}

@@ -36,7 +36,7 @@ export default function Account({ partner: p }: { partner: BpPartner }) {
           <h2 className="truncate text-xl font-bold">{p.name}</h2>
           <p className="text-xs text-muted">Ownership {pct(p.ownershipBp)} · Profit share {pct(p.profitBp)} · Loss share {pct(p.lossBp)} · Share of current capital {pct(capShare)}</p>
         </div>
-        <div className="text-right"><div className="text-xs text-muted">Outstanding balance</div><div className={cn('text-2xl font-bold tabular-nums', f.balance < 0 && 'text-danger')}>{pkr(f.balance)}</div></div>
+        <div className="text-end"><div className="text-xs text-muted">Outstanding balance</div><div className={cn('text-2xl font-bold tabular-nums', f.balance < 0 && 'text-danger')}>{pkr(f.balance)}</div></div>
       </div>
       <div className="flex flex-wrap gap-2">
         <Button variant="primary" icon={PiggyBank} onClick={() => openForm('investment')}>Add investment</Button>

@@ -15,7 +15,7 @@ export default defineConfig({
       manifest: {
         name: 'workMYwork — Basic to Advanced',
         short_name: 'workMYwork',
-        description: 'All-in-one workspace for life, home, work, projects, files, time and data.',
+        description: 'Private all-in-one workspace for life, work, projects and documents, plus GLAMIEX business tools.',
         theme_color: '#111317',
         background_color: '#111317',
         display: 'standalone',

@@ -132,7 +132,7 @@ function NewSale() {
               <ul className="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Products">
                 {filtered.map((p) => {
                   const st = stockOf(p.id, data.stock)
-                  return <li key={p.id}><button type="button" onClick={() => add(p.id)} className="card flex min-h-[56px] w-full items-center justify-between gap-2 p-3 text-left text-sm active:scale-[0.99]">
+                  return <li key={p.id}><button type="button" onClick={() => add(p.id)} className="card flex min-h-[56px] w-full items-center justify-between gap-2 p-3 text-start text-sm active:scale-[0.99]">
                     <span className="min-w-0"><span className="block truncate font-medium">{p.name}</span><span className={cn('text-xs', st <= 0 ? 'text-danger' : st <= p.lowStockAt ? 'text-warn' : 'text-muted')}>{p.sku} · stock {st}</span></span>
                     <Money v={p.sellPrice} />
                   </button></li>
@@ -161,7 +161,7 @@ function NewSale() {
                         </div>
                       </div>
                       <Field label="Unit price" htmlFor={`price-${l.key}`}><MoneyInput id={`price-${l.key}`} value={l.unitPrice} onChange={(v) => setLines(lines.map((x) => (x.key === l.key ? { ...x, unitPrice: v } : x)))} /></Field>
-                      <div className="col-span-2 text-right text-sm sm:col-span-1">Line: <b><Money v={l.qty * (l.unitPrice ?? 0)} /></b></div>
+                      <div className="col-span-2 text-end text-sm sm:col-span-1">Line: <b><Money v={l.qty * (l.unitPrice ?? 0)} /></b></div>
                     </div>
                   </li>
                 )
@@ -270,7 +270,7 @@ function OrderDetail({ id }: { id: string }) {
           <ul className="divide-y divide-line/60">{o.items.map((i, k) => (
             <li key={k} className="flex flex-wrap items-center gap-2 py-2 text-sm">
               <Link to={`/glamiex/products/${i.productId}`} className="min-w-0 flex-1 truncate font-medium hover:text-accent">{i.name} <span className="text-xs text-muted">{i.sku}</span></Link>
-              <span>{i.qty} × <Money v={i.unitPrice} /></span><span className="w-24 text-right font-semibold"><Money v={i.qty * i.unitPrice} /></span>
+              <span>{i.qty} × <Money v={i.unitPrice} /></span><span className="w-24 text-end font-semibold"><Money v={i.qty * i.unitPrice} /></span>
               <span className="w-full text-xs text-muted">Cost {i.qty} × {pkr(i.unitCost)} · line profit <Money v={i.qty * (i.unitPrice - i.unitCost)} tone /></span>
             </li>
           ))}</ul>

@@ -255,7 +255,7 @@ function WorkProjects() {
   return (
     <section aria-label="Work projects">
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <h2 className="mr-auto text-base font-semibold">Work projects</h2>
+        <h2 className="me-auto text-base font-semibold">Work projects</h2>
         <Select aria-label="Filter by workspace" className="w-auto" value={ws} onChange={(e) => setWs(e.target.value)}>
           <option value="">All workspaces</option>
           <option value="none">No workspace</option>
@@ -427,7 +427,7 @@ function Timesheets() {
         <h2 className="text-base font-semibold">{fmtDate(toISODate(ws), 'MMM d')} – {fmtDate(toISODate(days[6]), 'MMM d, yyyy')}</h2>
         <IconNav label="Next week" icon={ChevronRight} onClick={() => setWeekStart(addWeeks(ws, 1))} />
         <Button size="sm" onClick={() => setWeekStart(startOfWeek(new Date(), { weekStartsOn: settings.weekStartsOn }))}>This week</Button>
-        <div className="ml-auto flex flex-wrap gap-2">
+        <div className="ms-auto flex flex-wrap gap-2">
           <Button icon={Download} onClick={exportCsv} disabled={!sessions?.length}>CSV</Button>
           <Button icon={Printer} onClick={() => window.print()}>Print</Button>
           <Button variant="primary" icon={Plus} onClick={() => setAdding(true)}>Add time entry</Button>
@@ -446,28 +446,28 @@ function Timesheets() {
               <caption className="sr-only">Hours per project per day</caption>
               <thead>
                 <tr className="border-b border-line text-xs text-muted">
-                  <th scope="col" className="px-3 py-2 text-left font-medium">Project</th>
-                  {days.map((d) => <th key={d.toISOString()} scope="col" className={cn('px-2 py-2 text-right font-medium', toISODate(d) === todayISO() && 'text-work')}>{fmtDate(toISODate(d), 'EEE d')}</th>)}
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Total</th>
-                  <th scope="col" className="px-3 py-2 text-right font-medium">Billable</th>
+                  <th scope="col" className="px-3 py-2 text-start font-medium">Project</th>
+                  {days.map((d) => <th key={d.toISOString()} scope="col" className={cn('px-2 py-2 text-end font-medium', toISODate(d) === todayISO() && 'text-work')}>{fmtDate(toISODate(d), 'EEE d')}</th>)}
+                  <th scope="col" className="px-3 py-2 text-end font-medium">Total</th>
+                  <th scope="col" className="px-3 py-2 text-end font-medium">Billable</th>
                 </tr>
               </thead>
               <tbody>
                 {grid.map((r) => (
                   <tr key={r.label} className="border-b border-line/60">
-                    <th scope="row" className="max-w-[180px] truncate px-3 py-2 text-left font-medium">{r.label}</th>
-                    {r.perDay.map((ms, i) => <td key={i} className="px-2 py-2 text-right tabular-nums">{h(ms)}</td>)}
-                    <td className="px-3 py-2 text-right font-semibold tabular-nums">{h(r.total)}</td>
-                    <td className="px-3 py-2 text-right tabular-nums text-ok">{h(r.billable)}</td>
+                    <th scope="row" className="max-w-[180px] truncate px-3 py-2 text-start font-medium">{r.label}</th>
+                    {r.perDay.map((ms, i) => <td key={i} className="px-2 py-2 text-end tabular-nums">{h(ms)}</td>)}
+                    <td className="px-3 py-2 text-end font-semibold tabular-nums">{h(r.total)}</td>
+                    <td className="px-3 py-2 text-end tabular-nums text-ok">{h(r.billable)}</td>
                   </tr>
                 ))}
               </tbody>
               <tfoot>
                 <tr className="font-semibold">
-                  <th scope="row" className="px-3 py-2 text-left">Total</th>
-                  {dayTotals.map((ms, i) => <td key={i} className="px-2 py-2 text-right tabular-nums">{h(ms)}</td>)}
-                  <td className="px-3 py-2 text-right tabular-nums">{h(total)}</td>
-                  <td className="px-3 py-2 text-right tabular-nums text-ok">{h(billable)}</td>
+                  <th scope="row" className="px-3 py-2 text-start">Total</th>
+                  {dayTotals.map((ms, i) => <td key={i} className="px-2 py-2 text-end tabular-nums">{h(ms)}</td>)}
+                  <td className="px-3 py-2 text-end tabular-nums">{h(total)}</td>
+                  <td className="px-3 py-2 text-end tabular-nums text-ok">{h(billable)}</td>
                 </tr>
               </tfoot>
             </table>

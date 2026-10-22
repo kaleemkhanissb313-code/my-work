@@ -16,7 +16,7 @@ import { zoned } from './time'
 /* ---------------- Settings ---------------- */
 export const DEFAULT_GX_SETTINGS: GxSettings = {
   timeZone: localTimeZone(), taxRatePct: 0, taxInclusive: false, allowNegativeStock: false, defaultLowStock: 5,
-  preset: 'neon', gxAccent: 'violet', density: 'comfortable', chartStyle: 'smooth', chartGradient: true, sidebar: 'expanded',
+  preset: 'executive', gxAccent: 'violet', density: 'comfortable', chartStyle: 'smooth', chartGradient: true, sidebar: 'expanded',
   expenseCategories: DEFAULT_EXPENSE_CATEGORIES,
 }
 const mergeGx = (v: Partial<GxSettings> | undefined): GxSettings => ({ ...DEFAULT_GX_SETTINGS, ...v })

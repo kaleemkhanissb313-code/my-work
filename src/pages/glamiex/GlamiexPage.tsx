@@ -1,3 +1,4 @@
+import { createPortal } from 'react-dom'
 import { lazy, Suspense, useEffect, useMemo, useState } from 'react'
 import { NavLink, useNavigate, useParams } from 'react-router'
 import {
@@ -11,32 +12,35 @@ import { GxCtx } from './context'
 import { SYSTEM_SHEETS } from '@/features/sheets/systemSheets'
 
 export const GX_SECTIONS = [
-  { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-  { id: 'products', label: 'Products', icon: Package },
-  { id: 'sales', label: 'Sales & Orders', icon: ShoppingCart },
-  { id: 'people', label: 'Customers & People', icon: Users },
-  { id: 'payments', label: 'Deposits & Payments', icon: Wallet },
-  { id: 'names', label: 'Names & Payments', icon: HandCoins },
-  { id: 'partners', label: 'Business Partners', icon: Handshake },
-  { id: 'payment-image', label: '5 Payments', icon: ImageDown },
-  { id: 'returns', label: 'Returns and Refunds', icon: Undo2 },
-  { id: 'deliveries', label: 'Deliveries and Shipments', icon: Truck },
-  { id: 'riders', label: 'Delivery Partners & Riders', icon: Bike },
-  { id: 'logistics-reports', label: 'Return & Delivery Reports', icon: ClipboardList },
-  { id: 'ad-income', label: 'Advertising Revenue', icon: TrendingUp },
-  { id: 'ad-spend', label: 'Advertising Expenses', icon: Megaphone },
-  { id: 'expenses', label: 'Business Expenses', icon: Receipt },
-  { id: 'pnl', label: 'Profit & Loss', icon: Scale },
-  { id: 'analytics', label: 'Sales Analytics', icon: BarChart3 },
-  { id: 'weekly', label: 'Weekly Reports', icon: CalendarDays },
-  { id: 'monthly', label: 'Monthly Reports', icon: CalendarRange },
-  { id: 'yearly', label: 'Yearly Reports', icon: CalendarIcon },
-  { id: 'media', label: 'Pictures & Videos', icon: Images },
-  { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight },
-  { id: 'sheets', label: 'Overall Sheets', icon: Sheet },
-  { id: 'reports', label: 'Reports & Exports', icon: FileBarChart },
-  { id: 'settings', label: 'GLAMIEX Settings', icon: Settings2 },
+  { id: 'overview', label: 'Overview', icon: LayoutDashboard, group: 'Overview' },
+  { id: 'products', label: 'Products', icon: Package, group: 'Sales' },
+  { id: 'sales', label: 'Sales & Orders', icon: ShoppingCart, group: 'Sales' },
+  { id: 'people', label: 'Customers & People', icon: Users, group: 'Sales' },
+  { id: 'payments', label: 'Deposits & Payments', icon: Wallet, group: 'Payments' },
+  { id: 'names', label: 'Names & Payments', icon: HandCoins, group: 'Payments' },
+  { id: 'partners', label: 'Business Partners', icon: Handshake, group: 'Payments' },
+  { id: 'payment-image', label: '5 Payments', icon: ImageDown, group: 'Payments' },
+  { id: 'returns', label: 'Returns and Refunds', icon: Undo2, group: 'Sales' },
+  { id: 'deliveries', label: 'Deliveries and Shipments', icon: Truck, group: 'Delivery' },
+  { id: 'riders', label: 'Delivery Partners & Riders', icon: Bike, group: 'Delivery' },
+  { id: 'logistics-reports', label: 'Return & Delivery Reports', icon: ClipboardList, group: 'Delivery' },
+  { id: 'ad-income', label: 'Advertising Revenue', icon: TrendingUp, group: 'Marketing' },
+  { id: 'ad-spend', label: 'Advertising Expenses', icon: Megaphone, group: 'Marketing' },
+  { id: 'expenses', label: 'Business Expenses', icon: Receipt, group: 'Finance' },
+  { id: 'pnl', label: 'Profit & Loss', icon: Scale, group: 'Finance' },
+  { id: 'analytics', label: 'Sales Analytics', icon: BarChart3, group: 'Reports' },
+  { id: 'weekly', label: 'Weekly Reports', icon: CalendarDays, group: 'Reports' },
+  { id: 'monthly', label: 'Monthly Reports', icon: CalendarRange, group: 'Reports' },
+  { id: 'yearly', label: 'Yearly Reports', icon: CalendarIcon, group: 'Reports' },
+  { id: 'media', label: 'Pictures & Videos', icon: Images, group: 'Library' },
+  { id: 'transactions', label: 'Transactions', icon: ArrowLeftRight, group: 'Finance' },
+  { id: 'sheets', label: 'Overall Sheets', icon: Sheet, group: 'Reports' },
+  { id: 'reports', label: 'Reports & Exports', icon: FileBarChart, group: 'Reports' },
+  { id: 'settings', label: 'GLAMIEX Settings', icon: Settings2, group: 'Settings' },
 ] as const
+export const GX_GROUPS = ['Overview', 'Sales', 'Payments', 'Delivery', 'Marketing', 'Finance', 'Reports', 'Library', 'Settings'] as const
+/** Sections in menu order, grouped (a section's group decides where it appears; order within a group is kept). */
+const GROUPED = GX_GROUPS.map((g) => ({ group: g, items: GX_SECTIONS.filter((s) => s.group === g) })).filter((x) => x.items.length)
 export type GxSectionId = (typeof GX_SECTIONS)[number]['id']
 const SHEET_NAV = [{ id: 'all', label: 'All Sheets' }, ...SYSTEM_SHEETS.map((s) => ({ id: s.key, label: s.title })), { id: 'custom', label: 'Custom Sheet' }, { id: 'archived', label: 'Archived Sheets' }]
 
@@ -126,7 +130,7 @@ export function GlamiexPage() {
       <div className="mb-3 flex flex-wrap items-center gap-3">
         <div className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl text-white btn-3d"><Gem className="h-5 w-5" aria-hidden /></div>
         <div className="min-w-0 flex-1">
-          <div className="text-[11px] font-semibold uppercase tracking-[0.2em] text-accent">GLAMIEX</div>
+          <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted"><span className="text-accent">GLAMIEX</span>{current.group !== 'Overview' && <> · {current.group}</>}</div>
           <h1 className="truncate text-xl font-bold tracking-tight sm:text-2xl">{current.label}</h1>
         </div>
         <button type="button" className="btn btn-soft h-10 px-3 text-sm lg:hidden" onClick={() => setSheet(true)} aria-haspopup="dialog"><LayoutGrid className="h-4 w-4" aria-hidden />Sections</button>
@@ -146,19 +150,25 @@ export function GlamiexPage() {
         {/* Desktop: collapsible module sidebar */}
         <aside className={cn('sticky top-16 hidden h-[calc(100vh-5rem)] shrink-0 overflow-y-auto transition-[width] duration-300 lg:block', collapsed ? 'w-[60px]' : 'w-56')} aria-label="GLAMIEX navigation">
           <nav className="card flex flex-col gap-0.5 p-2">
-            {GX_SECTIONS.map((s) => (
+            {GROUPED.map(({ group, items }) => (
+              <div key={group} className="[&:not(:first-child)]:mt-2">
+                {!collapsed && group !== 'Overview' && <div className="px-3 pb-1 pt-1 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted/80">{group}</div>}
+                {collapsed && group !== 'Overview' && <div className="mx-3 my-1 border-t border-line/60" aria-hidden />}
+            {items.map((s) => (
               <div key={s.id}>
                 <NavLink to={s.id === 'sheets' ? '/glamiex/sheets/all' : `/glamiex/${s.id}`} title={collapsed ? s.label : undefined} aria-label={collapsed ? s.label : undefined}
                   className={() => cn('nav-item py-1.5', collapsed && 'justify-center px-0', section === s.id && 'active')}>
                   <s.icon className="h-4 w-4 shrink-0" aria-hidden />{!collapsed && <span className="truncate">{s.label}</span>}
                 </NavLink>
                 {s.id === 'sheets' && section === 'sheets' && !collapsed && (
-                  <div className="ml-4 mt-0.5 space-y-0.5 border-l border-line pl-2">
+                  <div className="ms-4 mt-0.5 space-y-0.5 border-s border-line ps-2">
                     {SHEET_NAV.map((x) => (
                       <NavLink key={x.id} to={`/glamiex/sheets/${x.id}`} className={() => cn('nav-item py-1 text-xs', (id ?? 'all') === x.id && 'active')}>{x.label}</NavLink>
                     ))}
                   </div>
                 )}
+              </div>
+            ))}
               </div>
             ))}
             <button type="button" className={cn('nav-item mt-1 border-t border-line/60 pt-2', collapsed && 'justify-center px-0')} onClick={() => void updateGxSettings({ sidebar: collapsed ? 'expanded' : 'collapsed' })}
@@ -178,21 +188,29 @@ export function GlamiexPage() {
       </div>
 
       {/* Mobile "all sections" sheet */}
-      {sheet && (
+      {/* Portal: the page transition applies a transform, which would make position:fixed relative to the page instead of the screen. */}
+      {sheet && createPortal(
         <div className="fixed inset-0 z-50 flex items-end bg-black/50 lg:hidden" role="dialog" aria-modal="true" aria-label="GLAMIEX sections" onClick={() => setSheet(false)}>
           <div className="glass max-h-[80vh] w-full overflow-y-auto rounded-t-3xl p-4" style={{ paddingBottom: 'calc(1rem + env(safe-area-inset-bottom))' }} onClick={(e) => e.stopPropagation()}>
             <div className="mb-3 flex items-center justify-between"><h2 className="font-semibold">GLAMIEX sections</h2>
               <button className="btn btn-ghost h-11 w-11" aria-label="Close" onClick={() => setSheet(false)}><X className="h-5 w-5" /></button></div>
-            <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
-              {GX_SECTIONS.map((s) => (
-                <NavLink key={s.id} to={s.id === 'sheets' ? '/glamiex/sheets/all' : `/glamiex/${s.id}`} onClick={() => setSheet(false)} className={({ isActive }) => cn('flex min-h-[56px] items-center gap-2 rounded-2xl border p-3 text-sm', isActive ? 'border-accent bg-raised font-semibold' : 'border-line')}>
-                  <s.icon className="h-5 w-5 shrink-0 text-accent" aria-hidden />{s.label}
-                </NavLink>
+            <div className="space-y-4">
+              {GROUPED.map(({ group, items }) => (
+                <section key={group} aria-label={group}>
+                  <h3 className="mb-1.5 text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">{group}</h3>
+                  <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+                    {items.map((s) => (
+                      <NavLink key={s.id} to={s.id === 'sheets' ? '/glamiex/sheets/all' : `/glamiex/${s.id}`} onClick={() => setSheet(false)} className={({ isActive }) => cn('flex min-h-[52px] items-center gap-2 rounded-xl border px-3 py-2 text-sm', isActive ? 'border-accent bg-accent/10 font-semibold' : 'border-line')}>
+                        <s.icon className="h-5 w-5 shrink-0 text-accent" aria-hidden /><span className="min-w-0 leading-tight">{s.label}</span>
+                      </NavLink>
+                    ))}
+                  </div>
+                </section>
               ))}
             </div>
           </div>
         </div>
-      )}
+      , document.body)}
     </div>
   )
 }

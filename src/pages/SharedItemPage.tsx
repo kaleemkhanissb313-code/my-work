@@ -25,6 +25,12 @@ export function SharedItemPage() {
     catch (e) { setErr(token ? 'This link is invalid, has expired or was revoked.' : (e as Error).message) }
   }
   useEffect(() => { void load() }, [id, token]) // eslint-disable-line react-hooks/exhaustive-deps
+  // Shared items must never appear in search results.
+  useEffect(() => {
+    const m = Object.assign(document.createElement("meta"), { name: "robots", content: "noindex, nofollow" })
+    document.head.appendChild(m)
+    return () => m.remove()
+  }, [])
 
   if (err) return <EmptyState icon={Lock} title="Not available">{err}</EmptyState>
   if (!item) return <Spinner label="Opening shared item" />

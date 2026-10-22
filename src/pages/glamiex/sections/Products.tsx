@@ -51,7 +51,7 @@ function ProductList() {
         <Select aria-label="Status" className="w-auto" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
           <option value="active">Active</option><option value="low">Low stock</option><option value="all">All (not archived)</option><option value="archived">Archived</option>
         </Select>
-        <div className="ml-auto flex flex-wrap gap-2">
+        <div className="ms-auto flex flex-wrap gap-2">
           <ExportButtons name="Product performance" period="All time" sheets={() => [{ name: 'Products', rows: [['Product', 'SKU', 'Category', 'Cost (Rs)', 'Price (Rs)', 'Stock', 'Units sold', 'Revenue (Rs)', 'Cost of sales (Rs)', 'Gross profit (Rs)', 'Margin %'], ...rows.map((p) => [p.product.name, p.product.sku, p.product.category, rs(p.product.buyPrice), rs(p.product.sellPrice), p.stock, p.units, rs(p.revenue), rs(p.cost), rs(p.profit), p.margin == null ? '' : +(p.margin * 100).toFixed(2)])] }]} />
           <Button variant="primary" icon={Plus} onClick={() => go('products/new')}>Add product</Button>
         </div>
@@ -80,7 +80,7 @@ function ThumbById({ id, alt, size }: { id?: string; alt: string; size: string }
   return <div className={cn('shrink-0 overflow-hidden rounded-xl bg-raised', size)}>{m?.thumbnail ? <img loading="lazy" decoding="async" src={m.thumbnail} alt={alt} className="h-full w-full object-cover" /> : <Package className="m-auto h-full w-1/2 text-muted" aria-hidden />}</div>
 }
 function ProductName({ p }: { p: ProductPerf }) {
-  return <div className="flex items-center gap-2"><ThumbById id={p.product.imageIds[0]} alt={p.product.name} size="h-9 w-9" /><div className="min-w-0"><div className="truncate font-medium">{p.product.name}</div><div className="text-xs text-muted">{p.product.sku}{p.product.status !== 'active' && <Badge className="ml-1">{p.product.status}</Badge>}</div></div></div>
+  return <div className="flex items-center gap-2"><ThumbById id={p.product.imageIds[0]} alt={p.product.name} size="h-9 w-9" /><div className="min-w-0"><div className="truncate font-medium">{p.product.name}</div><div className="text-xs text-muted">{p.product.sku}{p.product.status !== 'active' && <Badge className="ms-1">{p.product.status}</Badge>}</div></div></div>
 }
 
 function ProductForm({ product, onDone }: { product: GxProduct | null; onDone?: () => void }) {

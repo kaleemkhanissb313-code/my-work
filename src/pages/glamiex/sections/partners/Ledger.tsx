@@ -40,7 +40,7 @@ export function TxnDetail({ t, onClose }: { t: BpTxn; onClose: () => void }) {
   const save = async (patch: Partial<Pick<BpTxn, 'description' | 'reference' | 'proofIds'>>) => {
     try { await annotateTxn(t.id, { description: desc, reference: ref, proofIds: t.proofIds, ...patch }); toast('Details saved') } catch (e) { toast((e as Error).message, 'error') }
   }
-  const row = (k: string, v: React.ReactNode) => <><dt className="text-muted">{k}</dt><dd className="text-right">{v}</dd></>
+  const row = (k: string, v: React.ReactNode) => <><dt className="text-muted">{k}</dt><dd className="text-end">{v}</dd></>
   return (
     <Modal open onClose={onClose} title={`${t.txnNo} · ${txnLabel(t.type)}`} wide footer={<>
       {canImage && <Button icon={ImageDown} onClick={() => openPaymentImage(t, byId, nav)}>Payment image</Button>}
@@ -62,8 +62,8 @@ export function TxnDetail({ t, onClose }: { t: BpTxn; onClose: () => void }) {
           {row('Recorded', new Date(t.createdAt).toLocaleString())}
         </dl>
         {t.lines.length > 0 && (
-          <table className="w-full text-sm"><thead><tr className="text-left text-xs text-muted"><th className="py-1">Partner</th><th className="py-1 text-right">Amount</th></tr></thead>
-            <tbody>{t.lines.map((l) => <tr key={l.partnerId} className="border-t border-line"><td className="py-1.5">{byId.get(l.partnerId)?.name}</td><td className="py-1.5 text-right tabular-nums">{pkr(l.amount)}</td></tr>)}</tbody></table>
+          <table className="w-full text-sm"><thead><tr className="text-start text-xs text-muted"><th className="py-1">Partner</th><th className="py-1 text-end">Amount</th></tr></thead>
+            <tbody>{t.lines.map((l) => <tr key={l.partnerId} className="border-t border-line"><td className="py-1.5">{byId.get(l.partnerId)?.name}</td><td className="py-1.5 text-end tabular-nums">{pkr(l.amount)}</td></tr>)}</tbody></table>
         )}
         <div className="grid gap-3 sm:grid-cols-2">
           <Field label="Description" htmlFor="bpd-desc"><Input id="bpd-desc" value={desc} maxLength={200} onChange={(e) => setDesc(e.target.value)} onBlur={() => desc !== t.description && void save({})} /></Field>
@@ -107,7 +107,7 @@ export function TxnTable({ rows, partnerId }: { rows: BpTxn[]; partnerId?: strin
               <div className="mt-1 truncate text-sm font-medium">{partiesOf(t, byId)}</div>
               <div className="truncate text-xs text-muted">{t.date} · {t.txnNo}{t.description ? ` · ${t.description}` : ''}</div>
             </div>
-            <div className={cn('text-right font-semibold tabular-nums', t.reversedBy && 'line-through opacity-60')}>{pkr(partnerId ? effect(t) ?? t.amount : t.amount)}</div>
+            <div className={cn('text-end font-semibold tabular-nums', t.reversedBy && 'line-through opacity-60')}>{pkr(partnerId ? effect(t) ?? t.amount : t.amount)}</div>
           </div>
         )} />
       {open && <TxnDetail t={open} onClose={() => setOpen(null)} />}

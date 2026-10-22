@@ -101,19 +101,19 @@ export function Gantt({ rows, initialZoom = 'week', ariaLabel = 'Timeline' }: { 
         <Button size="sm" onClick={() => setAnchor(defaultAnchor(zoom, []))}>Today</Button>
         <IconButton icon={ChevronRight} label="Later" onClick={() => shift(1)} />
         <IconButton icon={ChevronsLeftRight} label="Jump to earliest item" onClick={fit} disabled={!rows.some((r) => r.start || r.end)} />
-        <span className="ml-auto text-xs text-muted">{format(start, 'MMM d, yyyy')} – {format(end, 'MMM d, yyyy')}</span>
+        <span className="ms-auto text-xs text-muted">{format(start, 'MMM d, yyyy')} – {format(end, 'MMM d, yyyy')}</span>
       </div>
       <div className="overflow-x-auto" role="region" aria-label={ariaLabel} tabIndex={0}>
         <div className="relative" style={{ minWidth: `calc(${LABEL_PX_SM}px + ${width}px)` }}>
           {/* Header */}
           <div className="sticky top-0 z-20 flex border-b border-line bg-surface text-[11px] text-muted">
-            <div className={cn('sticky left-0 z-30 shrink-0 border-r border-line bg-surface p-2 font-medium', LABEL_W)}>Item</div>
+            <div className={cn('sticky start-0 z-30 shrink-0 border-e border-line bg-surface p-2 font-medium', LABEL_W)}>Item</div>
             <div className="relative shrink-0" style={{ width }}>
               <div className="relative h-5 border-b border-line/50">
-                {groups.map((g) => <div key={g.x} className="absolute top-0 truncate border-l border-line/60 px-1 font-medium text-fg" style={{ left: g.x, width: g.w }}>{g.label}</div>)}
+                {groups.map((g) => <div key={g.x} className="absolute top-0 truncate border-s border-line/60 px-1 font-medium text-fg" style={{ left: g.x, width: g.w }}>{g.label}</div>)}
               </div>
               <div className="relative h-5">
-                {units.map((u) => <div key={u.x} className={cn('absolute top-0 truncate border-l border-line/40 px-0.5 text-center', u.weekend && 'bg-raised/60')} style={{ left: u.x, width: u.w }}>{u.label}</div>)}
+                {units.map((u) => <div key={u.x} className={cn('absolute top-0 truncate border-s border-line/40 px-0.5 text-center', u.weekend && 'bg-raised/60')} style={{ left: u.x, width: u.w }}>{u.label}</div>)}
               </div>
             </div>
           </div>
@@ -123,12 +123,12 @@ export function Gantt({ rows, initialZoom = 'week', ariaLabel = 'Timeline' }: { 
           </ul>
           {todayX >= 0 && todayX <= width && (
             <div className="pointer-events-none absolute bottom-0 top-0 z-10 hidden w-0 sm:block" style={{ left: `calc(14rem + ${todayX + px / 2}px)` }}>
-              <div className="h-full border-l-2 border-danger/70" />
+              <div className="h-full border-s-2 border-danger/70" />
             </div>
           )}
           {todayX >= 0 && todayX <= width && (
             <div className="pointer-events-none absolute bottom-0 top-0 z-10 w-0 sm:hidden" style={{ left: `calc(9rem + ${todayX + px / 2}px)` }}>
-              <div className="h-full border-l-2 border-danger/70" />
+              <div className="h-full border-s-2 border-danger/70" />
             </div>
           )}
         </div>
@@ -152,8 +152,8 @@ function GanttRowView({ r, start, px, width, units }: { r: GanttRow; start: Date
     const x0 = differenceInCalendarDays(parseDate(r.milestone ? e : s), start) * px
     const x1 = (differenceInCalendarDays(parseDate(e), start) + 1) * px
     const title = r.milestone ? `${r.label}: milestone ${fmtDate(e)}` : `${r.label}: ${fmtDate(s)} – ${fmtDate(e)}`
-    if (x1 <= 0) bar = <span className="absolute left-1 top-1/2 -translate-y-1/2 text-[10px] text-muted">◀ {fmtDate(e, 'MMM d')}</span>
-    else if (x0 >= width) bar = <span className="absolute right-1 top-1/2 -translate-y-1/2 text-[10px] text-muted">{fmtDate(s, 'MMM d')} ▶</span>
+    if (x1 <= 0) bar = <span className="absolute start-1 top-1/2 -translate-y-1/2 text-[10px] text-muted">◀ {fmtDate(e, 'MMM d')}</span>
+    else if (x0 >= width) bar = <span className="absolute end-1 top-1/2 -translate-y-1/2 text-[10px] text-muted">{fmtDate(s, 'MMM d')} ▶</span>
     else if (r.milestone) {
       const cx = x0 + px / 2
       bar = (
@@ -164,9 +164,9 @@ function GanttRowView({ r, start, px, width, units }: { r: GanttRow; start: Date
       const left = Math.max(0, x0), right = Math.min(width, x1)
       bar = (
         <button type="button" onClick={r.onOpen} aria-label={title} title={title}
-          className={cn('absolute top-1/2 h-5 -translate-y-1/2 overflow-hidden rounded-md text-left text-[10px] font-medium text-white shadow', r.done && 'opacity-60')}
+          className={cn('absolute top-1/2 h-5 -translate-y-1/2 overflow-hidden rounded-md text-start text-[10px] font-medium text-white shadow', r.done && 'opacity-60')}
           style={{ left, width: Math.max(4, right - left), background: color }}>
-          {r.progress != null && r.progress > 0 && <span className="absolute inset-y-0 left-0 bg-black/25" style={{ width: `${Math.min(100, r.progress)}%` }} aria-hidden />}
+          {r.progress != null && r.progress > 0 && <span className="absolute inset-y-0 start-0 bg-black/25" style={{ width: `${Math.min(100, r.progress)}%` }} aria-hidden />}
           {right - left > 50 && <span className="relative truncate px-1.5 leading-5">{r.label}</span>}
         </button>
       )
@@ -174,20 +174,20 @@ function GanttRowView({ r, start, px, width, units }: { r: GanttRow; start: Date
   }
   return (
     <li className="flex border-b border-line/40 last:border-0 hover:bg-raised/30">
-      <div className={cn('sticky left-0 z-10 flex shrink-0 items-center gap-1 border-r border-line bg-surface px-2 py-1.5 text-xs', LABEL_W)} style={{ paddingLeft: 8 + (r.depth ?? 0) * 14 }}>
+      <div className={cn('sticky start-0 z-10 flex shrink-0 items-center gap-1 border-e border-line bg-surface px-2 py-1.5 text-xs', LABEL_W)} style={{ paddingLeft: 8 + (r.depth ?? 0) * 14 }}>
         {r.expandable ? (
           <button type="button" onClick={r.onToggle} aria-expanded={!!r.expanded} aria-label={`${r.expanded ? 'Collapse' : 'Expand'} ${r.label}`} className="grid h-5 w-5 shrink-0 place-items-center rounded text-muted hover:text-fg">
             {r.expanded ? <ChevronDown className="h-3.5 w-3.5" aria-hidden /> : <ChevronRight className="h-3.5 w-3.5" aria-hidden />}
           </button>
         ) : <span className="w-1" />}
         <span className="h-2 w-2 shrink-0 rounded-full" style={{ background: color }} aria-hidden />
-        <button type="button" onClick={r.onOpen} disabled={!r.onOpen} className={cn('min-w-0 flex-1 truncate text-left', r.depth ? 'text-muted' : 'font-medium', r.done && 'line-through', r.onOpen && 'hover:text-accent')} title={r.label}>
+        <button type="button" onClick={r.onOpen} disabled={!r.onOpen} className={cn('min-w-0 flex-1 truncate text-start', r.depth ? 'text-muted' : 'font-medium', r.done && 'line-through', r.onOpen && 'hover:text-accent')} title={r.label}>
           {r.label}
         </button>
       </div>
       <div className="relative h-9 shrink-0" style={{ width }}>
-        {units.map((u) => <div key={u.x} className={cn('absolute inset-y-0 border-l border-line/30', u.weekend && 'bg-raised/40')} style={{ left: u.x, width: u.w }} aria-hidden />)}
-        {bar ?? <span className="absolute left-2 top-1/2 -translate-y-1/2 text-[10px] text-muted">No dates set</span>}
+        {units.map((u) => <div key={u.x} className={cn('absolute inset-y-0 border-s border-line/30', u.weekend && 'bg-raised/40')} style={{ left: u.x, width: u.w }} aria-hidden />)}
+        {bar ?? <span className="absolute start-2 top-1/2 -translate-y-1/2 text-[10px] text-muted">No dates set</span>}
       </div>
     </li>
   )

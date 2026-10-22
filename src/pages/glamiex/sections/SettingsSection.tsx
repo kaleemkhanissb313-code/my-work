@@ -36,7 +36,7 @@ export default function SettingsSection() {
         <div className="grid grid-cols-1 gap-3 min-[420px]:grid-cols-2 lg:grid-cols-5" role="radiogroup" aria-label="Design preset">
           {PRESETS.map((p) => (
             <button key={p.id} type="button" role="radio" aria-checked={s.preset === p.id} onClick={() => set({ preset: p.id })}
-              className={cn('flex flex-col overflow-hidden rounded-2xl border text-left transition', s.preset === p.id ? 'border-accent ring-2 ring-accent/40' : 'border-line hover:border-accent/50')}>
+              className={cn('flex flex-col overflow-hidden rounded-2xl border text-start transition', s.preset === p.id ? 'border-accent ring-2 ring-accent/40' : 'border-line hover:border-accent/50')}>
               <span className="h-16 w-full" style={{ background: p.swatch }} aria-hidden />
               <span className="p-3"><span className="block text-sm font-semibold">{p.name}</span><span className="block text-xs text-muted">{p.desc}</span></span>
             </button>
@@ -81,7 +81,7 @@ export default function SettingsSection() {
       </Section>
 
       <Section title="Accounting assumptions" icon={BookOpen} defaultOpen={false}>
-        <ol className="list-decimal space-y-1.5 pl-5 text-sm text-muted">
+        <ol className="list-decimal space-y-1.5 ps-5 text-sm text-muted">
           <li><b className="text-fg">Money</b> is stored as whole paisa (Rs 1 = 100 paisa), so totals never drift from rounding.</li>
           <li><b className="text-fg">Sales</b> count on the sale date. <b className="text-fg">Cancelled</b> sales are excluded completely and their stock is returned. <b className="text-fg">Refunds</b> are separate records that reduce revenue (and COGS for returned units) on the refund date.</li>
           <li><b className="text-fg">Net sales</b> = item totals − discounts − refunds. <b className="text-fg">Tax</b> is collected for the government and is not revenue.</li>

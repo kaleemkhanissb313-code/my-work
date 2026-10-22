@@ -151,7 +151,7 @@ function AccountSection() {
       <div className="mt-4 border-t border-line pt-3">
         <div className="mb-2 flex items-center gap-2 text-sm font-medium"><Smartphone className="h-4 w-4" aria-hidden />Two-factor authentication (TOTP)</div>
         {factors.filter((f) => f.status === 'verified').map((f) => (
-          <div key={f.id} className="mb-2 flex items-center justify-between rounded-xl border border-line px-3 py-2 text-sm"><span><CheckCircle2 className="mr-1 inline h-4 w-4 text-ok" />{f.friendly_name ?? 'Authenticator app'}</span><Button size="sm" variant="ghost" onClick={() => void unenroll(f.id)}>Remove</Button></div>
+          <div key={f.id} className="mb-2 flex items-center justify-between rounded-xl border border-line px-3 py-2 text-sm"><span><CheckCircle2 className="me-1 inline h-4 w-4 text-ok" />{f.friendly_name ?? 'Authenticator app'}</span><Button size="sm" variant="ghost" onClick={() => void unenroll(f.id)}>Remove</Button></div>
         ))}
         {mfa ? (
           <div className="grid gap-3 sm:grid-cols-[160px_1fr]">
@@ -219,9 +219,9 @@ function ActivitySection() {
       {!list?.length ? <p className="py-3 text-sm text-muted">No security events recorded yet.</p> : (
         <div className="max-h-80 overflow-y-auto">
           <table className="w-full text-sm">
-            <thead className="sticky top-0 bg-surface text-left text-xs text-muted"><tr><th className="py-1 pr-3 font-medium">When</th><th className="py-1 pr-3 font-medium">Event</th><th className="py-1 font-medium">Detail</th></tr></thead>
+            <thead className="sticky top-0 bg-surface text-start text-xs text-muted"><tr><th className="py-1 pe-3 font-medium">When</th><th className="py-1 pe-3 font-medium">Event</th><th className="py-1 font-medium">Detail</th></tr></thead>
             <tbody>{list.map((e) => (
-              <tr key={e.id} className="border-t border-line/60"><td className="whitespace-nowrap py-1.5 pr-3 text-muted">{format(e.at, 'MMM d, HH:mm:ss')}</td><td className={cn('py-1.5 pr-3', bad(e.type) && 'text-danger')}>{e.type.replace(/_/g, ' ')}</td><td className="py-1.5 text-muted">{e.detail}</td></tr>
+              <tr key={e.id} className="border-t border-line/60"><td className="whitespace-nowrap py-1.5 pe-3 text-muted">{format(e.at, 'MMM d, HH:mm:ss')}</td><td className={cn('py-1.5 pe-3', bad(e.type) && 'text-danger')}>{e.type.replace(/_/g, ' ')}</td><td className="py-1.5 text-muted">{e.detail}</td></tr>
             ))}</tbody>
           </table>
         </div>
@@ -256,7 +256,7 @@ export function SecurityPage() {
         <AccountSection />
         <BackupSection />
         <Card><CardTitle icon={AlertTriangle} tone="text-warn">What is protected (and what is not)</CardTitle>
-          <ul className="list-disc space-y-1.5 pl-5 text-sm text-muted">
+          <ul className="list-disc space-y-1.5 ps-5 text-sm text-muted">
             <li><b className="text-fg">Private Vault</b>: end-to-end encrypted (AES-256-GCM, key derived from your passphrase with PBKDF2). Only ciphertext is stored locally and in the cloud.</li>
             <li><b className="text-fg">App lock</b>: a privacy screen on this device. It does <i>not</i> encrypt your other local data; someone with access to this browser profile and developer tools could read it.</li>
             <li><b className="text-fg">Cloud data</b>: protected by Supabase Auth and Row Level Security on the server (each user can only access rows they own). Data is encrypted in transit (HTTPS) and at rest by the hosting provider.</li>

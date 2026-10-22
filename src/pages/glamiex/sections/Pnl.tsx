@@ -27,13 +27,13 @@ export default function Pnl() {
         <Section title="Profit & loss statement" icon={Scale}>
           <div className="overflow-x-auto">
             <table className="gx-table w-full min-w-[480px] text-sm">
-              <thead><tr className="text-left text-xs text-muted"><th className="py-2 pr-2">Line</th><th className="py-2 text-right">This period</th><th className="py-2 text-right">Previous</th><th className="py-2 text-right">Change</th></tr></thead>
+              <thead><tr className="text-start text-xs text-muted"><th className="py-2 pe-2">Line</th><th className="py-2 text-end">This period</th><th className="py-2 text-end">Previous</th><th className="py-2 text-end">Change</th></tr></thead>
               <tbody>{p.lines.map((l) => (
                 <tr key={l.label} className={cn('border-t border-line/60', l.kind === 'sub' && 'font-semibold', l.kind === 'total' && 'border-t-2 border-line text-base font-bold')}>
-                  <td className={cn('py-2 pr-2', l.kind === 'indent' && 'pl-4 text-muted')}>{l.label}</td>
+                  <td className={cn('py-2 pe-2', l.kind === 'indent' && 'ps-4 text-muted')}>{l.label}</td>
                   <td className={cn('gx-num py-2', l.kind === 'total' && (l.cur >= 0 ? 'text-ok' : 'text-danger'))}>{pkr(l.cur)}</td>
                   <td className="gx-num py-2 text-muted">{pkr(l.prev)}</td>
-                  <td className="py-2 text-right"><Delta cur={l.cur} prev={l.prev} money /></td>
+                  <td className="py-2 text-end"><Delta cur={l.cur} prev={l.prev} money /></td>
                 </tr>
               ))}</tbody>
             </table>

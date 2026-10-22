@@ -48,7 +48,7 @@ export function RangeBar({ state, setState, range, extra }: { state: RangeState;
         <label className="flex flex-col text-xs text-muted">To<Input type="date" className="mt-1 w-auto" value={state.custom.to} min={state.custom.from} onChange={(e) => setState({ ...state, custom: { ...state.custom, to: e.target.value } })} /></label>
       </>}
       <span className="mb-2.5 text-xs text-muted">{state.preset === 'all' ? 'All records' : `${range.from} → ${range.to}`}</span>
-      {extra && <div className="ml-auto flex flex-wrap gap-2">{extra}</div>}
+      {extra && <div className="ms-auto flex flex-wrap gap-2">{extra}</div>}
     </div>
   )
 }
@@ -98,8 +98,8 @@ export function MoneyInput({ id, value, onChange, placeholder = '0', allowNegati
   useEffect(() => { if (value !== last.current) { last.current = value; setText(value == null ? '' : String(toRupees(value))) } }, [value])
   return (
     <div className="relative">
-      <span className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted">{prefix}</span>
-      <Input id={id} inputMode="decimal" autoComplete="off" className={cn(prefix.length > 2 ? "pl-12" : "pl-9", "text-right tabular-nums")} placeholder={placeholder} value={text} {...rest}
+      <span className="pointer-events-none absolute start-3 top-1/2 -translate-y-1/2 text-sm text-muted">{prefix}</span>
+      <Input id={id} inputMode="decimal" autoComplete="off" className={cn(prefix.length > 2 ? "ps-12" : "ps-9", "text-end tabular-nums")} placeholder={placeholder} value={text} {...rest}
         onChange={(e) => {
           const t = e.target.value.replace(allowNegative ? /[^\d.,-]/g : /[^\d.,]/g, '')
           setText(t)
@@ -138,23 +138,23 @@ export function DataTable<T>({ rows, cols, rowKey, onRowClick, card, empty = 'No
       {(searchable || toolbar) && (
         <div className="mb-3 flex flex-wrap items-center gap-2">
           {searchable && <div className="relative min-w-[10rem] flex-1 sm:max-w-xs">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-            <Input aria-label="Filter rows" placeholder="Filter…" className="pl-9" value={q} onChange={(e) => setQ(e.target.value)} />
+            <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+            <Input aria-label="Filter rows" placeholder="Filter…" className="ps-9" value={q} onChange={(e) => setQ(e.target.value)} />
           </div>}
           {toolbar}
-          <span className="ml-auto text-xs text-muted">{list.length} record{list.length === 1 ? '' : 's'}</span>
+          <span className="ms-auto text-xs text-muted">{list.length} record{list.length === 1 ? '' : 's'}</span>
         </div>
       )}
       {!list.length ? <div className="rounded-2xl border border-dashed border-line p-8 text-center text-sm text-muted">{rows.length ? 'No records match this filter.' : empty}</div> : <>
         {/* Cards on phones */}
         {card && <ul className="space-y-2 md:hidden">{shown.map((r) => (
-          <li key={rowKey(r)}>{onRowClick ? <button type="button" className="card block w-full p-3 text-left active:scale-[0.99]" onClick={() => onRowClick(r)}>{card(r)}</button> : <div className="card p-3">{card(r)}</div>}</li>
+          <li key={rowKey(r)}>{onRowClick ? <button type="button" className="card block w-full p-3 text-start active:scale-[0.99]" onClick={() => onRowClick(r)}>{card(r)}</button> : <div className="card p-3">{card(r)}</div>}</li>
         ))}</ul>}
         {/* Table on tablets / laptops */}
         <div className={cn('card overflow-auto p-0', card && 'hidden md:block')} style={{ maxHeight: '70vh' }}>
           <table className="gx-table w-full text-sm">
             <thead><tr>{cols.map((c) => (
-              <th key={c.key} scope="col" className={cn('whitespace-nowrap px-3 py-2 text-left text-xs font-semibold text-muted', c.align === 'right' && 'text-right', c.className)}
+              <th key={c.key} scope="col" className={cn('whitespace-nowrap px-3 py-2 text-start text-xs font-semibold text-muted', c.align === 'right' && 'text-end', c.className)}
                 aria-sort={sort?.key === c.key ? (sort.dir === 1 ? 'ascending' : 'descending') : undefined}>
                 {c.sort ? <button type="button" className="inline-flex items-center gap-1 hover:text-fg" onClick={() => setSort(sort?.key === c.key ? (sort.dir === 1 ? { key: c.key, dir: -1 } : null) : { key: c.key, dir: 1 })}>
                   {c.label}{sort?.key === c.key && (sort.dir === 1 ? <ArrowUp className="h-3 w-3" /> : <ArrowDown className="h-3 w-3" />)}
@@ -189,10 +189,10 @@ export function Section({ title, icon: Icon, children, actions, defaultOpen = tr
   return (
     <section className={cn('card p-4', className)}>
       <div className="flex flex-wrap items-center gap-2">
-        <button type="button" className="flex min-w-0 flex-1 items-center gap-2 text-left text-sm font-semibold" aria-expanded={open} onClick={() => setOpen(!open)}>
+        <button type="button" className="flex min-w-0 flex-1 items-center gap-2 text-start text-sm font-semibold" aria-expanded={open} onClick={() => setOpen(!open)}>
           {Icon && <span className="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-raised text-accent"><Icon className="h-4 w-4" aria-hidden /></span>}
           <span className="truncate">{title}</span>
-          <ChevronDown className={cn('ml-1 h-4 w-4 shrink-0 text-muted transition-transform', !open && '-rotate-90')} aria-hidden />
+          <ChevronDown className={cn('ms-1 h-4 w-4 shrink-0 text-muted transition-transform', !open && '-rotate-90')} aria-hidden />
         </button>
         {actions}
       </div>
@@ -273,7 +273,7 @@ export function AttachmentField({ ids, onChange, accept = 'any', label, tag }: {
               )}
             </button>
             <button type="button" aria-label={`Remove ${f!.name}`} onClick={() => onChange(ids.filter((x) => x !== f!.id))}
-              className="absolute right-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-surface/90 text-muted shadow hover:text-danger"><X className="h-4 w-4" /></button>
+              className="absolute end-1 top-1 grid h-7 w-7 place-items-center rounded-full bg-surface/90 text-muted shadow hover:text-danger"><X className="h-4 w-4" /></button>
           </div>
         ))}
         {progress.map((p) => (

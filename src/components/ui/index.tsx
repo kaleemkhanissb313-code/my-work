@@ -67,7 +67,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaHTMLAttributes<H
   return <textarea ref={ref} className={cn('input min-h-[90px] resize-y', className)} {...p} />
 })
 export function Select({ className, children, ...p }: SelectHTMLAttributes<HTMLSelectElement>) {
-  return <select className={cn('input pr-8', className)} {...p}>{children}</select>
+  return <select className={cn('input pe-8', className)} {...p}>{children}</select>
 }
 export function Checkbox({ label, checked, onChange, className }: { label: ReactNode; checked: boolean; onChange: (v: boolean) => void; className?: string }) {
   const id = useId()
@@ -84,7 +84,7 @@ export function Toggle({ checked, onChange, label, description }: { checked: boo
       <div><div className="text-sm font-medium">{label}</div>{description && <div className="text-xs text-muted">{description}</div>}</div>
       <button type="button" role="switch" aria-checked={checked} aria-label={label} onClick={() => onChange(!checked)}
         className={cn('relative h-6 w-11 shrink-0 rounded-full border border-line transition-colors', checked ? 'bg-accent' : 'bg-raised')}>
-        <span className={cn('absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform', checked ? 'translate-x-[22px]' : 'translate-x-0.5')} />
+        <span className={cn('absolute top-0.5 h-[18px] w-[18px] rounded-full bg-white shadow transition-transform', checked ? 'translate-x-[22px] rtl:-translate-x-[22px]' : 'translate-x-0.5 rtl:-translate-x-0.5')} />
       </button>
     </div>
   )

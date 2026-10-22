@@ -138,7 +138,7 @@ function TaskForm({ task, defaults, projects, onClose }: { task: Task | null; de
         {task && <>
           <Button size="sm" icon={Copy} onClick={duplicate}>Duplicate</Button>
           <Button size="sm" icon={task.archived ? ArchiveRestore : Archive} onClick={archive}>{task.archived ? 'Unarchive' : 'Archive'}</Button>
-          <Button size="sm" variant="ghost" icon={Trash2} onClick={trash} className="text-danger sm:mr-auto">Move to trash</Button>
+          <Button size="sm" variant="ghost" icon={Trash2} onClick={trash} className="text-danger sm:me-auto">Move to trash</Button>
         </>}
         <Button onClick={onClose}>Cancel</Button>
         <Button variant="primary" loading={saving} onClick={save}>{task ? 'Save' : 'Create task'}</Button>
@@ -256,7 +256,7 @@ export function TaskCard({ task: t, project, onOpen, onStatusChange, onMove, can
             aria-label={`Mark "${t.title}" ${t.status === 'completed' ? 'not completed' : 'completed'}`}
             onChange={() => onStatusChange(t, t.status === 'completed' ? 'todo' : 'completed')} />
         )}
-        <button type="button" className="min-w-0 flex-1 text-left" onClick={() => onOpen(t)}>
+        <button type="button" className="min-w-0 flex-1 text-start" onClick={() => onOpen(t)}>
           <span className={cn('flex items-center gap-1.5 font-medium', t.status === 'completed' && 'line-through')}>
             {t.isMilestone && <Diamond className="h-3.5 w-3.5 shrink-0 text-accent" aria-label="Milestone" />}
             <span className="break-words">{t.title || '(untitled)'}</span>

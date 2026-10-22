@@ -164,7 +164,7 @@ export function DocsPage({ kind }: { kind: Kind }) {
                 <p className="mt-1 flex-1 text-sm text-muted">{t.description}</p>
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <Badge>{t.kind === 'note' ? 'Note' : 'Document'}</Badge>
-                  <Button size="sm" variant="primary" icon={Sparkles} className="ml-auto" onClick={() => void applyTemplate(t)}>Use template</Button>
+                  <Button size="sm" variant="primary" icon={Sparkles} className="ms-auto" onClick={() => void applyTemplate(t)}>Use template</Button>
                 </div>
               </li>
             ))}
@@ -181,8 +181,8 @@ export function DocsPage({ kind }: { kind: Kind }) {
         <section aria-label={`${meta.title} list`} className="min-w-0">
           <div className="mb-4 flex flex-wrap items-center gap-2">
             <div className="relative min-w-[180px] flex-1">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-              <Input type="search" className="pl-9" placeholder={`Search ${meta.title.toLowerCase()}…`} aria-label={`Search ${meta.title.toLowerCase()}`} value={q} onChange={(e) => setQ(e.target.value)} />
+              <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+              <Input type="search" className="ps-9" placeholder={`Search ${meta.title.toLowerCase()}…`} aria-label={`Search ${meta.title.toLowerCase()}`} value={q} onChange={(e) => setQ(e.target.value)} />
             </div>
             <Select aria-label="Sort" className="w-auto" value={sort} onChange={(e) => setSort(e.target.value as SortKey)}>
               <option value="updated">Sort: Last edited</option>
@@ -250,7 +250,7 @@ function DocItem({ d, layout, dense, isTemplatePage, onRename, onOrganize, onUse
 
   const actions = (
     <div className="flex flex-wrap items-center">
-      {isTemplatePage && <Button size="sm" variant="primary" icon={Sparkles} onClick={onUse} className="mr-1">Use template</Button>}
+      {isTemplatePage && <Button size="sm" variant="primary" icon={Sparkles} onClick={onUse} className="me-1">Use template</Button>}
       <IconButton icon={Star} label={d.favorite ? 'Remove from favorites' : 'Add to favorites'} active={d.favorite} onClick={() => void safeWrite(() => docsRepo.toggle(d.id, 'favorite'))} />
       <IconButton icon={Pencil} label="Rename" onClick={onRename} />
       <IconButton icon={FolderInput} label="Move to folder / color label" onClick={onOrganize} />

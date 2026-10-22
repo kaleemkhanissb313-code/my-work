@@ -215,10 +215,10 @@ function TimerCard({ t, now }: { t: RunningTimer; now: number }) {
         <div className="mt-3 max-h-48 overflow-y-auto rounded-xl border border-line">
           <table className="w-full text-sm">
             <caption className="sr-only">Laps for {t.name}</caption>
-            <thead className="text-xs text-muted"><tr><th className="px-2 py-1 text-left">Lap</th><th className="px-2 py-1 text-right">Split</th><th className="px-2 py-1 text-right">Total</th></tr></thead>
+            <thead className="text-xs text-muted"><tr><th className="px-2 py-1 text-start">Lap</th><th className="px-2 py-1 text-end">Split</th><th className="px-2 py-1 text-end">Total</th></tr></thead>
             <tbody>
               {[...t.laps].map((total, i) => ({ total, i })).reverse().map(({ total, i }) => (
-                <tr key={i} className="border-t border-line/60 tabular-nums"><td className="px-2 py-1">#{i + 1}</td><td className="px-2 py-1 text-right font-mono">{fmtDuration(splits[i], true)}</td><td className="px-2 py-1 text-right font-mono text-muted">{fmtDuration(total, true)}</td></tr>
+                <tr key={i} className="border-t border-line/60 tabular-nums"><td className="px-2 py-1">#{i + 1}</td><td className="px-2 py-1 text-end font-mono">{fmtDuration(splits[i], true)}</td><td className="px-2 py-1 text-end font-mono text-muted">{fmtDuration(total, true)}</td></tr>
               ))}
             </tbody>
           </table>
@@ -622,7 +622,7 @@ function HistoryTab({ tasks, projects }: { tasks: Task[]; projects: Project[] })
               {projects.map((p) => <option key={p.id} value={p.id}>{p.name}</option>)}
             </Select>
           </Field>
-          <div className="ml-auto flex items-center gap-2">
+          <div className="ms-auto flex items-center gap-2">
             <span className="text-sm text-muted">{filtered.length} sessions · <span className="font-semibold text-fg">{fmtHours(filteredTotal)}</span></span>
             <Button icon={Download} disabled={!filtered.length} onClick={exportCsv}>Export CSV</Button>
           </div>

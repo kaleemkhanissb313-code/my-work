@@ -251,7 +251,7 @@ function DocEditorInner({ id }: { id: string }) {
         {doc.isTemplate && <Badge tone="accent">Template</Badge>}
         <Badge>{doc.kind === 'note' ? 'Note' : 'Document'}</Badge>
         <SaveIndicator status={status} savedAt={savedAt} error={saveError} onRetry={() => void save()} />
-        <div className="ml-auto flex flex-wrap items-center gap-1">
+        <div className="ms-auto flex flex-wrap items-center gap-1">
           <Button size="sm" icon={Save} onClick={() => void save()} disabled={status === 'saving'} title="Save now (Ctrl/Cmd+S)">Save</Button>
           <ExportMenu onMarkdown={() => downloadText(htmlToMarkdown(currentHtml()), `${fileBase(exportTitle)}.md`, 'text/markdown;charset=utf-8')}
             onText={() => downloadText(htmlToText(currentHtml()), `${fileBase(exportTitle)}.txt`)}
@@ -313,9 +313,9 @@ function DocEditorInner({ id }: { id: string }) {
                 <Button size="sm" icon={Star} className={cn('w-full', doc.favorite && 'text-warn')} aria-pressed={doc.favorite}
                   onClick={() => void safeWrite(() => docsRepo.toggle(doc.id, 'favorite'))}>{doc.favorite ? 'Favorited' : 'Add to favorites'}</Button>
                 <dl className="grid grid-cols-2 gap-1 text-xs text-muted">
-                  <dt>Words</dt><dd className="text-right tabular-nums text-fg">{stats.words.toLocaleString()}</dd>
-                  <dt>Characters</dt><dd className="text-right tabular-nums text-fg">{stats.characters.toLocaleString()}</dd>
-                  <dt>Created</dt><dd className="text-right text-fg">{new Date(doc.createdAt).toLocaleDateString()}</dd>
+                  <dt>Words</dt><dd className="text-end tabular-nums text-fg">{stats.words.toLocaleString()}</dd>
+                  <dt>Characters</dt><dd className="text-end tabular-nums text-fg">{stats.characters.toLocaleString()}</dd>
+                  <dt>Created</dt><dd className="text-end text-fg">{new Date(doc.createdAt).toLocaleDateString()}</dd>
                 </dl>
               </div>
             </Card>
@@ -364,14 +364,14 @@ function ExportMenu({ onMarkdown, onText, onPrint, onWord }: { onMarkdown: () =>
     return () => { document.removeEventListener('mousedown', h); document.removeEventListener('keydown', k) }
   }, [open])
   const item = (label: string, Icon: typeof FileText, run: () => void) => (
-    <button type="button" role="menuitem" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm hover:bg-raised"
+    <button type="button" role="menuitem" className="flex w-full items-center gap-2 rounded-lg px-3 py-2 text-start text-sm hover:bg-raised"
       onClick={() => { setOpen(false); run() }}><Icon className="h-4 w-4 text-muted" aria-hidden />{label}</button>
   )
   return (
     <div className="relative" ref={ref}>
       <Button size="sm" icon={Download} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)}>Export</Button>
       {open && (
-        <div role="menu" className="glass absolute right-0 z-30 mt-1 w-56 rounded-xl p-1">
+        <div role="menu" className="glass absolute end-0 z-30 mt-1 w-56 rounded-xl p-1">
           {item('Markdown (.md)', FileText, onMarkdown)}
           {item('Plain text (.txt)', FileText, onText)}
           {item('Print / Save as PDF', Printer, onPrint)}

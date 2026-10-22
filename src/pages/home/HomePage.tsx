@@ -142,7 +142,7 @@ function HomeOverview() {
                 </li>
               ))}
             </ul>
-            <p className="mt-3 border-t border-line pt-2 text-right text-sm">Total due: <span className="font-semibold">{money(data.billTotal, settings.currency)}</span></p>
+            <p className="mt-3 border-t border-line pt-2 text-end text-sm">Total due: <span className="font-semibold">{money(data.billTotal, settings.currency)}</span></p>
           </>
         )}
       </Card>
@@ -380,7 +380,7 @@ function HomeDocuments() {
   return (
     <section aria-label="Home documents">
       <div className="mb-3 flex flex-wrap items-center gap-2">
-        <h2 className="mr-auto text-base font-semibold">Home documents</h2>
+        <h2 className="me-auto text-base font-semibold">Home documents</h2>
         <Button variant="primary" icon={Plus} loading={busy} onClick={() => void create()}>New home document</Button>
       </div>
       {!docs ? <Spinner /> : sorted.length === 0 ? (

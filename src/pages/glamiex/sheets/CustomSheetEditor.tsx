@@ -275,8 +275,8 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
           onBlur={() => { if (editing && editing.r === sel.r2 && editing.c === sel.c2) commit(editing.r, editing.c, editing.value, 'none') }}
           placeholder="Value or formula, e.g. =SUM(B1:B10)" />
         <datalist id="fx-functions">{FUNCTION_NAMES.map((f) => <option key={f} value={`=${f}(`} />)}</datalist>
-        <div className="relative w-full sm:w-44"><Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-          <Input aria-label="Search cells" className="pl-8" placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)}
+        <div className="relative w-full sm:w-44"><Search className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+          <Input aria-label="Search cells" className="ps-8" placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && hits.list.length) { const i = hits.list.findIndex(([r, c]) => r > sel.r2 || (r === sel.r2 && c > sel.c2)); const [r, c] = hits.list[i < 0 ? 0 : i]; setSel({ r1: r, c1: c, r2: r, c2: c }) } }} /></div>
         {search && <Badge>{hits.list.length} found</Badge>}
         <Select aria-label="Filter column" className="w-auto" value={filterCol} onChange={(e) => setFilterCol(e.target.value)}><option value="">No filter</option>{data.columns.map((c) => <option key={c.id} value={c.id}>Filter: {c.name}</option>)}</Select>

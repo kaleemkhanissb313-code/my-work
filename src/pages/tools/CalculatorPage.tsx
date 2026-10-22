@@ -193,14 +193,14 @@ function CalculatorTool({ scientific, show }: { scientific: boolean; show: (n: n
                 </div>
               )}
               {memory !== 0 && <Badge tone="accent">M = {formatResult(memory)}</Badge>}
-              <span className="ml-auto">Ans = {formatResult(ans)}</span>
+              <span className="ms-auto">Ans = {formatResult(ans)}</span>
             </div>
             <label htmlFor="calc-expr" className="sr-only">Expression</label>
             <input id="calc-expr" ref={inputRef} value={expr} spellCheck={false} autoComplete="off" placeholder="Type an expression, e.g. 2(3+4)^2"
               onChange={(e) => { setExpr(e.target.value); setJustEvaluated(false); setError(null) }}
               onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); void run() } else if (e.key === 'Escape') { e.preventDefault(); clear() } }}
-              className="mt-2 w-full bg-transparent text-right font-mono text-lg outline-none" />
-            <div className="mt-1 min-h-[2.5rem] text-right font-mono text-3xl font-bold tabular-nums" aria-live="polite">
+              className="mt-2 w-full bg-transparent text-end font-mono text-lg outline-none" />
+            <div className="mt-1 min-h-[2.5rem] text-end font-mono text-3xl font-bold tabular-nums" aria-live="polite">
               {error ? <span className="text-base font-medium text-danger" role="alert">{error}</span>
                 : result != null && justEvaluated ? <span>= {result}</span>
                 : preview != null ? <span className="text-muted">{preview}</span> : null}
@@ -246,7 +246,7 @@ function HistoryPanel({ history, onReuse }: { history: { id: string; at: number;
         <ul className="max-h-[520px] space-y-1 overflow-y-auto">
           {history.map((h) => (
             <li key={h.id}>
-              <button type="button" onClick={() => onReuse(h)} className="w-full rounded-xl px-2 py-1.5 text-right hover:bg-raised" title="Reuse this expression">
+              <button type="button" onClick={() => onReuse(h)} className="w-full rounded-xl px-2 py-1.5 text-end hover:bg-raised" title="Reuse this expression">
                 <div className="truncate font-mono text-xs text-muted">{h.expression}</div>
                 <div className="truncate font-mono font-semibold">= {h.result}</div>
                 <div className="text-[10px] text-muted">{h.tool} · {format(h.at, 'MMM d')}, {time12(h.at)}</div>
@@ -266,8 +266,8 @@ function NumInput({ id, label, value, onChange, hint, suffix }: { id: string; la
   return (
     <Field label={label} htmlFor={id} error={bad ? 'Enter a valid number.' : null} hint={hint}>
       <div className="relative">
-        <Input id={id} inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value)} className={suffix ? 'pr-10' : undefined} />
-        {suffix && <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted">{suffix}</span>}
+        <Input id={id} inputMode="decimal" value={value} onChange={(e) => onChange(e.target.value)} className={suffix ? 'pe-10' : undefined} />
+        {suffix && <span className="pointer-events-none absolute end-3 top-1/2 -translate-y-1/2 text-sm text-muted">{suffix}</span>}
       </div>
     </Field>
   )

@@ -76,7 +76,7 @@ export default function LogisticsReports() {
       <Section title={name} icon={FileBarChart} actions={<ExportButtons name={name} period={`${range.from} to ${range.to}`} sheets={() => [{ name: 'Report', rows: [heads, ...rows.map(line), line({ ...tot, label: 'Total' })] }]} />}>
         {!rows.length ? <p className="text-sm text-muted">No returns or finished deliveries match these filters.</p> : (
           <div className="overflow-x-auto"><table className="gx-table w-full min-w-[900px] text-sm">
-            <thead><tr>{heads.map((h) => <th key={h} className="px-2 py-1.5 text-left text-xs font-semibold text-muted">{h.replace(' (Rs)', '')}</th>)}</tr></thead>
+            <thead><tr>{heads.map((h) => <th key={h} className="px-2 py-1.5 text-start text-xs font-semibold text-muted">{h.replace(' (Rs)', '')}</th>)}</tr></thead>
             <tbody>{[...rows, { ...tot, key: 'total', label: 'Total' }].map((r) => (
               <tr key={r.key} className={r.key === 'total' ? 'border-t-2 border-line font-semibold' : 'border-t border-line/60'}>
                 <td className="px-2 py-1.5">{r.label}</td><td className="gx-num px-2">{r.returns}</td><td className="gx-num px-2">{r.units}</td><td className="gx-num px-2"><Money v={r.refunds} /></td><td className="gx-num px-2"><Money v={r.returnCost} /></td>

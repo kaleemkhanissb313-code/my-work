@@ -31,7 +31,7 @@ function ProfileCard({ p }: { p: BpPartner }) {
         <div className="shrink-0 text-center">
           <label className="relative block cursor-pointer" title="Upload profile image">
             <Avatar p={{ name: form.name, photo: form.photo }} size="lg" />
-            <span className="absolute -bottom-1 -right-1 grid h-7 w-7 place-items-center rounded-full border border-line bg-surface text-muted"><ImagePlus className="h-3.5 w-3.5" aria-hidden /></span>
+            <span className="absolute -bottom-1 -end-1 grid h-7 w-7 place-items-center rounded-full border border-line bg-surface text-muted"><ImagePlus className="h-3.5 w-3.5" aria-hidden /></span>
             <input type="file" accept={IMAGE_TYPES.join(',')} className="sr-only" aria-label={`Profile image for ${p.name}`} onChange={(e) => { void onPhoto(e.target.files?.[0]); e.target.value = '' }} />
           </label>
           {form.photo && <button type="button" className="mt-2 text-xs text-muted hover:text-danger" onClick={() => setForm((f) => ({ ...f, photo: null }))}>Remove</button>}
@@ -72,20 +72,20 @@ function SharesEditor() {
       <p className="mb-3 mt-1 flex gap-2 text-xs text-muted"><Info className="h-4 w-4 shrink-0" aria-hidden />These three agreements can differ from each other and from the capital each partner has put in. Each column must total 100% before it can be saved or used.</p>
       <div className="overflow-x-auto">
         <table className="w-full min-w-[560px] text-sm">
-          <thead><tr className="text-left text-xs text-muted"><th className="py-2">Partner</th><th className="py-2 text-right">Capital share (actual)</th>
-            {SHARE_COLS.map((c) => <th key={c.kind} className="py-2 text-right" title={c.hint}>{c.label} %</th>)}</tr></thead>
+          <thead><tr className="text-start text-xs text-muted"><th className="py-2">Partner</th><th className="py-2 text-end">Capital share (actual)</th>
+            {SHARE_COLS.map((c) => <th key={c.kind} className="py-2 text-end" title={c.hint}>{c.label} %</th>)}</tr></thead>
           <tbody>
             {partners.map((p) => {
               const f = figures.partners.find((x) => x.partnerId === p.id)!
               return (
                 <tr key={p.id} className="border-t border-line">
                   <td className="py-2"><span className="flex items-center gap-2"><Avatar p={p} size="sm" />{p.name}</span></td>
-                  <td className="py-2 text-right tabular-nums text-muted">{figures.capital > 0 ? pct(Math.round((Math.max(0, f.capital) / figures.capital) * FULL_SHARE)) : '—'}</td>
+                  <td className="py-2 text-end tabular-nums text-muted">{figures.capital > 0 ? pct(Math.round((Math.max(0, f.capital) / figures.capital) * FULL_SHARE)) : '—'}</td>
                   {SHARE_COLS.map((c) => {
                     const bad = parsePercent(text[c.kind][p.id] ?? '') == null
                     return (
-                      <td key={c.kind} className="py-2 pl-2">
-                        <Input aria-label={`${p.name} ${c.label} percent`} inputMode="decimal" value={text[c.kind][p.id] ?? ''} aria-invalid={bad} className={cn('ml-auto w-24 text-right tabular-nums', bad && 'border-danger')}
+                      <td key={c.kind} className="py-2 ps-2">
+                        <Input aria-label={`${p.name} ${c.label} percent`} inputMode="decimal" value={text[c.kind][p.id] ?? ''} aria-invalid={bad} className={cn('ms-auto w-24 text-end tabular-nums', bad && 'border-danger')}
                           onChange={(e) => setText((t) => ({ ...t, [c.kind]: { ...t[c.kind], [p.id]: e.target.value.replace(/[^\d.]/g, '') } }))} />
                       </td>
                     )
@@ -93,10 +93,10 @@ function SharesEditor() {
                 </tr>
               )
             })}
-            <tr className="border-t border-line font-semibold"><td className="py-2">Total</td><td className="py-2 text-right text-muted">{figures.capital > 0 ? '100%' : '—'}</td>
-              {SHARE_COLS.map((c) => <td key={c.kind} className={cn('py-2 text-right tabular-nums', valid(c.kind) ? 'text-ok' : 'text-danger')}>{pct(total(c.kind))}</td>)}</tr>
+            <tr className="border-t border-line font-semibold"><td className="py-2">Total</td><td className="py-2 text-end text-muted">{figures.capital > 0 ? '100%' : '—'}</td>
+              {SHARE_COLS.map((c) => <td key={c.kind} className={cn('py-2 text-end tabular-nums', valid(c.kind) ? 'text-ok' : 'text-danger')}>{pct(total(c.kind))}</td>)}</tr>
             <tr><td /><td />
-              {SHARE_COLS.map((c) => <td key={c.kind} className="py-2 text-right"><Button size="sm" disabled={!valid(c.kind)} loading={busy === c.kind} onClick={() => void save(c.kind)}>Save {c.label.split(' ')[0].toLowerCase()}</Button></td>)}</tr>
+              {SHARE_COLS.map((c) => <td key={c.kind} className="py-2 text-end"><Button size="sm" disabled={!valid(c.kind)} loading={busy === c.kind} onClick={() => void save(c.kind)}>Save {c.label.split(' ')[0].toLowerCase()}</Button></td>)}</tr>
           </tbody>
         </table>
       </div>

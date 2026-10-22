@@ -256,7 +256,7 @@ function InspectPanel({ r }: { r: GxReturn }) {
   }
   return (
     <Section title="Inspection" icon={ClipboardCheck}>
-      {r.restockPostedAt ? <p className="text-sm"><CheckCircle2 className="mr-1 inline h-4 w-4 text-ok" />{r.qtyReturned} unit(s) restocked as sellable.</p> : !r.received ? <p className="text-sm text-muted">Available after the goods are received. Sellable stock only increases once they are received and approved.</p> : (
+      {r.restockPostedAt ? <p className="text-sm"><CheckCircle2 className="me-1 inline h-4 w-4 text-ok" />{r.qtyReturned} unit(s) restocked as sellable.</p> : !r.received ? <p className="text-sm text-muted">Available after the goods are received. Sellable stock only increases once they are received and approved.</p> : (
         <div className="space-y-2">
           <fieldset className="space-y-1" aria-label="Inspection result">{DISPOSITIONS.map((d) => (
             <label key={d.id} className={cn('flex min-h-[44px] cursor-pointer items-center gap-2 rounded-xl border px-3 text-sm', disp === d.id ? 'border-accent bg-raised' : 'border-line')}>
@@ -281,7 +281,7 @@ function RefundPanel({ r }: { r: GxReturn }) {
   }
   return (
     <Section title="Customer refund" icon={Undo2}>
-      {r.refundPostedAt ? <p className="text-sm"><CheckCircle2 className="mr-1 inline h-4 w-4 text-ok" />Refund of <b>{pkr(r.refundAmount)}</b> posted on {r.refundPostedAt.slice(0, 10)}.</p> : r.status === 'rejected' ? <p className="text-sm text-muted">Rejected — no refund.</p> : !r.refundAmount ? <p className="text-sm text-muted">Set an approved refund amount (Edit) to post a refund. A return with no refund (e.g. exchange) is fine.</p> : (
+      {r.refundPostedAt ? <p className="text-sm"><CheckCircle2 className="me-1 inline h-4 w-4 text-ok" />Refund of <b>{pkr(r.refundAmount)}</b> posted on {r.refundPostedAt.slice(0, 10)}.</p> : r.status === 'rejected' ? <p className="text-sm text-muted">Rejected — no refund.</p> : !r.refundAmount ? <p className="text-sm text-muted">Set an approved refund amount (Edit) to post a refund. A return with no refund (e.g. exchange) is fine.</p> : (
         <div className="space-y-2">
           <p className="text-sm">Approved: <b>{pkr(r.refundAmount)}</b></p>
           <label className="flex min-h-[44px] items-center gap-2 text-sm"><input type="checkbox" checked={payNow} onChange={(e) => setPayNow(e.target.checked)} />Paid back to the customer now</label>

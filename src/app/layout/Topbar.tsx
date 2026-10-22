@@ -31,10 +31,10 @@ function Menu_({ label, icon, children, align = 'right', buttonClass, badge }: {
     <div className="relative" ref={ref}>
       <button type="button" aria-label={label} title={label} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen(!open)} className={cn('btn btn-ghost relative h-9 w-9 rounded-xl', buttonClass)}>
         <Icon className="h-4 w-4" aria-hidden />
-        {!!badge && <span className="absolute -right-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-bold text-white">{badge > 9 ? '9+' : badge}</span>}
+        {!!badge && <span className="absolute -end-0.5 -top-0.5 grid h-4 min-w-4 place-items-center rounded-full bg-danger px-1 text-[10px] font-bold text-white">{badge > 9 ? '9+' : badge}</span>}
       </button>
       {open && (
-        <div role="menu" className={cn('glass absolute z-40 mt-2 w-72 rounded-2xl p-2', align === 'right' ? 'right-0' : 'left-0')}>
+        <div role="menu" className={cn('glass absolute z-40 mt-2 w-72 rounded-2xl p-2', align === 'right' ? 'end-0' : 'start-0')}>
           {children(() => setOpen(false))}
         </div>
       )}
@@ -43,7 +43,7 @@ function Menu_({ label, icon, children, align = 'right', buttonClass, badge }: {
 }
 
 const MenuItem = ({ icon: Icon, children, onClick, kbd }: { icon: typeof Plus; children: React.ReactNode; onClick: () => void; kbd?: string }) => (
-  <button role="menuitem" type="button" onClick={onClick} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-left text-sm hover:bg-raised">
+  <button role="menuitem" type="button" onClick={onClick} className="flex w-full items-center gap-3 rounded-xl px-3 py-2 text-start text-sm hover:bg-raised">
     <Icon className="h-4 w-4 text-muted" aria-hidden /><span className="flex-1">{children}</span>{kbd && <span className="kbd">{kbd}</span>}
   </button>
 )
@@ -60,10 +60,10 @@ export function Topbar({ onMenu, onSearch }: { onMenu: () => void; onSearch: () 
   return (
     <header className="glass sticky top-0 z-30 flex h-14 items-center gap-2 border-x-0 border-t-0 px-3 sm:px-4">
       <IconButton icon={Menu} label="Open menu" className="lg:hidden" onClick={onMenu} />
-      <button type="button" onClick={onSearch} className="input flex h-9 min-w-0 max-w-md flex-1 items-center gap-2 text-left text-muted" aria-label="Search and commands (Ctrl+K)">
+      <button type="button" onClick={onSearch} className="input flex h-9 min-w-0 max-w-md flex-1 items-center gap-2 text-start text-muted" aria-label="Search and commands (Ctrl+K)">
         <Search className="h-4 w-4 shrink-0" aria-hidden /><span className="min-w-0 flex-1 truncate">Search everything…</span><span className="kbd hidden sm:inline-flex">Ctrl K</span>
       </button>
-      <div className="ml-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
+      <div className="ms-auto flex shrink-0 items-center gap-0.5 sm:gap-1">
         <button type="button" onClick={() => openQuickAdd()} title="Smart quick add (Q)" className="btn btn-soft hidden h-9 px-3 text-sm md:inline-flex">
           <Wand2 className="h-4 w-4 text-accent" aria-hidden />Quick add<span className="kbd">Q</span>
         </button>

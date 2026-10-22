@@ -1,10 +1,10 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('GLAMIEX password lock', () => {
   test('locks only GLAMIEX and relocks after a refresh', async ({ page }) => {
     // The rest of the site opens normally.
     await page.goto('/')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText(/Good (morning|afternoon|evening|night)/)
+    await expect(page.getByRole('heading', { level: 1 })).toContainText(/^Hi /)
 
     await page.goto('/glamiex')
     await expect(page.getByRole('heading', { name: 'GLAMIEX is locked' })).toBeVisible()

@@ -224,7 +224,7 @@ function Summary({ project, tasks, onOpen }: { project: Project; tasks: Task[]; 
           <ul className="space-y-2 text-sm">
             {milestones.slice(0, 6).map((m) => (
               <li key={m.id} className="flex items-center justify-between gap-2">
-                <button type="button" className="min-w-0 truncate text-left hover:text-accent" onClick={() => onOpen(m)}>◆ {m.title}</button>
+                <button type="button" className="min-w-0 truncate text-start hover:text-accent" onClick={() => onOpen(m)}>◆ {m.title}</button>
                 <span className={isOverdue(m, today) ? 'shrink-0 text-xs font-semibold text-danger' : 'shrink-0 text-xs text-muted'}>{m.dueDate ? fmtDate(m.dueDate, 'MMM d') : 'No date'}</span>
               </li>
             ))}

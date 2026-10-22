@@ -69,8 +69,8 @@ export function TrashPage() {
         actions={<Button variant="danger" icon={Trash2} disabled={!items?.length} onClick={() => void purge(items ?? [])}>Empty trash</Button>} />
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <div className="relative min-w-[160px] flex-1 sm:max-w-xs">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-          <Input aria-label="Search trash" className="pl-9" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+          <Input aria-label="Search trash" className="ps-9" placeholder="Search…" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select aria-label="Filter by type" className="w-auto" value={type} onChange={(e) => setType(e.target.value as TableName | '')}>
           <option value="">All types</option>
@@ -86,7 +86,7 @@ export function TrashPage() {
       ) : (
         <div className="card overflow-x-auto p-0">
           <table className="w-full text-sm">
-            <thead className="border-b border-line text-left text-xs text-muted">
+            <thead className="border-b border-line text-start text-xs text-muted">
               <tr>
                 <th className="w-10 p-3"><input type="checkbox" aria-label="Select all" checked={allChecked} onChange={() => setSelected(allChecked ? new Set() : new Set(list.map((i) => i.key)))} /></th>
                 <th className="p-3 font-medium">Name</th><th className="p-3 font-medium">Type</th><th className="p-3 font-medium">Deleted</th><th className="p-3"><span className="sr-only">Actions</span></th>
@@ -99,7 +99,7 @@ export function TrashPage() {
                   <td className="max-w-[16rem] truncate p-3 font-medium">{i.title}</td>
                   <td className="p-3"><Badge>{i.type}</Badge></td>
                   <td className="whitespace-nowrap p-3 text-muted">{format(i.deletedAt, 'MMM d, yyyy')} {time12(i.deletedAt)}</td>
-                  <td className="whitespace-nowrap p-3 text-right">
+                  <td className="whitespace-nowrap p-3 text-end">
                     <Button size="sm" variant="ghost" icon={RotateCcw} onClick={() => void restore([i])}>Restore</Button>
                     <Button size="sm" variant="ghost" icon={Trash2} onClick={() => void purge([i])} aria-label={`Delete ${i.title} permanently`}>Delete</Button>
                   </td>

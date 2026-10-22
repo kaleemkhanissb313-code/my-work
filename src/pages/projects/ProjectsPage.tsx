@@ -93,8 +93,8 @@ export function ProjectsPage() {
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="relative min-w-[160px] flex-1 sm:max-w-xs">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-          <Input aria-label="Search projects" placeholder="Search projects…" className="pl-9" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+          <Input aria-label="Search projects" placeholder="Search projects…" className="ps-9" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select aria-label="Filter by status" className="w-auto" value={status} onChange={(e) => setStatus(e.target.value as typeof status)}>
           <option value="open">Open (not completed/cancelled)</option>

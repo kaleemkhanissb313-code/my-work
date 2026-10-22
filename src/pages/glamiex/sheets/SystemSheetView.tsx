@@ -96,17 +96,17 @@ export function SystemSheetView({ sheetKey }: { sheetKey: SystemKey }) {
     <div className="space-y-2">
       <div className="flex flex-wrap items-center gap-2">
         <div className="min-w-0 flex-1"><h2 className="truncate text-lg font-semibold">{meta.title}</h2><p className="text-xs text-muted">{meta.desc}. Live from your records{live.editable ? ' — highlighted columns are editable after confirmation' : ' — read-only'}.</p></div>
-        <Badge tone="ok"><Lock className="mr-0.5 inline h-3 w-3" />Official data</Badge>
+        <Badge tone="ok"><Lock className="me-0.5 inline h-3 w-3" />Official data</Badge>
       </div>
       {meta.ranged ? <RangeBar state={state} setState={setState} range={range} /> : <div className="h-1" />}
       <div className="flex flex-wrap items-center gap-2">
-        <div className="relative w-full sm:w-52"><Search className="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden /><Input aria-label="Search sheet" className="pl-8" placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
+        <div className="relative w-full sm:w-52"><Search className="pointer-events-none absolute start-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden /><Input aria-label="Search sheet" className="ps-8" placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)} /></div>
         <IconButton icon={ArrowDownAZ} label="Sort ascending by selected column" onClick={() => setSort({ c: sel.c2, dir: 1 })} active={sort?.c === sel.c2 && sort.dir === 1} />
         <IconButton icon={ArrowUpZA} label="Sort descending by selected column" onClick={() => setSort({ c: sel.c2, dir: -1 })} active={sort?.c === sel.c2 && sort.dir === -1} />
         {sort && <Button size="sm" variant="ghost" onClick={() => setSort(null)}>Clear sort</Button>}
         <Button size="sm" icon={BarChart3} onClick={() => setChart(true)}>Chart</Button>
         <Button size="sm" icon={CopyPlus} onClick={() => void copyToCustom()}>Editable copy</Button>
-        <div className="ml-auto"><ExportButtons name={meta.title} period={meta.ranged ? `${range.from} to ${range.to}` : 'As of today'} sheets={() => [{ name: meta.title.slice(0, 31), rows: exportRows() }]} /></div>
+        <div className="ms-auto"><ExportButtons name={meta.title} period={meta.ranged ? `${range.from} to ${range.to}` : 'As of today'} sheets={() => [{ name: meta.title.slice(0, 31), rows: exportRows() }]} /></div>
       </div>
       {changes.length > 0 && (
         <div className="card flex flex-wrap items-center gap-2 border-warn/50 p-3 text-sm" role="status">

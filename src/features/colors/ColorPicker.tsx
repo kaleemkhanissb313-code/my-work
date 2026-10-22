@@ -52,7 +52,7 @@ export function ColorPicker({ value, onChange, label, icon, allowNone = true }: 
         {icon}<span className="h-1 w-5 rounded-full border border-line" style={{ background: value ?? 'transparent' }} aria-hidden />
       </button>
       {open && (
-        <div role="dialog" aria-label={label} className="glass absolute left-0 z-50 mt-1 w-[248px] rounded-2xl p-3 max-sm:fixed max-sm:inset-x-3 max-sm:bottom-20 max-sm:left-3 max-sm:w-auto">
+        <div role="dialog" aria-label={label} className="glass absolute start-0 z-50 mt-1 w-[248px] rounded-2xl p-3 max-sm:fixed max-sm:inset-x-3 max-sm:bottom-20 max-sm:start-3 max-sm:w-auto">
           <div className="grid grid-cols-8 gap-1.5">{BASE_SWATCHES.map((c) => <Swatch key={c} c={c} />)}</div>
           {recent.length > 0 && <><div className="mb-1 mt-3 text-[11px] text-muted">Recent</div><div className="grid grid-cols-8 gap-1.5">{recent.slice(0, 8).map((c) => <Swatch key={c} c={c} />)}</div></>}
           {favs.length > 0 && <><div className="mb-1 mt-3 text-[11px] text-muted">Favorites</div><div className="grid grid-cols-8 gap-1.5">{favs.slice(0, 16).map((c) => <Swatch key={c} c={c} />)}</div></>}

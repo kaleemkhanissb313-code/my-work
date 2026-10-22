@@ -232,8 +232,8 @@ export function LinksPage() {
 
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <div className="relative min-w-[180px] flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
-          <Input type="search" className="pl-9" placeholder="Search links…" aria-label="Search links" value={q} onChange={(e) => setQ(e.target.value)} />
+          <Search className="pointer-events-none absolute start-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted" aria-hidden />
+          <Input type="search" className="ps-9" placeholder="Search links…" aria-label="Search links" value={q} onChange={(e) => setQ(e.target.value)} />
         </div>
         <Select aria-label="Filter by category" className="w-auto" value={category} onChange={(e) => setCategory(e.target.value)}>
           <option value="">All categories</option>

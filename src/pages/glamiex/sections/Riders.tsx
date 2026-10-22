@@ -61,7 +61,7 @@ function RiderList() {
         ] }]} />}
         card={(r) => <div className="flex items-center gap-3">
           <div className="min-w-0 flex-1"><div className="truncate font-medium">{r.a.partner.name}</div><div className="text-xs text-muted">{r.a.deliveredOrders} delivered · {rateText(r.a.partner)}</div></div>
-          <div className="text-right"><div className="text-xs text-muted">Due</div><b className={r.bal > 0 ? 'text-warn' : ''}>{pkr(r.bal)}</b></div>
+          <div className="text-end"><div className="text-xs text-muted">Due</div><b className={r.bal > 0 ? 'text-warn' : ''}>{pkr(r.bal)}</b></div>
         </div>} />
       {editing && <PartnerForm partner={editing === 'new' ? null : editing} onClose={() => setEditing(null)} />}
     </div>
@@ -110,7 +110,7 @@ function RiderDetail({ id }: { id: string }) {
           <p className="text-sm text-muted">{p.kind === 'company' ? 'Delivery company' : 'Rider'}{p.code && ` · ID ${p.code}`}{p.phone && ` · ${p.phone}`}{p.email && ` · ${p.email}`} · pays by {PAYMENT_METHODS.find((m) => m.id === p.method)?.label}</p>
           <p className="text-xs text-muted">Rule: {ruleLabel(p.rateRule)} — {rateText(p)} · pickups: {p.countPickupAsDelivery ? 'count as deliveries' : pkr(p.pickupRate)} · failed: {PAY_POLICIES.find((x) => x.id === p.failedPolicy)?.label}{p.failedPolicy === 'fixed' && ` ${pkr(p.failedFixed)}`} · returned: {PAY_POLICIES.find((x) => x.id === p.returnedPolicy)?.label}{p.returnedPolicy === 'fixed' && ` ${pkr(p.returnedFixed)}`}</p>
         </div>
-        <div className="text-right"><div className="text-xs text-muted">Outstanding</div><div className={cn('text-2xl font-bold tabular-nums', due > 0 && 'text-warn')}>{pkr(due)}</div></div>
+        <div className="text-end"><div className="text-xs text-muted">Outstanding</div><div className={cn('text-2xl font-bold tabular-nums', due > 0 && 'text-warn')}>{pkr(due)}</div></div>
         <div className="flex flex-wrap gap-2"><Button icon={Pencil} onClick={() => setEdit(true)}>Edit</Button><Button icon={Printer} onClick={statement}>Statement</Button><Button variant="primary" icon={HandCoins} onClick={() => setPaying(true)}>Pay rider</Button></div>
       </div>
       <RangeBar state={state} setState={setState} range={range} />
@@ -122,7 +122,7 @@ function RiderDetail({ id }: { id: string }) {
       </div>
       <Section title={`Deliveries (${ships.length})`} icon={Bike}>
         {!ships.length ? <p className="text-sm text-muted">No deliveries in this period.</p> : <ul className="divide-y divide-line/60">{ships.map((s) => (
-          <li key={s.id} className="flex flex-wrap items-center gap-2 py-2 text-sm"><span className="font-mono text-xs">{s.shipmentNo}</span><span className="min-w-0 flex-1 truncate">{s.customerName} · {shipmentUnits(s)} units</span><ShipBadge s={s.status} /><b className="w-24 text-right"><Money v={shipmentEarning(s)} /></b></li>
+          <li key={s.id} className="flex flex-wrap items-center gap-2 py-2 text-sm"><span className="font-mono text-xs">{s.shipmentNo}</span><span className="min-w-0 flex-1 truncate">{s.customerName} · {shipmentUnits(s)} units</span><ShipBadge s={s.status} /><b className="w-24 text-end"><Money v={shipmentEarning(s)} /></b></li>
         ))}</ul>}
       </Section>
       {pickups.length > 0 && <Section title={`Return pickups (${pickups.length})`} icon={Bike} defaultOpen={false}>

@@ -204,7 +204,7 @@ export default function PaymentImage() {
                         <Input id={fid('name')} value={p.name} maxLength={60} autoComplete="off" aria-invalid={!!err.name} onChange={(e) => updatePerson(p.key, { name: e.target.value })} />
                       </Field>
                       <Field label="Amount (Rs)" htmlFor={fid('amount')} error={err.amount}>
-                        <Input id={fid('amount')} value={p.amount} inputMode="decimal" autoComplete="off" placeholder="0" aria-invalid={!!err.amount} className="text-right tabular-nums"
+                        <Input id={fid('amount')} value={p.amount} inputMode="decimal" autoComplete="off" placeholder="0" aria-invalid={!!err.amount} className="text-end tabular-nums"
                           onChange={(e) => updatePerson(p.key, { amount: e.target.value.replace(/[^\d.,]/g, '') })} />
                       </Field>
                       <Field label="Payment date" htmlFor={fid('date')} error={err.date}>

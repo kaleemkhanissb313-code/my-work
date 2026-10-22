@@ -42,7 +42,7 @@ function PeopleList({ openNew }: { openNew: boolean }) {
       <div className="mb-3 flex flex-wrap items-center gap-2">
         <Select aria-label="Type" className="w-auto" value={type} onChange={(e) => setType(e.target.value as PersonType | '')}><option value="">All people</option>{PERSON_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</Select>
         <Select aria-label="Balance" className="w-auto" value={only} onChange={(e) => setOnly(e.target.value as typeof only)}><option value="all">Any balance</option><option value="owing">Owes the business</option><option value="credit">Business owes them</option></Select>
-        <div className="ml-auto flex flex-wrap gap-2">
+        <div className="ms-auto flex flex-wrap gap-2">
           <ExportButtons name="Customer balance report" period={`As at ${zoned(new Date().toISOString(), tz).date}`} sheets={() => [{ name: 'Balances', rows: [['Name', 'Type', 'Phone', 'Opening (Rs)', 'Charges (Rs)', 'Refunds (Rs)', 'Received (Rs)', 'Paid out (Rs)', 'Adjustments (Rs)', 'Outstanding (Rs)'], ...rows.map((r) => [r.p.name, typeLabel(r.p.type), r.p.phone, rs(r.b.opening), rs(r.b.charges), rs(r.b.refunds), rs(r.b.received), rs(r.b.paidOut), rs(r.b.adjustments), rs(r.b.balance)])] }]} />
           <Button variant="primary" icon={Plus} onClick={() => setEditing('new')}>Add person</Button>
         </div>
@@ -139,8 +139,8 @@ function PersonDetail({ id }: { id: string }) {
           <ul className="divide-y divide-line/60">{ledger.map((h, i) => (
             <li key={i}><Link to={`/glamiex/${h.to}`} className="flex min-h-[48px] flex-wrap items-center gap-x-3 gap-y-0.5 py-2 text-sm hover:text-accent">
               <span className="w-24 text-xs text-muted">{zoned(h.at, tz).date}</span><span className="min-w-0 flex-1"><span className="font-medium">{h.kind}</span> <span className="font-mono text-xs text-muted">{h.ref}</span>{h.note && <span className="text-xs text-muted"> · {h.note}</span>}</span>
-              <span className={cn('w-28 text-right tabular-nums', h.sign > 0 ? '' : 'text-ok')}>{h.sign > 0 ? '+' : '−'}{pkr(h.amount)}</span>
-              <span className="w-28 text-right text-xs tabular-nums text-muted">bal {pkr(h.balance)}</span>
+              <span className={cn('w-28 text-end tabular-nums', h.sign > 0 ? '' : 'text-ok')}>{h.sign > 0 ? '+' : '−'}{pkr(h.amount)}</span>
+              <span className="w-28 text-end text-xs tabular-nums text-muted">bal {pkr(h.balance)}</span>
             </Link></li>
           ))}</ul>
         )}

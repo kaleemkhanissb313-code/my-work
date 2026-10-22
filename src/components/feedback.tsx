@@ -39,7 +39,7 @@ export function Toaster() {
   const icon = { success: CheckCircle2, error: XCircle, info: Info, warn: AlertTriangle }
   const color = { success: 'text-ok', error: 'text-danger', info: 'text-accent2', warn: 'text-warn' }
   return (
-    <div className="pointer-events-none fixed bottom-24 right-4 z-[60] lg:bottom-4 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2" aria-live="polite" role="status">
+    <div className="pointer-events-none fixed bottom-24 end-4 z-[60] lg:bottom-4 flex w-[calc(100%-2rem)] max-w-sm flex-col gap-2" aria-live="polite" role="status">
       <AnimatePresence initial={false}>
         {items.map((t) => {
           const I = icon[t.tone]

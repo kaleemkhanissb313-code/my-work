@@ -1,6 +1,7 @@
 import { lazy } from 'react'
 import { createBrowserRouter, Navigate } from 'react-router'
 import { GlamiexLock } from '@/features/glamiex/GlamiexLock'
+import { SiteLock } from '@/features/security/siteLock'
 import { AppShell } from './AppShell'
 import { RouteError } from './RouteError'
 
@@ -43,7 +44,7 @@ const SharedItemPage = p(() => import('@/pages/SharedItemPage'), 'SharedItemPage
 export const router = createBrowserRouter([
   {
     path: '/',
-    element: <AppShell />,
+    element: <SiteLock><AppShell /></SiteLock>,
     errorElement: <RouteError />,
     children: [
       { index: true, element: <Dashboard /> },

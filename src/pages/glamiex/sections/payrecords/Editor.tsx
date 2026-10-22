@@ -185,7 +185,7 @@ export function Editor({ partner, record, today, now, onSaved, onCleared }: {
             <Input id="pr-title" value={d.title} maxLength={80} onChange={(e) => set({ title: e.target.value })} />
           </Field>
           <Field label="Payment amount" htmlFor="pr-amount" error={err('amount')}>
-            <Input id="pr-amount" inputMode="decimal" autoComplete="off" className="text-right tabular-nums" value={amountText} placeholder="0"
+            <Input id="pr-amount" inputMode="decimal" autoComplete="off" className="text-end tabular-nums" value={amountText} placeholder="0"
               onChange={(e) => { const t = e.target.value.replace(/[^\d.,]/g, ''); setAmountText(t); set({ amount: parseAmount(t) ?? 0 }) }} />
           </Field>
           <Field label="Currency" htmlFor="pr-cur">

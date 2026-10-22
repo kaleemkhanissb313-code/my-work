@@ -113,7 +113,7 @@ export function StudioPage() {
   return (
     <div className="flex flex-col gap-3 lg:h-[calc(100dvh-6.5rem)]">
       <div className="flex flex-wrap items-center gap-1.5">
-        <h1 className="mr-auto min-w-0 truncate text-base font-semibold sm:text-lg" title={src.name}>{src.name} <span className="text-xs font-normal text-muted">{src.w} × {src.h}</span></h1>
+        <h1 className="me-auto min-w-0 truncate text-base font-semibold sm:text-lg" title={src.name}>{src.name} <span className="text-xs font-normal text-muted">{src.w} × {src.h}</span></h1>
         <IconButton icon={Undo2} label="Undo (Ctrl+Z)" disabled={!hist.past.length} onClick={doUndo} />
         <IconButton icon={Redo2} label="Redo (Ctrl+Shift+Z)" disabled={!hist.future.length} onClick={doRedo} />
         <IconButton icon={RotateCcw} label="Reset all edits" disabled={isIdentity(edits)} onClick={() => set(DEFAULT_EDITS)} />
@@ -247,8 +247,8 @@ function Canvas({ preview, edits, srcW, srcH, zoom, setZoom, compare, split, set
             {compare && !cropping && <>
               <canvas ref={before} className="absolute inset-0 block h-full w-full" style={{ clipPath: `inset(0 ${100 - split}% 0 0)` }} aria-hidden />
               <div className="pointer-events-none absolute inset-y-0 w-0.5 bg-white shadow" style={{ left: `${split}%` }} aria-hidden />
-              <span className="pointer-events-none absolute left-2 top-2 rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">Before</span>
-              <span className="pointer-events-none absolute right-2 top-2 rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">After</span>
+              <span className="pointer-events-none absolute start-2 top-2 rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">Before</span>
+              <span className="pointer-events-none absolute end-2 top-2 rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">After</span>
             </>}
             {cropping && (
               <div className="pointer-events-none absolute inset-0">
@@ -258,7 +258,7 @@ function Canvas({ preview, edits, srcW, srcH, zoom, setZoom, compare, split, set
                 </div>
               </div>
             )}
-            {showOriginal && <span className="pointer-events-none absolute bottom-2 left-2 rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">Original colours</span>}
+            {showOriginal && <span className="pointer-events-none absolute bottom-2 start-2 rounded bg-black/60 px-1.5 py-0.5 text-[11px] text-white">Original colours</span>}
           </div>
         </div>
       </div>
@@ -269,8 +269,8 @@ function Canvas({ preview, edits, srcW, srcH, zoom, setZoom, compare, split, set
         <Button size="sm" variant="ghost" icon={Maximize} onClick={() => setZoom('fit')}>Fit</Button>
         <Button size="sm" variant="ghost" className="hidden sm:inline-flex" onClick={() => setZoom(1)}>100%</Button>
         {compare && !cropping
-          ? <label className="ml-auto flex min-w-0 items-center gap-2"><span className="hidden sm:inline">Split</span><input type="range" min={0} max={100} value={split} onChange={(e) => setSplit(Number(e.target.value))} aria-label="Before/after split position" className="w-24 min-w-0 accent-[rgb(var(--accent))] sm:w-28" /></label>
-          : <span className="ml-auto min-w-0 truncate text-muted" aria-live="polite">{busy ? 'Rendering…' : cropping ? 'Drag to crop' : 'Original kept'}</span>}
+          ? <label className="ms-auto flex min-w-0 items-center gap-2"><span className="hidden sm:inline">Split</span><input type="range" min={0} max={100} value={split} onChange={(e) => setSplit(Number(e.target.value))} aria-label="Before/after split position" className="w-24 min-w-0 accent-[rgb(var(--accent))] sm:w-28" /></label>
+          : <span className="ms-auto min-w-0 truncate text-muted" aria-live="polite">{busy ? 'Rendering…' : cropping ? 'Drag to crop' : 'Original kept'}</span>}
       </div>
     </div>
   )
@@ -281,7 +281,7 @@ function Panel({ title, children, defaultOpen = true }: { title: string; childre
   const [open, setOpen] = useState(defaultOpen)
   return (
     <section className="border-b border-line/50 py-2 last:border-0">
-      <button type="button" className="flex min-h-[36px] w-full items-center justify-between text-left text-xs font-semibold uppercase tracking-wide text-muted" aria-expanded={open} onClick={() => setOpen(!open)}>
+      <button type="button" className="flex min-h-[36px] w-full items-center justify-between text-start text-xs font-semibold uppercase tracking-wide text-muted" aria-expanded={open} onClick={() => setOpen(!open)}>
         {title}<ChevronDown className={cn('h-4 w-4 transition-transform', !open && '-rotate-90')} aria-hidden />
       </button>
       {open && <div className="space-y-3 pt-1">{children}</div>}
@@ -435,7 +435,7 @@ function ExportPanel({ src, edits }: { src: Source; edits: Edits }) {
     <Panel title="Resolution">
       <div className="grid grid-cols-2 gap-1.5">{presets.map((p) => (
         <button key={p.id} type="button" onClick={() => setPreset(p.id)} aria-pressed={preset === p.id}
-          className={cn('min-h-[40px] rounded-lg border px-2 text-left text-xs', preset === p.id ? 'border-accent bg-raised font-semibold' : 'border-line hover:bg-raised/60', p.id === 'original' && 'col-span-2')}>{p.label}</button>
+          className={cn('min-h-[40px] rounded-lg border px-2 text-start text-xs', preset === p.id ? 'border-accent bg-raised font-semibold' : 'border-line hover:bg-raised/60', p.id === 'original' && 'col-span-2')}>{p.label}</button>
       ))}</div>
       {preset === 'custom' && <div className="grid grid-cols-[1fr_auto_1fr] items-end gap-2">
         <label className="text-xs">Width<input type="number" min={1} max={7680} className="input mt-1" value={customW} onChange={(e) => { const w = Number(e.target.value); setCustomW(w); if (lock) setCustomH(Math.round(w * cp.h / cp.w)) }} /></label>
@@ -498,7 +498,7 @@ function LibraryPicker({ onClose, onPick }: { onClose: () => void; onPick: (id: 
     <Modal open onClose={onClose} title="Choose from Media Library" wide>
       {!items?.length ? <p className="text-sm text-muted">No images in the library yet.</p> : (
         <ul className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-5">{items.map((m) => (
-          <li key={m.id}><button type="button" onClick={() => onPick(m.id)} className="block w-full overflow-hidden rounded-xl border border-line text-left hover:border-accent">
+          <li key={m.id}><button type="button" onClick={() => onPick(m.id)} className="block w-full overflow-hidden rounded-xl border border-line text-start hover:border-accent">
             <div className="aspect-square bg-raised">{m.thumbnail && <img src={m.thumbnail} alt="" className="h-full w-full object-cover" loading="lazy" />}</div>
             <div className="truncate p-1 text-[11px]">{m.name}</div>
           </button></li>

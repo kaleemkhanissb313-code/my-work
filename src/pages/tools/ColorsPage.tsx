@@ -143,7 +143,7 @@ function Palettes({ current }: { current: string }) {
         <ul className="space-y-3">{sorted.map((p) => (
           <li key={p.id} className="rounded-2xl border border-line p-3">
             <div className="mb-2 flex flex-wrap items-center gap-1">
-              <span className="mr-auto font-medium">{p.name === FAVORITES ? '♥ ' : ''}{p.name} <span className="text-xs text-muted">({p.colors.length})</span></span>
+              <span className="me-auto font-medium">{p.name === FAVORITES ? '♥ ' : ''}{p.name} <span className="text-xs text-muted">({p.colors.length})</span></span>
               <Button size="sm" icon={Plus} disabled={p.colors.includes(current)} onClick={() => void safeWrite(() => palettesRepo.update(p.id, { colors: [...p.colors, current] }))}>Add {current}</Button>
               <IconButton icon={Pencil} label={`Rename ${p.name}`} onClick={() => { const n = prompt('Palette name', p.name)?.trim(); if (n) void safeWrite(() => palettesRepo.update(p.id, { name: n })) }} />
               <IconButton icon={Download} label={`Export ${p.name} as CSS variables`} onClick={() => exportCss(p)} />
@@ -153,7 +153,7 @@ function Palettes({ current }: { current: string }) {
             <div className="flex flex-wrap gap-1">{p.colors.map((c) => (
               <div key={c} className="relative h-12 w-20"><Swatch hex={c} />
                 <button type="button" aria-label={`Remove ${c} from ${p.name}`} onClick={() => void safeWrite(() => palettesRepo.update(p.id, { colors: p.colors.filter((x) => x !== c) }))}
-                  className="absolute -right-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-surface text-muted shadow hover:text-danger"><X className="h-3 w-3" /></button>
+                  className="absolute -end-1 -top-1 grid h-5 w-5 place-items-center rounded-full bg-surface text-muted shadow hover:text-danger"><X className="h-3 w-3" /></button>
               </div>
             ))}</div>
           </li>

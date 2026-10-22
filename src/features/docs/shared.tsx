@@ -98,10 +98,10 @@ export function FolderPanel({ scope, value, onChange, counts, onBeforeDelete }: 
 
   const item = (id: string, label: string, Icon: typeof FolderIcon, count?: number) => (
     <button type="button" onClick={() => onChange(id)} aria-pressed={value === id}
-      className={cn('flex min-w-0 flex-1 items-center gap-2 rounded-xl px-2.5 py-1.5 text-left text-sm transition', value === id ? 'bg-raised font-medium text-fg' : 'text-muted hover:bg-raised/60 hover:text-fg')}>
+      className={cn('flex min-w-0 flex-1 items-center gap-2 rounded-xl px-2.5 py-1.5 text-start text-sm transition', value === id ? 'bg-raised font-medium text-fg' : 'text-muted hover:bg-raised/60 hover:text-fg')}>
       <Icon className="h-4 w-4 shrink-0" aria-hidden />
       <span className="truncate">{label}</span>
-      {count != null && <span className="ml-auto text-xs tabular-nums text-muted">{count}</span>}
+      {count != null && <span className="ms-auto text-xs tabular-nums text-muted">{count}</span>}
     </button>
   )
 
