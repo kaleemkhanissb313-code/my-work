@@ -14,11 +14,13 @@
     "noEmit": true,
     "strict": true,
     "types": [
-      "node"
+      "node",
+      "vitest/globals"
     ]
   },
   "include": [
     "vite.config.ts",
-    "playwright.config.ts"
+    "playwright.config.ts",
+    "supabase/tests/**/*.ts"
   ]
 }
