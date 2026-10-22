@@ -4,8 +4,9 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { addDays, endOfWeek, startOfWeek } from 'date-fns'
 import {
   BookOpen, CalendarHeart, CheckCircle2, Dumbbell, Flame, Heart, LayoutDashboard, Lock, Luggage, NotebookPen, Plane, Plus,
-  Repeat, Save, Sparkles, Star, Target, Trophy,
+  Repeat, Save, Sparkles, Star, Target, Trophy, UtensilsCrossed,
 } from 'lucide-react'
+import { FoodsTab } from '@/features/life/FoodsTab'
 import { db } from '@/lib/db'
 import { recordsRepo } from '@/services/repo'
 import { useSettings } from '@/services/settings'
@@ -19,7 +20,7 @@ import { bestStreak, completionRate, currentStreak, doneDatesFor, heatmapWeeks, 
 import { setHabitDone } from '@/features/life/habitLogs'
 import type { CollectionKey, HabitLog, RecordItem } from '@/types/models'
 
-const TAB_IDS = ['overview', 'goals', 'habits', 'journal', 'reading', 'travel', 'packing', 'fitness', 'reviews', 'dates'] as const
+const TAB_IDS = ['overview', 'goals', 'habits', 'journal', 'reading', 'travel', 'packing', 'fitness', 'foods', 'reviews', 'dates'] as const
 type TabId = (typeof TAB_IDS)[number]
 const TABS: { id: TabId; label: string; icon: typeof Heart }[] = [
   { id: 'overview', label: 'Overview', icon: LayoutDashboard },
@@ -30,6 +31,7 @@ const TABS: { id: TabId; label: string; icon: typeof Heart }[] = [
   { id: 'travel', label: 'Travel', icon: Plane },
   { id: 'packing', label: 'Packing', icon: Luggage },
   { id: 'fitness', label: 'Fitness', icon: Dumbbell },
+  { id: 'foods', label: 'Foods', icon: UtensilsCrossed },
   { id: 'reviews', label: 'Reviews', icon: Sparkles },
   { id: 'dates', label: 'Dates', icon: CalendarHeart },
 ]
@@ -38,7 +40,7 @@ export function LifePage() {
   const [tab, setTab] = useTabRoute<TabId>('/life', TAB_IDS)
   return (
     <div>
-      <PageHeader title="Life" description="Goals, habits, journal, reading, travel, fitness and the dates that matter." icon={Heart} tone="text-life" />
+      <PageHeader title="Life" description="Goals, habits, journal, reading, travel, fitness, foods and the dates that matter." icon={Heart} tone="text-life" />
       <Tabs tabs={TABS} value={tab} onChange={setTab} label="Life sections" />
       {tab === 'overview' && <LifeOverview />}
       {tab === 'goals' && <RecordManager collection="goals" areas={['life', 'personal']} />}
@@ -48,6 +50,7 @@ export function LifePage() {
       {tab === 'travel' && <RecordManager collection="trips" areas={['life', 'personal', 'work']} />}
       {tab === 'packing' && <PackingTab />}
       {tab === 'fitness' && <RecordManager collection="fitness" areas={['life', 'personal']} />}
+      {tab === 'foods' && <FoodsTab />}
       {tab === 'reviews' && <ReviewsTab />}
       {tab === 'dates' && <RecordManager collection="importantDates" defaults={{ recurrence: { freq: 'yearly', interval: 1 } }} />}
     </div>

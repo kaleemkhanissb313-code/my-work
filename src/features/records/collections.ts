@@ -201,6 +201,16 @@ export const COLLECTIONS: Record<CollectionKey, CollectionDef> = {
     ],
     emptyHint: 'Log workouts, sleep, weight or meditation.',
   }),
+  foods: def({
+    key: 'foods', label: 'Foods', singular: 'Food', area: 'life', path: '/life/foods', titleLabel: 'Food',
+    core: { due: 'Date', category: ['Breakfast', 'Lunch', 'Dinner', 'Snack'] },
+    fields: [
+      { key: 'time', label: 'Time', type: 'text', list: true },
+      { key: 'calories', label: 'Calories (kcal)', type: 'number', list: true },
+      { key: 'notes', label: 'Notes', type: 'textarea' },
+    ],
+    emptyHint: 'Log what you eat by meal, time and optional calories.',
+  }),
   reviews: def({
     key: 'reviews', label: 'Reviews', singular: 'Review', area: 'life', path: '/life/reviews', titleLabel: 'Title',
     core: { due: 'Date', category: ['Daily', 'Weekly', 'Monthly', 'Quarterly', 'Yearly'] },

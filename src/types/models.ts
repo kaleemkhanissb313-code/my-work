@@ -144,7 +144,7 @@ export interface Dataset extends BaseEntity {
 export type CollectionKey =
   | 'chores' | 'groceries' | 'maintenance' | 'bills' | 'inventory' | 'contacts'
   | 'workspaces' | 'meetings' | 'invoices' | 'goals' | 'habits' | 'journal'
-  | 'reading' | 'trips' | 'packing' | 'fitness' | 'reviews' | 'importantDates'
+  | 'reading' | 'trips' | 'packing' | 'fitness' | 'foods' | 'reviews' | 'importantDates'
   | 'expenses' | 'budgets' | 'income'
 
 /** Generic record used for Home / Work / Life / Finance list modules. */

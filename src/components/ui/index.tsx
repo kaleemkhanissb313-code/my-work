@@ -142,6 +142,14 @@ export function PageHeader({ title, description, icon: Icon, actions, tone }: { 
 /* ---------------- Tabs ---------------- */
 export function Tabs<T extends string>({ tabs, value, onChange, label }: { tabs: { id: T; label: string; icon?: LucideIcon }[]; value: T; onChange: (v: T) => void; label: string }) {
   const refs = useRef<(HTMLButtonElement | null)[]>([])
+  const list = useRef<HTMLDivElement>(null)
+  // Keep the selected tab visible in the horizontally scrolling bar (phones), without scrolling the page.
+  useEffect(() => {
+    const el = refs.current[tabs.findIndex((t) => t.id === value)], box = list.current
+    if (!el || !box || box.scrollWidth <= box.clientWidth) return
+    const l = el.offsetLeft, r = l + el.offsetWidth // the list is position:relative, so offsets are measured from it
+    if (l < box.scrollLeft || r > box.scrollLeft + box.clientWidth) box.scrollTo({ left: Math.max(0, l - (box.clientWidth - el.offsetWidth) / 2) })
+  }, [value, tabs])
   const onKey = (e: React.KeyboardEvent, i: number) => {
     const d = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
     if (!d) return
@@ -151,7 +159,7 @@ export function Tabs<T extends string>({ tabs, value, onChange, label }: { tabs:
     refs.current[n]?.focus()
   }
   return (
-    <div role="tablist" aria-label={label} className="mb-4 flex gap-1 overflow-x-auto rounded-2xl border border-line bg-surface/60 p-1">
+    <div ref={list} role="tablist" aria-label={label} className="relative mb-4 flex gap-1 overflow-x-auto rounded-2xl border border-line bg-surface/60 p-1">
       {tabs.map((t, i) => (
         <button key={t.id} ref={(el) => { refs.current[i] = el }} role="tab" type="button" aria-selected={value === t.id} tabIndex={value === t.id ? 0 : -1}
           onKeyDown={(e) => onKey(e, i)} onClick={() => onChange(t.id)}
