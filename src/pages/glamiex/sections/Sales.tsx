@@ -35,7 +35,7 @@ function SalesList() {
   type R = (typeof rows)[number]
   const cols: Col<R>[] = [
     { key: 'no', label: 'Order', render: (r) => <span className="font-mono text-xs">{r.o.orderNo}</span>, sort: (r) => r.o.orderNo, text: (r) => `${r.o.orderNo} ${r.o.items.map((i) => i.name).join(' ')} ${people.get(r.o.personId ?? '')?.name ?? ''} ${r.o.notes}` },
-    { key: 'date', label: 'Date & time', render: (r) => <span className="whitespace-nowrap">{r.z.date} <span className="text-muted">{r.z.time} · {r.z.weekday.slice(0, 3)}</span></span>, sort: (r) => r.o.at },
+    { key: 'date', label: 'Date & time', render: (r) => <span className="whitespace-nowrap">{r.z.date} <span className="text-muted">{r.z.time12} · {r.z.weekday.slice(0, 3)}</span></span>, sort: (r) => r.o.at },
     { key: 'cust', label: 'Customer', render: (r) => people.get(r.o.personId ?? '')?.name ?? <span className="text-muted">Walk-in</span>, sort: (r) => people.get(r.o.personId ?? '')?.name ?? '' },
     { key: 'items', label: 'Items', render: (r) => <span className="line-clamp-1">{r.o.items.map((i) => `${i.qty}× ${i.name}`).join(', ')}</span> },
     { key: 'units', label: 'Units', align: 'right', render: (r) => orderUnits(r.o), sort: (r) => orderUnits(r.o) },
@@ -62,7 +62,7 @@ function SalesList() {
           <div>
             <div className="flex items-start justify-between gap-2"><span className="font-mono text-xs text-muted">{r.o.orderNo}</span><PayBadge s={r.b.status} /></div>
             <div className="mt-1 line-clamp-2 text-sm font-medium">{r.o.items.map((i) => `${i.qty}× ${i.name}`).join(', ')}</div>
-            <div className="mt-1 flex flex-wrap items-center gap-x-3 text-xs text-muted"><span>{r.z.date} {r.z.time}</span><span>{people.get(r.o.personId ?? '')?.name ?? 'Walk-in'}</span></div>
+            <div className="mt-1 flex flex-wrap items-center gap-x-3 text-xs text-muted"><span>{r.z.date} {r.z.time12}</span><span>{people.get(r.o.personId ?? '')?.name ?? 'Walk-in'}</span></div>
             <div className="mt-2 flex items-end justify-between"><span className="text-xs">{r.b.balance > 0 && r.o.status !== 'cancelled' ? <span className="text-warn">Due <Money v={r.b.balance} /></span> : null}</span><b className="text-base"><Money v={r.b.total} /></b></div>
           </div>
         )} />
@@ -248,7 +248,7 @@ function OrderDetail({ id }: { id: string }) {
       <div className="card flex flex-wrap items-start gap-3 p-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2"><h2 className="font-mono text-lg font-bold">{o.orderNo}</h2><PayBadge s={b.status} /></div>
-          <p className="text-sm text-muted">{z.weekday}, {z.date} at {z.time} ({tz}) · {PAYMENT_METHODS.find((m) => m.id === o.method)?.label}</p>
+          <p className="text-sm text-muted">{z.weekday}, {z.date} at {z.time12} ({tz}) · {PAYMENT_METHODS.find((m) => m.id === o.method)?.label}</p>
           {o.status === 'cancelled' && <p className="mt-1 text-sm text-danger">Cancelled{o.cancelReason ? `: ${o.cancelReason}` : ''}. Excluded from sales; stock returned.</p>}
         </div>
         {o.status !== 'cancelled' && <div className="flex flex-wrap gap-2">

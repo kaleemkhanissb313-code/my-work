@@ -318,7 +318,7 @@ const livePeople = async () => (await db.npPeople.toArray()).filter((p) => !p.de
 export const NP_SEED: { name: string; obligation: Paisa; paid: Paisa; formerly?: string[] }[] = [
   { name: 'Kaleem', obligation: 5_000_000, paid: 0 },
   { name: 'Salman', obligation: 5_000_000, paid: 5_000_000 },
-  { name: 'Awais', obligation: 5_000_000, paid: 0 },
+  { name: 'Awais', obligation: 5_000_000, paid: 5_000_000 },
   { name: 'Noman', obligation: 5_000_000, paid: 0, formerly: ['Nauman'] },
   { name: 'Hasnain Malik', obligation: 5_000_000, paid: 0 },
 ]
@@ -331,6 +331,7 @@ const SEED_KEY = 'np.seeded.v1'
  */
 export async function seedNamesPayments(): Promise<boolean> {
   await applyRenames()
+  await applyOwnerPayments()
   if ((await db.kv.get(SEED_KEY))?.value) return false
   let created = false
   await db.transaction('rw', [db.npPeople, db.npPayments, db.kv], async () => {
@@ -360,6 +361,27 @@ export async function seedNamesPayments(): Promise<boolean> {
   })
   await gxAudit('npPerson', 'seed', 'create', 'Names & Payments initial records checked/created (Kaleem, Salman, Awais, Nauman, Hasnain Malik)')
   return created
+}
+
+/**
+ * Payments the owner reported after the initial setup (Awais paid PKR 50,000 — 23 Oct 2026). Applied once per
+ * device, only if that person has no recorded payment yet, with a deterministic id so syncing devices never duplicate it.
+ */
+const OWNER_PAYMENTS: { name: string; amount: Paisa; flag: string; note: string }[] = [
+  { name: 'Awais', amount: 5_000_000, flag: 'np.paid.awais.v1', note: 'Recorded on the owner’s instruction (23 Oct 2026): Awais paid PKR 50,000. Edit the date, method and reference if needed.' },
+]
+async function applyOwnerPayments() {
+  for (const op of OWNER_PAYMENTS) {
+    if ((await db.kv.get(op.flag))?.value) continue
+    const p = (await livePeople()).find((x) => norm(x.name) === norm(op.name))
+    if (!p) continue // person not created yet: the initial setup records it instead
+    const pays = (await db.npPayments.where('personId').equals(p.id).toArray()).filter((x) => !x.voided && !x.deletedAt)
+    if (!pays.length) {
+      await db.npPayments.put({ ...baseEntity(), id: `np-owner-pay-${p.id}`, receiptNo: await nextNo('np', 'NPR'), personId: p.id, amount: Math.min(op.amount, p.obligation || op.amount), at: now(), method: 'other', reference: 'Reported by owner', notes: op.note, linkedRef: '', voided: false })
+      await gxAudit('npPayment', `np-owner-pay-${p.id}`, 'create', `${op.name} paid ${pkr(op.amount)} (reported by owner)`)
+    }
+    await db.kv.put({ key: op.flag, value: Date.now() })
+  }
 }
 
 /** Owner-requested renames (e.g. Nauman → Noman), applied once to an existing record — never creates a duplicate. */
@@ -429,12 +451,18 @@ export async function addNpPayment(input: NpPaymentInput): Promise<{ payment: Np
 }
 
 /** Amounts are corrected by voiding and re-entering; other details can be edited (audited). */
-export async function updateNpPayment(id: string, patch: Pick<Partial<NpPayment>, 'at' | 'method' | 'reference' | 'notes' | 'linkedRef'>) {
+export async function updateNpPayment(id: string, patch: Pick<Partial<NpPayment>, 'at' | 'method' | 'reference' | 'notes' | 'linkedRef' | 'amount'>) {
   const p = await db.npPayments.get(id)
   if (!p) throw new Error('Payment not found.')
   if (p.voided) throw new Error('Voided payments cannot be edited.')
+  if (patch.amount !== undefined && patch.amount !== p.amount) {
+    if (!Number.isInteger(patch.amount) || patch.amount <= 0) throw new Error('Amount must be greater than 0.')
+    const person = await db.npPeople.get(p.personId)
+    const others = (await db.npPayments.where('personId').equals(p.personId).toArray()).filter((x) => x.id !== id && !x.voided && !x.deletedAt).reduce((a, x) => a + x.amount, 0)
+    if (person && others + patch.amount > person.obligation) throw new Error(`That is more than ${person.name} owes in total (${pkr(person.obligation)}). Increase their payment amount first if needed.`)
+  }
   await db.npPayments.update(id, { ...patch, ...bump(p) })
-  await gxAudit('npPayment', id, 'update', `${p.receiptNo}: ${Object.keys(patch).join(', ')}`)
+  await gxAudit('npPayment', id, 'update', `${p.receiptNo}: ${Object.keys(patch).join(', ')}${patch.amount !== undefined && patch.amount !== p.amount ? ` (amount ${pkr(p.amount)} → ${pkr(patch.amount)})` : ''}`)
 }
 
 export async function voidNpPayment(id: string, reason: string) {

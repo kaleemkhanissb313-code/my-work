@@ -13,6 +13,7 @@ import { TXN_TYPES, txnLabel, type BpPartner, type BpTxn } from '@/features/glam
 import { useGx } from '../../context'
 import { nowLocal } from '../shared'
 import { TYPE_TONE, partiesOf, useBp } from './shared'
+import { to12 } from '@/features/glamiex/time'
 
 /** Builds a Payment Image Creator design from a ledger entry (up to 5 partners). */
 export function openPaymentImage(t: BpTxn, byId: Map<string, BpPartner>, nav: (to: string) => void) {
@@ -52,7 +53,7 @@ export function TxnDetail({ t, onClose }: { t: BpTxn; onClose: () => void }) {
         {original && <p className="rounded-xl bg-raised p-2.5 text-sm" role="status">This entry cancels {original.txnNo} ({txnLabel(original.type)}). Reason: {t.reason}</p>}
         <dl className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-sm">
           {row('Amount', <b className="tabular-nums">{pkr(t.amount)}</b>)}
-          {row('Date & time', `${t.date} ${t.time}`)}
+          {row('Date & time', `${t.date} ${to12(t.time)}`)}
           {row('Partners', partiesOf(t, byId))}
           {t.method && row('Payment method', PAYMENT_METHODS.find((m) => m.id === t.method)?.label ?? t.method)}
           {row('Business / project', t.project || 'General business')}

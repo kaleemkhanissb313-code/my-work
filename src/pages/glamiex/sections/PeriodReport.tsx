@@ -68,7 +68,7 @@ export default function PeriodReport({ unit }: { unit: Unit }) {
       <div><h2 className="mb-2 text-sm font-semibold">Breakdown by {g === 'day' ? 'day' : 'month'}</h2><PeriodTable rows={v.series} /></div>
       <Section title={`Transactions behind this ${unit} (${v.orders.length} orders)`} icon={ListOrdered} defaultOpen={false}>
         {!v.orders.length ? <p className="text-sm text-muted">No orders.</p> : <ul className="divide-y divide-line/60">{v.orders.map((o) => { const b = orderBalance(o, data.payments, data.refunds); const z = zoned(o.at, tz); return (
-          <li key={o.id}><Link to={`/glamiex/sales/${o.id}`} className="flex min-h-[44px] flex-wrap items-center gap-x-3 py-2 text-sm hover:text-accent"><span className="font-mono text-xs">{o.orderNo}</span><span className="text-xs text-muted">{z.date} {z.time}</span><span className="min-w-0 flex-1 truncate">{o.items.map((i) => `${i.qty}× ${i.name}`).join(', ')}</span><PayBadge s={b.status} /><Money v={orderTotal(o)} /></Link></li>
+          <li key={o.id}><Link to={`/glamiex/sales/${o.id}`} className="flex min-h-[44px] flex-wrap items-center gap-x-3 py-2 text-sm hover:text-accent"><span className="font-mono text-xs">{o.orderNo}</span><span className="text-xs text-muted">{z.date} {z.time12}</span><span className="min-w-0 flex-1 truncate">{o.items.map((i) => `${i.qty}× ${i.name}`).join(', ')}</span><PayBadge s={b.status} /><Money v={orderTotal(o)} /></Link></li>
         ) })}</ul>}
         <p className="mt-2 text-xs text-muted">Payments, ad entries and expenses for this {unit} are in <Link className="text-accent" to="/glamiex/transactions">Transactions</Link>.</p>
       </Section>

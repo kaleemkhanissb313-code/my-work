@@ -347,6 +347,32 @@ const WIDGETS: Record<string, () => JSX.Element> = {
   quick: QuickWidget, security: SecurityWidget,
 }
 
+/** Ring that fills over the current hour (empty at :00, full at :59:59) and starts again every hour. */
+function HourRing({ now }: { now: number }) {
+  const d = new Date(now)
+  const secs = d.getMinutes() * 60 + d.getSeconds()
+  const frac = secs / 3600
+  const C = 113.1
+  const left = 60 - d.getMinutes()
+  return (
+    <div className="flex items-center gap-3" role="img" aria-label={`${d.getMinutes()} minutes into this hour, ${left} minute${left === 1 ? '' : 's'} left`}>
+      <svg viewBox="0 0 44 44" className="h-16 w-16 -rotate-90" aria-hidden>
+        <defs><linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="rgb(var(--accent))" /><stop offset="1" stopColor="rgb(var(--accent2))" /></linearGradient></defs>
+        <circle cx="22" cy="22" r="18" fill="none" stroke="rgb(var(--raised))" strokeWidth="5" />
+        {/* Smooth 1 s steps, but no backwards sweep when a new hour starts. */}
+        <circle cx="22" cy="22" r="18" fill="none" stroke="url(#ring)" strokeWidth="5" strokeLinecap="round" strokeDasharray={C}
+          strokeDashoffset={C * (1 - frac)} style={{ transition: secs === 0 ? 'none' : 'stroke-dashoffset 1s linear' }} />
+        {/* Small ball inside the ring: one lap per minute, following the seconds. */}
+        <circle cx="22" cy="22" r="10" fill="none" stroke="rgb(var(--line))" strokeWidth="0.6" strokeDasharray="1 2.2" />
+        <g style={{ transform: `rotate(${d.getSeconds() * 6}deg)`, transformOrigin: '22px 22px', transition: d.getSeconds() === 0 ? 'none' : 'transform 1s linear' }}>
+          <circle cx="32" cy="22" r="2.6" fill="rgb(var(--accent))" />
+        </g>
+      </svg>
+      <div className="hidden text-start sm:block"><div className="text-xl font-bold tabular-nums">{Math.floor(frac * 100)}%</div><div className="text-xs text-muted">of this hour</div></div>
+    </div>
+  )
+}
+
 /** 12-hour live clock (hh:mm:ss AM/PM) in the device time zone; updated every second by useNow. */
 function LiveClock({ now }: { now: number }) {
   const tz = Intl.DateTimeFormat().resolvedOptions().timeZone
@@ -375,7 +401,6 @@ export function Dashboard() {
   }), [])
   const planned = counts?.dueToday.length ?? 0
   const doneToday = counts?.dueToday.filter((t) => t.status === 'completed').length ?? 0
-  const pct = planned ? Math.round((doneToday / planned) * 100) : 0
   const hour = new Date(now).getHours()
   const greet = hour < 5 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   const visible = useMemo(() => s.dashboardWidgets.filter((w) => w.visible && WIDGETS[w.id]), [s.dashboardWidgets])
@@ -391,19 +416,11 @@ export function Dashboard() {
             <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Hi {s.displayName.trim() || 'Kaleem'}</h1>
             <p className="text-sm text-muted">{greet}.</p>
             <p className="mt-1 text-sm text-muted">
-              {counts ? `${counts.tasks} open task${counts.tasks === 1 ? '' : 's'} · ${counts.projects} active project${counts.projects === 1 ? '' : 's'} · ${counts.docs} document${counts.docs === 1 ? '' : 's'}` : ' '}
+              {counts ? `${counts.tasks} open task${counts.tasks === 1 ? '' : 's'} · ${counts.projects} active project${counts.projects === 1 ? '' : 's'} · ${counts.docs} document${counts.docs === 1 ? '' : 's'}${planned ? ` · ${doneToday}/${planned} due today done` : ''}` : ' '}
             </p>
           </div>
           <div className="flex items-center gap-5">
-            <Link to="/tasks" className="flex items-center gap-3" aria-label={planned ? `Today's progress: ${doneToday} of ${planned} tasks done` : 'No tasks due today'}>
-              <svg viewBox="0 0 44 44" className="h-16 w-16 -rotate-90" aria-hidden>
-                <defs><linearGradient id="ring" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor="rgb(var(--accent))" /><stop offset="1" stopColor="rgb(var(--accent2))" /></linearGradient></defs>
-                <circle cx="22" cy="22" r="18" fill="none" stroke="rgb(var(--raised))" strokeWidth="5" />
-                <motion.circle cx="22" cy="22" r="18" fill="none" stroke="url(#ring)" strokeWidth="5" strokeLinecap="round" strokeDasharray={113.1}
-                  initial={{ strokeDashoffset: 113.1 }} animate={{ strokeDashoffset: 113.1 * (1 - pct / 100) }} transition={{ duration: 0.9, ease: 'easeOut' }} />
-              </svg>
-              <div className="hidden text-start sm:block"><div className="text-xl font-bold tabular-nums">{planned ? `${pct}%` : '—'}</div><div className="text-xs text-muted">{planned ? `${doneToday}/${planned} due today` : 'Nothing due today'}</div></div>
-            </Link>
+            <HourRing now={now} />
           <LiveClock now={now} />
           </div>
         </div>

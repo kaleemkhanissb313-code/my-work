@@ -33,7 +33,7 @@ function PaymentList() {
   type R = (typeof rows)[number]
   const cols: Col<R>[] = [
     { key: 'no', label: 'Txn', render: (r) => <span className={cn('font-mono text-xs', r.p.voided && 'line-through')}>{r.p.txnNo}</span>, sort: (r) => r.p.txnNo, text: (r) => `${r.p.txnNo} ${r.p.reference} ${people.get(r.p.personId ?? '')?.name ?? ''} ${r.p.notes}` },
-    { key: 'date', label: 'Date & time', render: (r) => <span className="whitespace-nowrap">{r.z.date} <span className="text-muted">{r.z.time} · {r.z.weekday.slice(0, 3)}</span></span>, sort: (r) => r.p.at },
+    { key: 'date', label: 'Date & time', render: (r) => <span className="whitespace-nowrap">{r.z.date} <span className="text-muted">{r.z.time12} · {r.z.weekday.slice(0, 3)}</span></span>, sort: (r) => r.p.at },
     { key: 'person', label: 'Person', render: (r) => people.get(r.p.personId ?? '')?.name ?? '—', sort: (r) => people.get(r.p.personId ?? '')?.name ?? '' },
     { key: 'type', label: 'Type', render: (r) => <TypeBadge t={r.p.type} />, sort: (r) => r.p.type },
     { key: 'method', label: 'Method', render: (r) => PAYMENT_METHODS.find((m) => m.id === r.p.method)?.label, sort: (r) => r.p.method },
@@ -57,7 +57,7 @@ function PaymentList() {
         </>}
         card={(r) => <div className={cn(r.p.voided && 'opacity-60')}>
           <div className="flex items-start justify-between gap-2"><span className="font-mono text-xs text-muted">{r.p.txnNo}</span><TypeBadge t={r.p.type} /></div>
-          <div className="mt-1 flex items-end justify-between gap-2"><div className="text-sm">{people.get(r.p.personId ?? '')?.name ?? '—'}<div className="text-xs text-muted">{r.z.date} {r.z.time}{r.p.voided && ' · VOID'}</div></div>
+          <div className="mt-1 flex items-end justify-between gap-2"><div className="text-sm">{people.get(r.p.personId ?? '')?.name ?? '—'}<div className="text-xs text-muted">{r.z.date} {r.z.time12}{r.p.voided && ' · VOID'}</div></div>
             <b className={cn('text-base', typeInfo(r.p.type).dir === 'in' ? 'text-ok' : typeInfo(r.p.type).dir === 'out' ? 'text-danger' : '')}>{pkr(r.p.amount)}</b></div>
         </div>} />
     </div>
@@ -168,7 +168,7 @@ function PaymentDetail({ id }: { id: string }) {
       <div className="card flex flex-wrap items-start gap-3 p-4">
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2"><h2 className={cn('font-mono text-lg font-bold', p.voided && 'line-through')}>{p.txnNo}</h2><TypeBadge t={p.type} />{p.voided && <Badge tone="danger">VOID</Badge>}</div>
-          <p className="text-sm text-muted">{z.weekday}, {z.date} at {z.time} · {PAYMENT_METHODS.find((m) => m.id === p.method)?.label}{p.reference && ` · ref ${p.reference}`}</p>
+          <p className="text-sm text-muted">{z.weekday}, {z.date} at {z.time12} · {PAYMENT_METHODS.find((m) => m.id === p.method)?.label}{p.reference && ` · ref ${p.reference}`}</p>
           {person && <Link to={`/glamiex/people/${person.id}`} className="text-sm text-accent">{person.name}</Link>}
         </div>
         <div className={cn('text-2xl font-bold tabular-nums', t.dir === 'in' ? 'text-ok' : t.dir === 'out' ? 'text-danger' : '')}>{pkr(p.amount)}</div>

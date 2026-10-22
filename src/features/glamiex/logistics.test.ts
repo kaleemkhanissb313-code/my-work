@@ -3,7 +3,7 @@ import { db } from '@/lib/db'
 import { createOrder, createProduct, refundOrder } from './service'
 import { stockOf, summary, type GxData } from './engine'
 import {
-  addNpPayment, addRiderPayment, assignPickup, inspectReturn, postReturnRefund, receiveReturn, saveNpPerson, savePartner, saveReturn, saveShipment,
+  addNpPayment, updateNpPayment, addRiderPayment, assignPickup, inspectReturn, postReturnRefund, receiveReturn, saveNpPerson, savePartner, saveReturn, saveShipment,
   seedNamesPayments, setShipmentStatus, voidNpPayment, type PartnerInput, type ReturnInput,
 } from './logisticsService'
 import { logisticsSummary, npTotals, partnerAccount, returnCalc, shipmentEarning } from './logistics'
@@ -32,19 +32,40 @@ const ship = (partnerId: string | null, qty = 1) => ({
 })
 
 describe('Names & Payments', () => {
-  it('seeds the five people once with only Salman paid, and totals are correct', async () => {
+  it('seeds the five people once with only Salman and Awais paid, and totals are correct', async () => {
     await seedNamesPayments()
     await seedNamesPayments() // second run must not duplicate anything
     const t = npTotals(await db.npPeople.toArray(), await db.npPayments.toArray())
     expect(t.rows.map((r) => r.person.name).sort()).toEqual(['Awais', 'Hasnain Malik', 'Kaleem', 'Noman', 'Salman'])
     expect(t.obligations).toBe(25_000_000)
-    expect(t.received).toBe(5_000_000)
-    expect(t.remaining).toBe(20_000_000)
-    expect(t.paidPeople).toBe(1)
-    expect(t.pendingPeople).toBe(4)
-    expect(t.rows.find((r) => r.person.name === 'Salman')!.status).toBe('paid')
-    expect(t.rows.filter((r) => r.person.name !== 'Salman').every((r) => r.status === 'pending' && r.paid === 0)).toBe(true)
-    expect(await db.npPayments.count()).toBe(1)
+    expect(t.received).toBe(10_000_000)
+    expect(t.remaining).toBe(15_000_000)
+    expect(t.paidPeople).toBe(2)
+    expect(t.pendingPeople).toBe(3)
+    expect(t.rows.filter((r) => r.status === 'paid').map((r) => r.person.name).sort()).toEqual(['Awais', 'Salman'])
+    expect(t.rows.filter((r) => !['Salman', 'Awais'].includes(r.person.name)).every((r) => r.status === 'pending' && r.paid === 0)).toBe(true)
+    expect(await db.npPayments.count()).toBe(2)
+  })
+
+  it('on a device set up earlier, records Awais’s reported payment exactly once', async () => {
+    // Earlier setup: people exist, only Salman paid, initial setup already done.
+    for (const n of ['Kaleem', 'Salman', 'Awais', 'Noman', 'Hasnain Malik']) await saveNpPerson({ name: n, phone: '', obligation: 5_000_000, notes: '' }, null)
+    await db.kv.put({ key: 'np.seeded.v1', value: 1 })
+    await seedNamesPayments()
+    await seedNamesPayments()
+    const t = npTotals(await db.npPeople.toArray(), await db.npPayments.toArray())
+    expect(t.rows.find((r) => r.person.name === 'Awais')).toMatchObject({ paid: 5_000_000, remaining: 0, status: 'paid' })
+    expect((await db.npPayments.toArray()).filter((p) => p.personId === t.rows.find((r) => r.person.name === 'Awais')!.person.id)).toHaveLength(1)
+  })
+
+  it('lets the owner correct a payment amount, but never above what the person owes', async () => {
+    await seedNamesPayments()
+    const salman = (await db.npPeople.toArray()).find((p) => p.name === 'Salman')!
+    const pay = (await db.npPayments.toArray()).find((p) => p.personId === salman.id)!
+    await updateNpPayment(pay.id, { amount: 4_000_000 })
+    expect(npTotals(await db.npPeople.toArray(), await db.npPayments.toArray()).rows.find((r) => r.person.id === salman.id)).toMatchObject({ paid: 4_000_000, status: 'partial' })
+    await expect(updateNpPayment(pay.id, { amount: 6_000_000 })).rejects.toThrow(/more than Salman owes/)
+    await expect(updateNpPayment(pay.id, { amount: 0 })).rejects.toThrow(/greater than 0/)
   })
 
   it('renames an existing Nauman record to Noman without duplicating it', async () => {
@@ -67,7 +88,7 @@ describe('Names & Payments', () => {
 
   it('supports partial and multiple payments, blocks overpayment and double submit, and voiding restores the balance', async () => {
     await seedNamesPayments()
-    const awais = (await db.npPeople.toArray()).find((p) => p.name === 'Awais')!
+    const awais = (await db.npPeople.toArray()).find((p) => p.name === 'Kaleem')! // a person with nothing paid yet
     const base = { personId: awais.id, at: new Date().toISOString(), method: 'cash' as const, notes: '', linkedRef: '' }
     const a = await addNpPayment({ ...base, id: 's1', amount: 2_000_000, reference: 'TX1' })
     expect((await addNpPayment({ ...base, id: 's1', amount: 2_000_000, reference: 'TX1' })).duplicate).toBe(true)
@@ -76,11 +97,11 @@ describe('Names & Payments', () => {
     await expect(addNpPayment({ ...base, id: 's4', amount: 100, reference: 'tx1' })).rejects.toThrow(/already recorded/)
     let t = npTotals(await db.npPeople.toArray(), await db.npPayments.toArray())
     expect(t.rows.find((r) => r.person.id === awais.id)).toMatchObject({ paid: 3_000_000, remaining: 2_000_000, status: 'partial' })
-    expect(t.received).toBe(8_000_000)
+    expect(t.received).toBe(13_000_000)
     await voidNpPayment(a.payment.id, 'entered twice')
     t = npTotals(await db.npPeople.toArray(), await db.npPayments.toArray())
     expect(t.rows.find((r) => r.person.id === awais.id)!.paid).toBe(1_000_000)
-    expect(t.pendingPeople).toBe(4)
+    expect(t.pendingPeople).toBe(3)
   })
 })
 

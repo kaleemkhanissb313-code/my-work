@@ -7,7 +7,17 @@ export function zoned(iso: string, tz: string) {
     timeZone: tz, hourCycle: 'h23', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', weekday: 'long',
   }).formatToParts(new Date(iso))
   const g = (t: string) => parts.find((p) => p.type === t)?.value ?? ''
-  return { date: `${g('year')}-${g('month')}-${g('day')}`, hour: Number(g('hour')) % 24, minute: Number(g('minute')), time: `${g('hour')}:${g('minute')}`, weekday: g('weekday') }
+  const hour = Number(g('hour')) % 24
+  // time = 24-hour "HH:mm" (for inputs/exports); time12 = "hh:mm AM/PM" (for display)
+  return { date: `${g('year')}-${g('month')}-${g('day')}`, hour, minute: Number(g('minute')), time: `${g('hour')}:${g('minute')}`, time12: to12(`${g('hour')}:${g('minute')}`), weekday: g('weekday') }
+}
+
+/** "18:05" → "06:05 PM" (midnight = 12 AM, noon = 12 PM). Empty input stays empty. */
+export function to12(hhmm: string) {
+  const m = /^(\d{1,2}):(\d{2})/.exec(hhmm)
+  if (!m) return hhmm
+  const h = Number(m[1]) % 24
+  return `${String(h % 12 || 12).padStart(2, '0')}:${m[2]} ${h < 12 ? 'AM' : 'PM'}`
 }
 
 /** Convert a wall-clock date + time in `tz` to a UTC ISO instant. */

@@ -8,6 +8,7 @@ import { PAYMENT_TYPES } from '@/features/glamiex/types'
 import { cn } from '@/lib/cn'
 import { useGx, live } from '../context'
 import { Stat, earliestDate } from './shared'
+import { to12 } from '@/features/glamiex/time'
 
 type Kind = 'Sale' | 'Refund' | 'Payment' | 'Ad income' | 'Ad spend' | 'Expense'
 interface Tx { id: string; at: string; date: string; time: string; day: string; kind: Kind; ref: string; party: string; desc: string; inflow: number; outflow: number; status: string; to: string }
@@ -32,7 +33,7 @@ export default function Transactions() {
   }, [data, tz, range.from, range.to, kind]) // eslint-disable-line react-hooks/exhaustive-deps
   const totIn = rows.reduce((a, r) => a + r.inflow, 0), totOut = rows.reduce((a, r) => a + r.outflow, 0)
   const cols: Col<Tx>[] = [
-    { key: 'date', label: 'Date', render: (r) => <span className="whitespace-nowrap">{r.date} <span className="text-muted">{r.time} {r.day.slice(0, 3)}</span></span>, sort: (r) => r.at, text: (r) => `${r.ref} ${r.party} ${r.desc}` },
+    { key: 'date', label: 'Date', render: (r) => <span className="whitespace-nowrap">{r.date} <span className="text-muted">{to12(r.time)} {r.day.slice(0, 3)}</span></span>, sort: (r) => r.at, text: (r) => `${r.ref} ${r.party} ${r.desc}` },
     { key: 'kind', label: 'Type', render: (r) => <Badge tone={r.kind === 'Sale' ? 'accent' : r.kind === 'Refund' || r.kind === 'Expense' || r.kind === 'Ad spend' ? 'danger' : 'ok'}>{r.kind}</Badge>, sort: (r) => r.kind },
     { key: 'ref', label: 'Reference', render: (r) => <span className="font-mono text-xs">{r.ref}</span>, sort: (r) => r.ref },
     { key: 'party', label: 'Party', render: (r) => r.party, sort: (r) => r.party },
@@ -50,7 +51,7 @@ export default function Transactions() {
           <Select aria-label="Type" className="w-auto" value={kind} onChange={(e) => setKind(e.target.value as Kind | '')}><option value="">All types</option>{(['Sale', 'Refund', 'Payment', 'Ad income', 'Ad spend', 'Expense'] as Kind[]).map((k) => <option key={k}>{k}</option>)}</Select>
           <ExportButtons name="Transactions" period={`${range.from} to ${range.to}`} sheets={() => [{ name: 'Transactions', rows: [['Date', 'Time', 'Day', 'Type', 'Reference', 'Party', 'Description', 'Status', 'Cash in (Rs)', 'Cash out (Rs)'], ...rows.sort((a, b) => a.at.localeCompare(b.at)).map((r) => [r.date, r.time, r.day, r.kind, r.ref, r.party, r.desc, r.status, r.inflow ? rs(r.inflow) : '', r.outflow ? rs(r.outflow) : ''])] }]} />
         </>}
-        card={(r) => <div><div className="flex items-start justify-between gap-2"><Badge tone={r.kind === 'Sale' ? 'accent' : r.inflow ? 'ok' : 'danger'}>{r.kind}</Badge><span className="text-xs text-muted">{r.date} {r.time}</span></div>
+        card={(r) => <div><div className="flex items-start justify-between gap-2"><Badge tone={r.kind === 'Sale' ? 'accent' : r.inflow ? 'ok' : 'danger'}>{r.kind}</Badge><span className="text-xs text-muted">{r.date} {to12(r.time)}</span></div>
           <div className="mt-1 line-clamp-2 text-sm">{r.desc}</div><div className="mt-1 flex items-center justify-between text-xs text-muted"><span>{r.party} · {r.ref}</span>{r.inflow ? <b className="text-ok">+{pkr(r.inflow)}</b> : r.outflow ? <b className="text-danger">−{pkr(r.outflow)}</b> : null}</div></div>} />
     </div>
   )

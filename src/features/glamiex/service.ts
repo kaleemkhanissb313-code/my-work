@@ -287,5 +287,5 @@ export async function voidPayment(id: string, reason: string) {
 }
 
 /* ---------------- Helpers for UI ---------------- */
-export const localDateTime = (iso: string, tz: string) => { const z = zoned(iso, tz); return { ...z, label: `${z.date} ${z.time}` } }
+export const localDateTime = (iso: string, tz: string) => { const z = zoned(iso, tz); return { ...z, label: `${z.date} ${z.time12}` } }
 export const newSubmissionId = () => uid()

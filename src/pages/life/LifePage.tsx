@@ -7,6 +7,7 @@ import {
   Repeat, Save, Sparkles, Star, Target, Trophy, UtensilsCrossed,
 } from 'lucide-react'
 import { FoodsTab } from '@/features/life/FoodsTab'
+import { MEALS, toFood } from '@/features/life/foods'
 import { db } from '@/lib/db'
 import { recordsRepo } from '@/services/repo'
 import { useSettings } from '@/services/settings'
@@ -66,7 +67,7 @@ async function toggleHabit(habitId: string, date: string, done: boolean) {
 
 /* ---------------- Overview ---------------- */
 
-const OVERVIEW_COLLECTIONS: CollectionKey[] = ['goals', 'importantDates', 'journal', 'reading', 'fitness', 'trips']
+const OVERVIEW_COLLECTIONS: CollectionKey[] = ['goals', 'importantDates', 'journal', 'reading', 'fitness', 'trips', 'foods']
 
 function LifeOverview() {
   const settings = useSettings()
@@ -94,7 +95,9 @@ function LifeOverview() {
     const trips = by('trips').filter((r) => !r.done && r.dueDate)
     const current = trips.find((r) => r.dueDate! <= today && String(r.fields.returnDate ?? '') >= today)
     const next = trips.filter((r) => r.dueDate! > today).sort((a, b) => a.dueDate!.localeCompare(b.dueDate!))[0]
-    return { goals, dates, journal, reading, fitness, fitnessMins, current, next }
+    const foods = by('foods').map(toFood).filter((f) => f.date === today).sort((a, b) => MEALS.indexOf(a.meal) - MEALS.indexOf(b.meal) || a.time.localeCompare(b.time))
+    const foodCals = foods.reduce((t, f) => t + (f.calories ?? 0), 0)
+    return { goals, dates, journal, reading, fitness, fitnessMins, current, next, foods, foodCals }
   }, [records, today, settings.weekStartsOn])
 
   if (!data || !habits || !logs) return <Spinner />
@@ -185,6 +188,21 @@ function LifeOverview() {
             ))}
           </ul>
         )}
+      </Card>
+
+      <Card>
+        <CardTitle icon={UtensilsCrossed} tone="text-life" action={<Link className="text-xs text-accent hover:underline" to="/life/foods">Foods</Link>}>Today's meals</CardTitle>
+        {data.foods.length ? (
+          <ul className="space-y-1 text-sm">
+            {data.foods.slice(0, 6).map((f) => (
+              <li key={f.id} className="flex items-center justify-between gap-2"><span className="truncate"><span className="text-muted">{f.meal} · </span>{f.name}</span>{f.calories != null && <span className="shrink-0 tabular-nums text-muted">{f.calories} kcal</span>}</li>
+            ))}
+          </ul>
+        ) : <p className="text-sm text-muted">Nothing logged yet today.</p>}
+        <div className="mt-3 flex items-center justify-between gap-2">
+          <span className="text-xs text-muted">{data.foodCals ? `${data.foodCals} kcal today` : ''}</span>
+          <Link to="/life/foods" className="inline-flex items-center gap-1 rounded-lg bg-accent px-3 py-1.5 text-xs font-medium text-white hover:opacity-90"><Plus className="h-3.5 w-3.5" aria-hidden />Add food</Link>
+        </div>
       </Card>
 
       <Card>

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Ban, FileBarChart, HandCoins, History, Pencil, Plus, Printer, Trash2, UserPlus, Users } from 'lucide-react'
+import { Ban, CheckCircle2, FileBarChart, HandCoins, History, Pencil, Plus, Printer, Trash2, UserPlus, Users } from 'lucide-react'
 import { Badge, Button, Field, IconButton, Input, Modal, Select, Tabs, Textarea } from '@/components/ui'
 import { confirm, toast } from '@/components/feedback'
 import { addNpPayment, saveNpPerson, seedNamesPayments, trashNpPerson, updateNpPayment, voidNpPayment } from '@/features/glamiex/logisticsService'
@@ -26,7 +26,7 @@ export function printReceipt(p: NpPayment, person: NpPerson | undefined, tz: str
     <table>
       <tr><th style="text-align:left">Received from</th><td>${escapeHtml(person?.name ?? '—')}</td></tr>
       <tr><th style="text-align:left">Amount</th><td><b>${escapeHtml(pkr(p.amount))}</b></td></tr>
-      <tr><th style="text-align:left">Date & time</th><td>${escapeHtml(`${z.weekday}, ${z.date} ${z.time}`)} (${escapeHtml(tz)})</td></tr>
+      <tr><th style="text-align:left">Date & time</th><td>${escapeHtml(`${z.weekday}, ${z.date} ${z.time12}`)} (${escapeHtml(tz)})</td></tr>
       <tr><th style="text-align:left">Payment method</th><td>${escapeHtml(methodLabel(p.method))}</td></tr>
       <tr><th style="text-align:left">Transaction reference</th><td>${escapeHtml(p.reference || '—')}</td></tr>
       ${p.linkedRef ? `<tr><th style="text-align:left">Linked transaction</th><td>${escapeHtml(p.linkedRef)}</td></tr>` : ''}
@@ -77,6 +77,13 @@ function StatusBadge({ s }: { s: Row['status'] }) {
 }
 
 function PeopleTab({ rows, onEdit, onPay }: { rows: Row[]; onEdit: (p: NpPerson) => void; onPay: (id: string) => void }) {
+  const markPaid = async (r: Row) => {
+    if (!(await confirm({ title: `Mark ${r.person.name} as paid in full?`, body: `This records a payment of ${pkr(r.remaining)} today (method: cash). You can edit the date, method, reference or amount afterwards in Transaction history.`, confirmLabel: `Record ${pkr(r.remaining)}` }))) return
+    try {
+      const res = await addNpPayment({ id: newSubmissionId(), personId: r.person.id, amount: r.remaining, at: new Date().toISOString(), method: 'cash', reference: '', notes: 'Marked as paid in full', linkedRef: '' })
+      toast(`${res.payment.receiptNo}: ${r.person.name} is now paid in full`)
+    } catch (e) { toast((e as Error).message, 'error') }
+  }
   const { tz } = useGx()
   const [status, setStatus] = useState<'' | Row['status']>('')
   const list = rows.filter((r) => !status || r.status === status)
@@ -89,6 +96,7 @@ function PeopleTab({ rows, onEdit, onPay }: { rows: Row[]; onEdit: (p: NpPerson)
     { key: 'last', label: 'Last payment', render: (r) => r.last ? <span className="whitespace-nowrap text-xs">{zoned(r.last.at, tz).date} · {pkr(r.last.amount)}</span> : <span className="text-xs text-muted">—</span>, sort: (r) => r.last?.at ?? '' },
     { key: 'act', label: '', render: (r) => <div className="flex justify-end gap-1" onClick={(e) => e.stopPropagation()}>
       {r.remaining > 0 && <Button size="sm" icon={HandCoins} onClick={() => onPay(r.person.id)}>Pay</Button>}
+      {r.remaining > 0 && <Button size="sm" variant="ghost" icon={CheckCircle2} onClick={() => void markPaid(r)}>Mark paid</Button>}
       <IconButton icon={Pencil} label={`Edit ${r.person.name}`} onClick={() => onEdit(r.person)} />
       <IconButton icon={Trash2} label={`Delete ${r.person.name}`} onClick={async () => {
         if (!(await confirm({ title: `Delete ${r.person.name}?`, body: 'The name moves to Trash. People with recorded payments cannot be deleted.', danger: true, confirmLabel: 'Delete' }))) return
@@ -121,7 +129,7 @@ function HistoryTab() {
   const receipt = (p: NpPayment) => { const person = people.get(p.personId); printReceipt(p, person, tz, person ? npBalance(person, data.npPayments) : { paid: 0, remaining: 0 }) }
   const cols: Col<NpPayment>[] = [
     { key: 'no', label: 'Receipt', render: (p) => <span className={cn('font-mono text-xs', p.voided && 'line-through')}>{p.receiptNo}</span>, sort: (p) => p.receiptNo, text: (p) => `${p.receiptNo} ${people.get(p.personId)?.name ?? ''} ${p.reference} ${p.notes} ${p.linkedRef}` },
-    { key: 'date', label: 'Date & time', render: (p) => { const z = zoned(p.at, tz); return <span className="whitespace-nowrap">{z.date} <span className="text-muted">{z.time}</span></span> }, sort: (p) => p.at },
+    { key: 'date', label: 'Date & time', render: (p) => { const z = zoned(p.at, tz); return <span className="whitespace-nowrap">{z.date} <span className="text-muted">{z.time12}</span></span> }, sort: (p) => p.at },
     { key: 'person', label: 'Name', render: (p) => people.get(p.personId)?.name ?? '—', sort: (p) => people.get(p.personId)?.name ?? '' },
     { key: 'method', label: 'Method', render: (p) => methodLabel(p.method), sort: (p) => p.method },
     { key: 'ref', label: 'Reference', render: (p) => <div>{p.reference || '—'}{p.linkedRef && <div className="text-xs text-muted">Linked: {p.linkedRef}</div>}</div> },
@@ -275,16 +283,18 @@ function EditPayment({ p, onClose }: { p: NpPayment; onClose: () => void }) {
   const { tz } = useGx()
   const z = zoned(p.at, tz)
   const [f, setF] = useState({ date: z.date, time: z.time, method: p.method, reference: p.reference, notes: p.notes, linkedRef: p.linkedRef })
+  const [amount, setAmount] = useState<number | null>(p.amount)
   const [busy, setBusy] = useState(false)
   const save = async () => {
     setBusy(true)
-    try { await updateNpPayment(p.id, { at: wallToIso(f.date, f.time || '00:00', tz), method: f.method, reference: f.reference.trim(), notes: f.notes, linkedRef: f.linkedRef.trim() }); toast('Saved (recorded in the audit trail)'); onClose() }
+    if (!amount || amount <= 0) { toast('Enter an amount greater than 0.', 'error'); setBusy(false); return }
+    try { await updateNpPayment(p.id, { amount, at: wallToIso(f.date, f.time || '00:00', tz), method: f.method, reference: f.reference.trim(), notes: f.notes, linkedRef: f.linkedRef.trim() }); toast('Saved (recorded in the audit trail)'); onClose() }
     catch (e) { toast((e as Error).message, 'error') } finally { setBusy(false) }
   }
   return (
     <Modal open onClose={onClose} title={`Edit ${p.receiptNo}`} footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" loading={busy} onClick={() => void save()}>Save</Button></>}>
-      <p className="mb-3 text-sm text-muted">Amount <b>{pkr(p.amount)}</b> is locked — void this payment and record it again to change the amount.</p>
       <div className="grid gap-3 sm:grid-cols-2">
+        <Field label="Amount (PKR)" htmlFor="ep-a" className="sm:col-span-2" hint={amount !== p.amount ? `Was ${pkr(p.amount)} — the change is kept in the audit trail` : undefined}><MoneyInput id="ep-a" value={amount} onChange={setAmount} /></Field>
         <Field label="Date" htmlFor="ep-d"><Input id="ep-d" type="date" value={f.date} onChange={(e) => setF({ ...f, date: e.target.value })} /></Field>
         <Field label="Time" htmlFor="ep-t"><Input id="ep-t" type="time" value={f.time} onChange={(e) => setF({ ...f, time: e.target.value })} /></Field>
         <Field label="Method" htmlFor="ep-m"><Select id="ep-m" value={f.method} onChange={(e) => setF({ ...f, method: e.target.value as PaymentMethod })}>{PAYMENT_METHODS.map((m) => <option key={m.id} value={m.id}>{m.label}</option>)}</Select></Field>
