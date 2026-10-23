@@ -49,6 +49,8 @@ test.describe('core workflows', () => {
 
   test('calculator evaluates safely', async ({ page }) => {
     await page.goto('/')
+    // Extra dashboard cards sit behind “Show more cards” to keep the dashboard short.
+    await page.getByRole('button', { name: /Show \d+ more cards/ }).click()
     await page.getByLabel('Expression').fill('(2+3)*4')
     await expect(page.getByText('= 20')).toBeVisible()
   })

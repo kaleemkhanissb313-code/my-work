@@ -1,4 +1,4 @@
-import { Suspense, useEffect, useState } from 'react'
+import { Suspense, useCallback, useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router'
 import { MotionConfig, motion } from 'framer-motion'
 import { Sidebar } from './layout/Sidebar'
@@ -25,6 +25,7 @@ export function AppShell() {
   const s = useSettings()
   const { locked, ready } = lockState.use()
   const [menu, setMenu] = useState(false)
+  const closeMenu = useCallback(() => setMenu(false), [])
   const [cmd, setCmd] = useState(false)
   const nav = useNavigate()
   const loc = useLocation()
@@ -85,7 +86,7 @@ export function AppShell() {
     <MotionConfig reducedMotion={s.reduceMotion ? 'always' : 'user'}>
       <a href="#main" className="sr-only focus:not-sr-only focus:fixed focus:start-2 focus:top-2 focus:z-[70] focus:rounded-xl focus:bg-surface focus:p-2">Skip to content</a>
       <div className="flex min-h-screen">
-        <Sidebar mobileOpen={menu} onClose={() => setMenu(false)} />
+        <Sidebar mobileOpen={menu} onClose={closeMenu} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar onMenu={() => setMenu(true)} onSearch={() => setCmd(true)} />
           <main id="main" className="mx-auto w-full max-w-[1400px] flex-1 px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:px-6 lg:pb-8">

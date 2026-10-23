@@ -6,7 +6,7 @@ import { addDays, format, startOfWeek } from 'date-fns'
 import { Bar, BarChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from 'recharts'
 import {
   AlertTriangle, ArrowDown, ArrowUp, Banknote, Briefcase, Calculator, CalendarDays, CheckSquare, Eye, EyeOff, FileText, FolderKanban,
-  Heart, Home, Image, LayoutGrid, Link2, Pause, Play, ShieldCheck, Sparkles, Timer, Wand2, Wrench, Zap,
+  Heart, Home, Image, LayoutGrid, Link2, Pause, Play, ShieldCheck, Sparkles, Timer, Wand2, Wrench, Zap, BellRing, ChevronDown, ChevronRight, ChevronUp, Gem, NotebookPen, Sheet,
 } from 'lucide-react'
 import { db } from '@/lib/db'
 import { Badge, Button, Card, CardTitle, EmptyState, IconButton, Modal, Progress } from '@/components/ui'
@@ -26,6 +26,7 @@ import { cn } from '@/lib/cn'
 import { clock12 } from '@/lib/time12'
 import { can, useAccess } from '@/services/access'
 import type { Task } from '@/types/models'
+import { useNotificationRead, useNotifications } from '@/app/useReminders'
 
 const PRI: Record<Task['priority'], number> = { urgent: 0, high: 1, medium: 2, low: 3 }
 
@@ -404,6 +405,8 @@ export function Dashboard() {
   const hour = new Date(now).getHours()
   const greet = hour < 5 ? 'Good night' : hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening'
   const visible = useMemo(() => s.dashboardWidgets.filter((w) => w.visible && WIDGETS[w.id]), [s.dashboardWidgets])
+  const [showAll, setShowAll] = useState(() => { try { return localStorage.getItem('b2a-dash-all') === '1' } catch { return false } })
+  useEffect(() => { try { localStorage.setItem('b2a-dash-all', showAll ? '1' : '0') } catch { /* private mode */ } }, [showAll])
   const isEmpty = counts && !counts.tasks && !counts.docs && !counts.projects
 
   return (
@@ -444,14 +447,25 @@ export function Dashboard() {
         </EmptyState></div>
       )}
 
+      <Shortcuts />
+      <NeedsAttention />
+
       {visible.length === 0 ? (
         <EmptyState icon={LayoutGrid} title="All widgets are hidden" action={<Button variant="primary" onClick={() => setCustomize(true)}>Choose widgets</Button>} />
       ) : (
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {visible.map((w, i) => {
+          {(showAll ? visible : visible.slice(0, FIRST_WIDGETS)).map((w, i) => {
             const W = WIDGETS[w.id]
             return <motion.div key={w.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i * 0.03, 0.3) }} className={w.id === 'chart' ? 'md:col-span-2' : undefined}><W /></motion.div>
           })}
+        </div>
+      )}
+
+      {visible.length > FIRST_WIDGETS && (
+        <div className="mt-4 flex justify-center">
+          <Button icon={showAll ? ChevronUp : ChevronDown} aria-expanded={showAll} onClick={() => setShowAll(!showAll)}>
+            {showAll ? 'Show fewer cards' : `Show ${visible.length - FIRST_WIDGETS} more cards`}
+          </Button>
         </div>
       )}
 
@@ -490,5 +504,57 @@ function CustomizeModal({ open, onClose }: { open: boolean; onClose: () => void 
         })}
       </ul>
     </Modal>
+  )
+}
+
+/** Cards shown before "Show more" — keeps the dashboard short, especially on phones. */
+const FIRST_WIDGETS = 6
+
+const SHORTCUTS: [string, string, typeof FileText, string][] = [
+  ['/tasks', 'Tasks', CheckSquare, 'text-accent'], ['/documents', 'Docs', FileText, 'text-work'], ['/sheets', 'Sheets', Sheet, 'text-ok'],
+  ['/notes', 'Notes', NotebookPen, 'text-life'], ['/calendar', 'Calendar', CalendarDays, 'text-home'], ['/links', 'Links', Link2, 'text-accent'],
+  ['/finance', 'Finance', Banknote, 'text-ok'], ['/glamiex', 'GLAMIEX', Gem, 'text-accent'],
+]
+/** One row of the most-used places (scrolls sideways on small phones). */
+function Shortcuts() {
+  return (
+    <nav aria-label="Shortcuts" className="mb-4">
+      <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-8 sm:overflow-visible sm:px-0" style={{ scrollbarWidth: 'none' }}>
+        {SHORTCUTS.map(([to, label, I, tone]) => (
+          <li key={to} className="shrink-0">
+            <Link to={to} className="card card-hover flex h-[76px] w-[76px] flex-col items-center justify-center gap-1.5 text-xs font-medium sm:w-full">
+              <I className={cn('h-5 w-5', tone)} aria-hidden />{label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  )
+}
+
+/** Unread notifications on the dashboard itself (hidden when there is nothing to act on). */
+function NeedsAttention() {
+  const notes = useNotifications()
+  const { isRead, markRead } = useNotificationRead()
+  const unread = notes.filter((n) => !isRead(n.id))
+  if (!unread.length) return null
+  return (
+    <section aria-labelledby="attn" className="card mb-4 border-warn/40 p-4">
+      <div className="mb-2 flex items-center gap-2">
+        <BellRing className="h-4 w-4 text-warn" aria-hidden />
+        <h2 id="attn" className="font-semibold">Needs attention <span className="text-sm font-normal text-muted">({unread.length})</span></h2>
+        <button type="button" className="ms-auto min-h-[40px] text-xs text-accent hover:underline" onClick={() => void markRead(unread.map((n) => n.id))}>Mark all read</button>
+      </div>
+      <ul className="divide-y divide-line/60">
+        {unread.slice(0, 4).map((n) => (
+          <li key={n.id}><Link to={n.path} onClick={() => void markRead([n.id])} className="flex min-h-[48px] items-center gap-3 py-2 text-sm hover:text-accent">
+            <span className={cn('h-2 w-2 shrink-0 rounded-full', n.tone === 'danger' ? 'bg-danger' : n.tone === 'warn' ? 'bg-warn' : 'bg-accent')} aria-hidden />
+            <span className="min-w-0 flex-1"><span className="block truncate font-medium">{n.title}</span><span className="block truncate text-xs text-muted">{n.detail}</span></span>
+            <ChevronRight className="h-4 w-4 shrink-0 text-muted" aria-hidden />
+          </Link></li>
+        ))}
+      </ul>
+      {unread.length > 4 && <p className="pt-2 text-xs text-muted">+{unread.length - 4} more in the bell menu.</p>}
+    </section>
   )
 }

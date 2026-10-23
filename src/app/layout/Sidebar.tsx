@@ -84,13 +84,24 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
   // Hidden = turned off in Settings, or not permitted for this account (the database enforces the latter too).
   const hidden = new Set([...s.hiddenModules, ...ALL_LEAVES.filter((l) => !can(featureForPath(l.path), access)).map((l) => l.id), ...NAV.filter((g) => g.path && !can(featureForPath(g.path), access)).map((g) => g.id)])
   const [collapsed, setCollapsed] = useState(readCollapsed)
+  // Phone/tablet drawer: Escape closes, the page behind does not scroll, and it closes if the screen becomes wide.
+  useEffect(() => {
+    if (!mobileOpen) return
+    const key = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const wide = window.matchMedia('(min-width: 1024px)')
+    const onWide = () => { if (wide.matches) onClose() }
+    const prev = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
+    document.addEventListener('keydown', key); wide.addEventListener('change', onWide)
+    return () => { document.body.style.overflow = prev; document.removeEventListener('keydown', key); wide.removeEventListener('change', onWide) }
+  }, [mobileOpen, onClose])
   const toggle = () => setCollapsed((c) => { try { localStorage.setItem(COLLAPSE_KEY, c ? '0' : '1') } catch { /* per-device preference only */ } return !c })
 
   const nav = (compact: boolean, mobile: boolean) => (
     <nav aria-label="Main" className={cn('flex h-full flex-col gap-1 overflow-y-auto overflow-x-hidden', compact ? 'p-2' : 'p-3')}>
       <div className={cn('mb-3 flex items-center', compact ? 'justify-center' : 'justify-between')}>
         <Logo compact={compact} />
-        {mobile && <button className="btn btn-ghost h-9 w-9" aria-label="Close menu" onClick={onClose}><X className="h-4 w-4" /></button>}
+        {mobile && <button autoFocus className="btn btn-ghost h-10 w-10" aria-label="Close menu" onClick={onClose}><X className="h-4 w-4" /></button>}
       </div>
       {NAV.map((g) => <Group key={g.id} g={g} hidden={hidden} onNavigate={onClose} compact={compact} />)}
       {!mobile && (
@@ -109,9 +120,9 @@ export function Sidebar({ mobileOpen, onClose }: { mobileOpen: boolean; onClose:
       </aside>
       <AnimatePresence>
         {mobileOpen && (
-          <div className="fixed inset-0 z-40 lg:hidden">
+          <div className="fixed inset-0 z-40 lg:hidden" role="dialog" aria-modal="true" aria-label="Menu">
             <motion.div className="absolute inset-0 bg-black/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
-            <motion.aside className="glass absolute inset-y-0 start-0 w-72 max-w-[85vw]" initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }} transition={{ type: 'spring', stiffness: 400, damping: 40 }}>
+            <motion.aside className="glass absolute inset-y-0 start-0 w-72 max-w-[85vw] pb-[env(safe-area-inset-bottom)]" initial={{ x: -300 }} animate={{ x: 0 }} exit={{ x: -300 }} transition={{ type: 'spring', stiffness: 400, damping: 40 }}>
               {nav(false, true)}
             </motion.aside>
           </div>

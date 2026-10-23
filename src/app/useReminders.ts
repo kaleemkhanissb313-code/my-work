@@ -72,3 +72,17 @@ export function useReminderLoop() {
     return () => clearInterval(id)
   }, [])
 }
+
+/* Read state: a notification marked as read stays read for the rest of the day; if it still applies tomorrow it shows again. */
+const READ_KEY = 'notifications.read'
+const readTag = (id: string) => `${todayISO()}|${id}`
+export function useNotificationRead() {
+  const read = useLiveQuery(async () => new Set(((await db.kv.get(READ_KEY))?.value as string[] | undefined) ?? []), []) ?? new Set<string>()
+  const isRead = (id: string) => read.has(readTag(id))
+  const markRead = async (ids: string[]) => {
+    const today = `${todayISO()}|`
+    const keep = [...read].filter((t) => t.startsWith(today))
+    await db.kv.put({ key: READ_KEY, value: [...new Set([...keep, ...ids.map(readTag)])] })
+  }
+  return { isRead, markRead }
+}
