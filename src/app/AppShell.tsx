@@ -88,7 +88,7 @@ export function AppShell() {
         <Sidebar mobileOpen={menu} onClose={() => setMenu(false)} />
         <div className="flex min-w-0 flex-1 flex-col">
           <Topbar onMenu={() => setMenu(true)} onSearch={() => setCmd(true)} />
-          <main id="main" className="mx-auto w-full max-w-[1400px] flex-1 px-4 pb-28 pt-6 sm:px-6 lg:pb-8">
+          <main id="main" className="mx-auto w-full max-w-[1400px] flex-1 px-4 pb-[calc(7rem+env(safe-area-inset-bottom))] pt-6 sm:px-6 lg:pb-8">
             {/* Subtle page transition (disabled automatically with reduced motion) */}
             <motion.div key={loc.pathname} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.22, ease: 'easeOut' }}>
               <Suspense fallback={<Spinner />}><AccessGate><Outlet /></AccessGate></Suspense>

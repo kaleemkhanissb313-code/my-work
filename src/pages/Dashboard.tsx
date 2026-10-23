@@ -440,7 +440,7 @@ export function Dashboard() {
 
       {isEmpty && (
         <div className="mb-6"><EmptyState icon={Sparkles} title="Welcome to workMYwork">
-          Your workspace is empty and everything you add is saved on this device. Start with a task, a document or a project — or press <span className="kbd">Ctrl K</span> to search and run commands.
+          Your workspace is empty and everything you add is saved on this device. Start with a task, a document or a project<span className="hidden sm:inline"> — or press <span className="kbd">Ctrl K</span> to search and run commands</span>.
         </EmptyState></div>
       )}
 
