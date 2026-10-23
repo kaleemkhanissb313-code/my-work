@@ -154,6 +154,23 @@
   .prose-editor pre { @apply rounded-xl bg-raised p-4 my-3 overflow-x-auto; }
   .prose-editor pre code { @apply bg-transparent p-0; }
   .prose-editor hr { @apply my-6 border-line; }
+  .prose-editor h1, .prose-editor h2, .prose-editor h3 { scroll-margin-top: 6rem; }
+  .prose-editor mark { @apply rounded px-0.5; }
+  .prose-editor img { @apply my-3 h-auto max-w-full rounded-xl; }
+  .prose-editor img.ProseMirror-selectednode { outline: 2px solid rgb(var(--accent)); }
+  .prose-editor .tableWrapper { @apply my-4 overflow-x-auto; }
+  .prose-editor table { @apply w-full border-collapse text-sm; table-layout: fixed; }
+  .prose-editor td, .prose-editor th { @apply relative min-w-[80px] border border-line px-2 py-1.5 align-top; }
+  .prose-editor th { @apply bg-raised text-start font-semibold; }
+  .prose-editor .selectedCell::after { content: ''; @apply pointer-events-none absolute inset-0 bg-accent/15; }
+  .prose-editor .column-resize-handle { @apply pointer-events-none absolute -right-0.5 bottom-0 top-0 w-1 bg-accent; }
+  .prose-editor.resize-cursor { cursor: col-resize; }
+  .prose-editor ul[data-type="taskList"] { @apply list-none pl-1; }
+  .prose-editor ul[data-type="taskList"] li { @apply flex items-start gap-2; }
+  .prose-editor ul[data-type="taskList"] li > label { @apply mt-1 shrink-0; }
+  .prose-editor ul[data-type="taskList"] li > label input { width: 1rem; height: 1rem; accent-color: rgb(var(--accent)); }
+  .prose-editor ul[data-type="taskList"] li[data-checked="true"] > div { @apply text-muted line-through; }
+  .prose-editor ul[data-type="taskList"] li > div { @apply min-w-0 flex-1; }
   .prose-editor p.is-editor-empty:first-child::before { content: attr(data-placeholder); @apply text-muted/60 float-left h-0 pointer-events-none; }
 }
 

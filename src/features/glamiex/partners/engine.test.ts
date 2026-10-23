@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { computeFigures, findDuplicate, overlappingAllocations, parsePercent, periodResult, reversalOf, splitByShares, validateDraft } from './engine'
+import { computeFigures, findDuplicate, netEffect, netPosition, overlappingAllocations, parsePercent, periodResult, reversalOf, splitByShares, validateDraft } from './engine'
 import { PARTNER_SEED, type BpLine, type BpTxn, type BpTxnDraft, type BpTxnType } from './types'
 
 const partners = PARTNER_SEED.map((p) => ({ id: p.id }))
@@ -149,5 +149,45 @@ describe('validation and duplicates', () => {
     expect(findDuplicate([t], d)?.id).toBe(t.id)
     expect(findDuplicate([{ ...t, reversedBy: 'x' }], d)).toBeUndefined()
     expect(findDuplicate([t], { ...d, amount: 501 })).toBeUndefined()
+  })
+})
+
+describe('overall balance (investments and expenses −, income +)', () => {
+  it('invest 50,000 then receive a 10,000 order → −40,000', () => {
+    const inv = txn('investment', 5_000_000, { lines: L([K, 5_000_000]) })
+    expect(netPosition(partners, [inv]).balance).toBe(-5_000_000)
+    const order = txn('revenue', 1_000_000, { toId: K, description: 'Order payment' })
+    const n = netPosition(partners, [inv, order])
+    expect(n.balance).toBe(-4_000_000)
+    expect(n.partners.find((p) => p.partnerId === K)).toMatchObject({ invested: 5_000_000, income: 1_000_000, balance: -4_000_000 })
+    expect(netEffect(inv)).toBe(-5_000_000)
+    expect(netEffect(order)).toBe(1_000_000)
+  })
+  it('works for any amount and keeps partner and business totals consistent', () => {
+    const list = [
+      txn('initial_capital', 10_000_000, { lines: L([N, 6_000_000], [A, 4_000_000]) }),
+      txn('expense', 50_000, { fromId: A, description: 'Packing' }),
+      txn('expense', 1_000, { description: 'Bank charge' }),
+      txn('revenue', 2_500_000, { description: 'Orders' }),
+      txn('revenue', 1_000, { toId: N, description: 'PKR 10' }),
+    ]
+    const n = netPosition(partners, list)
+    expect(n.invested).toBe(10_000_000)
+    expect(n.expenses).toBe(51_000)
+    expect(n.income).toBe(2_501_000)
+    expect(n.balance).toBe(2_501_000 - 10_000_000 - 51_000)
+    const sum = n.partners.reduce((a, p) => a + p.balance, 0) + n.business.balance
+    expect(sum).toBe(n.balance)
+    expect(n.business).toMatchObject({ expenses: 1_000, income: 2_500_000 })
+  })
+  it('reversals cancel, withdrawals give investment back, transfers and profit pay-outs do not count', () => {
+    const inv = txn('investment', 1_000_000, { lines: L([S, 1_000_000]) })
+    const rev = txn('correction', 1_000_000, { reverses: inv.id, reversesType: 'investment', lines: inv.lines, reason: 'typo' })
+    expect(netPosition(partners, [inv, rev]).balance).toBe(0)
+    const inv2 = txn('investment', 1_000_000, { lines: L([S, 1_000_000]) })
+    const wd = txn('withdrawal', 300_000, { lines: L([S, 300_000]), method: 'cash' })
+    const tr = txn('transfer', 200_000, { fromId: S, toId: H, method: 'cash' })
+    const pd = txn('profit_dist', 100_000, { lines: L([S, 100_000]), method: 'cash' })
+    expect(netPosition(partners, [inv2, wd, tr, pd]).balance).toBe(-700_000)
   })
 })

@@ -10,9 +10,10 @@ import { PAYMENT_METHODS } from '@/features/glamiex/types'
 import { newDesign, setPrefill, type PayPerson } from '@/features/glamiex/payImage/model'
 import { annotateTxn, reverseTxn } from '@/features/glamiex/partners/service'
 import { TXN_TYPES, txnLabel, type BpPartner, type BpTxn } from '@/features/glamiex/partners/types'
+import { netEffect } from '@/features/glamiex/partners/engine'
 import { useGx } from '../../context'
 import { nowLocal } from '../shared'
-import { TYPE_TONE, partiesOf, useBp } from './shared'
+import { TYPE_TONE, partiesOf, useBp, partnerNetEffect, signed, signTone } from './shared'
 import { to12 } from '@/features/glamiex/time'
 
 /** Builds a Payment Image Creator design from a ledger entry (up to 5 partners). */
@@ -83,19 +84,23 @@ export function TxnDetail({ t, onClose }: { t: BpTxn; onClose: () => void }) {
 export function TxnTable({ rows, partnerId }: { rows: BpTxn[]; partnerId?: string }) {
   const { byId } = useBp()
   const [open, setOpen] = useState<BpTxn | null>(null)
-  const effect = (t: BpTxn) => {
-    if (!partnerId) return null
-    if (t.fromId === partnerId) return -t.amount
-    if (t.toId === partnerId) return t.amount
-    return t.lines.find((l) => l.partnerId === partnerId)?.amount ?? 0
-  }
+  // Effect on the overall balance (investments & expenses −, income +), for the business or for one partner.
+  const effect = (t: BpTxn) => (partnerId ? partnerNetEffect(t, partnerId) : netEffect(t))
+  const running = useMemo(() => {
+    const m = new Map<string, number>(); let bal = 0
+    for (const t of [...rows].sort((a, b) => (a.date + a.time + a.txnNo).localeCompare(b.date + b.time + b.txnNo))) { bal += effect(t); m.set(t.id, bal) }
+    return m
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [rows, partnerId])
+  const eff = (t: BpTxn) => { const e = effect(t); return e ? <span className={cn('tabular-nums font-semibold', signTone(e))}>{signed(e)}</span> : <span className="text-muted" title="Does not change the overall balance">—</span> }
   const cols: Col<BpTxn>[] = [
     { key: 'date', label: 'Date', render: (t) => <span className="whitespace-nowrap tabular-nums">{t.date}</span>, sort: (t) => t.date + t.time, text: (t) => t.date },
     { key: 'no', label: 'Entry', render: (t) => <span className={cn('font-mono text-xs', t.reversedBy && 'line-through opacity-60')}>{t.txnNo}</span>, text: (t) => t.txnNo },
     { key: 'type', label: 'Type', render: (t) => <Badge tone={TYPE_TONE[t.type] ?? 'muted'}>{t.type === 'correction' ? `Reversal of ${txnLabel(t.reversesType!).toLowerCase()}` : txnLabel(t.type)}</Badge>, sort: (t) => t.type, text: (t) => txnLabel(t.type) },
     { key: 'who', label: 'Partners', render: (t) => <span className="line-clamp-1">{partiesOf(t, byId)}</span>, text: (t) => partiesOf(t, byId) },
     { key: 'desc', label: 'Description', render: (t) => <span className="line-clamp-1 text-muted">{[t.project, t.description].filter(Boolean).join(' · ')}</span>, text: (t) => `${t.project} ${t.description} ${t.reference}` },
-    ...(partnerId ? [{ key: 'mine', label: 'This partner', align: 'right' as const, render: (t: BpTxn) => <span className="tabular-nums">{pkr(effect(t) ?? 0)}</span>, sort: (t: BpTxn) => effect(t) ?? 0 }] : []),
+    { key: 'effect', label: partnerId ? 'This partner (±)' : 'Balance effect (±)', align: 'right', render: eff, sort: (t) => effect(t) },
+    { key: 'running', label: 'Overall balance', align: 'right', render: (t) => { const b = running.get(t.id) ?? 0; return <span className={cn('tabular-nums', signTone(b))}>{signed(b)}</span> }, sort: (t) => t.date + t.time + t.txnNo },
     { key: 'amount', label: 'Amount', align: 'right', render: (t) => <span className={cn('tabular-nums font-medium', t.reversedBy && 'line-through opacity-60')}>{pkr(t.amount)}</span>, sort: (t) => t.amount },
   ]
   return (
@@ -108,7 +113,10 @@ export function TxnTable({ rows, partnerId }: { rows: BpTxn[]; partnerId?: strin
               <div className="mt-1 truncate text-sm font-medium">{partiesOf(t, byId)}</div>
               <div className="truncate text-xs text-muted">{t.date} · {t.txnNo}{t.description ? ` · ${t.description}` : ''}</div>
             </div>
-            <div className={cn('text-end font-semibold tabular-nums', t.reversedBy && 'line-through opacity-60')}>{pkr(partnerId ? effect(t) ?? t.amount : t.amount)}</div>
+            <div className={cn('text-end', t.reversedBy && 'line-through opacity-60')}>
+              <div className="font-semibold">{effect(t) ? eff(t) : <span className="tabular-nums">{pkr(t.amount)}</span>}</div>
+              <div className={cn('text-xs tabular-nums', signTone(running.get(t.id) ?? 0))}>Bal {signed(running.get(t.id) ?? 0)}</div>
+            </div>
           </div>
         )} />
       {open && <TxnDetail t={open} onClose={() => setOpen(null)} />}

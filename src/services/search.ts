@@ -44,6 +44,7 @@ export async function searchAll(q: string, limit = 50): Promise<SearchHit[]> {
   live(media).forEach((m) => push({ type: 'media', id: m.id, title: m.name, subtitle: `Media · ${m.mime}`, path: `/media?open=${m.id}` }, `${m.description} ${m.tags.join(' ')}`))
   live(bookmarks).forEach((b) => push({ type: 'bookmark', id: b.id, title: b.title || b.url, subtitle: `Link · ${b.category}`, path: `/links?open=${b.id}` }, `${b.url} ${b.description} ${b.notes} ${b.tags.join(' ')}`))
   live(records).forEach((r) => push({ type: 'record', id: r.id, title: r.title, subtitle: COLLECTIONS[r.collection]?.label ?? r.collection, path: `${recordPath(r)}?open=${r.id}` }, `${r.category} ${r.tags.join(' ')} ${Object.values(r.fields).join(' ')}`))
+  live(await db.sheets.toArray()).forEach((x) => push({ type: 'dataset', id: x.id, title: x.name, subtitle: 'Spreadsheet', path: `/sheets/${x.id}` }, `${x.description} ${x.columns.map((c) => c.name).join(' ')} ${x.rows.slice(0, 2000).map((r) => Object.values(r.cells).filter((v) => v != null && !String(v).startsWith('=')).join(' ')).join(' ')}`.slice(0, 20000)))
   live(datasets).forEach((d) => push({ type: 'dataset', id: d.id, title: d.name, subtitle: 'Dataset', path: `/graphs?open=${d.id}` }, d.columns.join(' ')))
   // GLAMIEX (hidden from search while the section is password-locked)
   if (!isGlamiexUnlocked()) return hits.sort((a, b) => b.score - a.score).slice(0, limit)

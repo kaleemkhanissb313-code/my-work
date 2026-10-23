@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   AlignCenter, AlignLeft, AlignRight, Archive, ArrowDownAZ, ArrowUpZA, BarChart3, Bold, Columns3, Copy, Download, FileSpreadsheet, Highlighter, Italic,
-  Loader2, Paintbrush, Printer, Redo2, Rows3, Search, Settings2, Sigma, Square, Trash2, Type, Underline, Undo2, WrapText, CheckCircle2, AlertTriangle,
+  Loader2, Paintbrush, Printer, Redo2, Rows3, Search, Settings2, Sigma, Square, Trash2, Type, Underline, Undo2, WrapText, CheckCircle2, AlertTriangle, Replace, MoreHorizontal,
 } from 'lucide-react'
-import { Badge, Button, IconButton, Input, Select } from '@/components/ui'
+import { Badge, Button, Field, IconButton, Input, Modal, Select } from '@/components/ui'
 import { confirm, toast } from '@/components/feedback'
 import { ColorPicker } from '@/features/colors/ColorPicker'
 import { Grid, selBounds, type Editing, type Sel } from '@/features/sheets/Grid'
@@ -12,15 +12,13 @@ import {
 } from '@/features/sheets/ops'
 import { cellName, colLetter, FUNCTION_NAMES, isError, type Value } from '@/features/sheets/formula'
 import { effectiveFmt, formatValue, NUM_FMTS, validateInput } from '@/features/sheets/format'
-import { saveFormatPresets, sheetsRepo, useFormatPresets } from '@/features/sheets/repo'
-import { gxAudit } from '@/features/glamiex/service'
+import { saveFormatPresets, useFormatPresets, type SheetHost } from '@/features/sheets/repo'
 import { downloadBlob, downloadText } from '@/services/backup'
 import { toCSV } from '@/lib/csv'
 import { xlsxBlob, type Cell, type XStyle } from '@/lib/xlsx'
 import { printHtml } from '@/lib/markdown'
 import type { CellFmt, GxSheet, NumFmt } from '@/features/sheets/types'
 import { cn } from '@/lib/cn'
-import { useGx, live } from '../context'
 import { AttachmentModal, ChartModal, ColumnModal, LinkPicker, RulesModal } from './SheetParts'
 import { escapeHtml } from '@/lib/html'
 
@@ -28,8 +26,8 @@ type Status = 'saved' | 'saving' | 'error' | 'dirty'
 const pick = (s: GxSheet): SheetData => ({ columns: s.columns, rows: s.rows, fmt: s.fmt, colFmt: s.colFmt, rowFmt: s.rowFmt, freezeCols: s.freezeCols, showTotals: s.showTotals, totals: s.totals, rules: s.rules })
 let internalClip: { text: string; raw: (string | number | null)[][]; fmt: (CellFmt | undefined)[][] } | null = null
 
-export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
-  const { data: gx, go } = useGx()
+export function CustomSheetEditor({ sheet, host }: { sheet: GxSheet; host: SheetHost }) {
+  const sheetsRepo = host.repo
   const [data, setData] = useState<SheetData>(() => pick(sheet))
   const [name, setName] = useState(sheet.name)
   const [status, setStatus] = useState<Status>('saved')
@@ -40,8 +38,9 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
   const [search, setSearch] = useState('')
   const [filterCol, setFilterCol] = useState('')
   const [filterText, setFilterText] = useState('')
-  const [modal, setModal] = useState<null | 'columns' | 'rules' | 'chart' | { attach: [number, number] } | { link: [number, number] }>(null)
+  const [modal, setModal] = useState<null | 'columns' | 'rules' | 'chart' | 'replace' | { attach: [number, number] } | { link: [number, number] }>(null)
   const [error, setError] = useState<string | null>(null)
+  const [moreOpen, setMoreOpen] = useState(false)
   const presets = useFormatPresets()
 
   /* ---------- history + autosave ---------- */
@@ -55,7 +54,7 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
     setStatus('saving')
     try { await sheetsRepo.update(sheet.id, { ...d, name: nm.trim() || 'Untitled sheet' }); setStatus('saved') }
     catch { setStatus('error') }
-  }, [sheet.id])
+  }, [sheet.id, sheetsRepo])
   useEffect(() => {
     if (status !== 'dirty') return
     const t = setTimeout(() => void save(data, name), 700)
@@ -96,7 +95,7 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
   const setEditing = (e: Editing | null) => {
     if (e) {
       const t = data.columns[e.c]?.type
-      if (t === 'product' || t === 'customer' || t === 'order') { setModal({ link: [e.r, e.c] }); return }
+      if ((t === 'product' || t === 'customer' || t === 'order') && host.links) { setModal({ link: [e.r, e.c] }); return }
       if (t === 'attachment') { setModal({ attach: [e.r, e.c] }); return }
     }
     setEditingRaw(e)
@@ -179,16 +178,14 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
     else if (k === 'xlsx') downloadBlob(xlsxBlob([{ name, rows: exportRows(true), colWidths: data.columns.map((c) => Math.round(c.width / 7)) }]), `${file}.xlsx`)
     else {
       const body = data.rows.map((row, ri) => `<tr>${data.columns.map((c, ci) => { const v = values[ri][ci]; const f = effectiveFmt(data, row.id, c, v); const st = [f.b && 'font-weight:700', f.i && 'font-style:italic', f.color && `color:${f.color}`, f.bg && `background:${f.bg}`, f.align && `text-align:${f.align}`].filter(Boolean).join(';'); return `<td style="${st}">${f.ruleLabel ? escapeHtml(f.ruleLabel) + ' ' : ''}${escapeHtml(formatValue(v, f.fmt ?? 'auto'))}</td>` }).join('')}</tr>`).join('')
-      printHtml(name, `<p>GLAMIEX sheet · currency PKR · generated ${escapeHtml(new Date().toLocaleString())}</p><table><thead><tr>${data.columns.map((c) => `<th>${escapeHtml(c.name)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`)
+      printHtml(name, `<p>${escapeHtml(host.printTag)} · generated ${escapeHtml(new Date().toLocaleString())}</p><table><thead><tr>${data.columns.map((c) => `<th>${escapeHtml(c.name)}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table>`)
     }
   }
 
   /* ---------- link options ---------- */
-  const linkOptions = (t: string) => t === 'product' ? live(gx.products).map((p) => ({ id: p.id, label: `${p.name} (${p.sku})` }))
-    : t === 'customer' ? live(gx.people).map((p) => ({ id: p.id, label: `${p.name} · ${p.type}` }))
-    : live(gx.orders).map((o) => ({ id: o.id, label: o.orderNo }))
-  const linkLabel = (t: string, id: string) => t === 'product' ? gx.products.find((p) => p.id === id)?.name ?? '(deleted product)' : t === 'customer' ? gx.people.find((p) => p.id === id)?.name ?? '(deleted person)' : gx.orders.find((o) => o.id === id)?.orderNo ?? '(deleted sale)'
-  const linkPath = (t: string, id: string) => `/glamiex/${t === 'product' ? 'products' : t === 'customer' ? 'people' : 'sales'}/${id}`
+  const linkOptions = (t: string) => host.links?.options(t) ?? []
+  const linkLabel = (t: string, id: string) => host.links?.label(t, id) ?? id
+  const linkPath = (t: string, id: string) => host.links?.path(t, id) ?? null
 
   const T = ({ icon: I, label, on, active, disabled }: { icon: typeof Bold; label: string; on: () => void; active?: boolean; disabled?: boolean }) => <IconButton icon={I} label={label} onClick={on} active={active} disabled={disabled} className="h-9 w-9" />
   const statusEl = status === 'saving' ? <span className="flex items-center gap-1 text-xs text-muted"><Loader2 className="h-3.5 w-3.5 animate-spin" />Saving…</span>
@@ -201,15 +198,18 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
       <div className="flex flex-wrap items-center gap-2">
         <input aria-label="Sheet name" value={name} onChange={(e) => { setName(e.target.value); setStatus('dirty') }} className="min-w-0 flex-1 rounded-xl bg-transparent px-2 py-1 text-lg font-semibold outline-none focus:bg-raised" />
         <div aria-live="polite">{statusEl}</div>
+        <div className={cn('w-full flex-wrap gap-2 sm:flex sm:w-auto', moreOpen ? 'flex' : 'hidden')}>
         <Button size="sm" icon={Download} onClick={() => exportAs('csv')}>CSV</Button>
         <Button size="sm" icon={FileSpreadsheet} onClick={() => exportAs('xlsx')}>Excel</Button>
         <Button size="sm" icon={Printer} onClick={() => exportAs('print')}>PDF</Button>
-        <Button size="sm" icon={Copy} onClick={async () => { const { createSheet } = await import('@/features/sheets/repo'); const s = await createSheet(`${name} (copy)`, data); go(`sheets/${s.id}`) }}>Duplicate</Button>
-        <Button size="sm" icon={Archive} onClick={async () => { await sheetsRepo.toggle(sheet.id, 'archived'); toast(sheet.archived ? 'Restored from archive' : 'Archived'); go('sheets/all') }}>{sheet.archived ? 'Unarchive' : 'Archive'}</Button>
+        <Button size="sm" icon={Copy} onClick={async () => { const s = await host.create(`${name} (copy)`, data); host.open(s.id) }}>Duplicate</Button>
+        <Button size="sm" icon={Archive} onClick={async () => { await sheetsRepo.toggle(sheet.id, 'archived'); toast(sheet.archived ? 'Restored from archive' : 'Archived'); host.open(null) }}>{sheet.archived ? 'Unarchive' : 'Archive'}</Button>
         <Button size="sm" variant="ghost" icon={Trash2} onClick={async () => {
-          if (!(await confirm({ title: `Delete “${name}”?`, body: 'The sheet moves to Trash and can be restored. Business records are not affected.', danger: true, confirmLabel: 'Delete' }))) return
-          await sheetsRepo.trash(sheet.id); await gxAudit('sheet', sheet.id, 'delete', name); go('sheets/all')
+          if (!(await confirm({ title: `Delete “${name}”?`, body: host.deleteNote, danger: true, confirmLabel: 'Delete' }))) return
+          await sheetsRepo.trash(sheet.id); await host.audit?.(sheet.id, 'delete', name); host.open(null)
         }}>Delete</Button>
+        </div>
+        <IconButton icon={MoreHorizontal} label={moreOpen ? 'Hide sheet actions' : 'Sheet actions: export, duplicate, archive, delete'} className="h-9 w-9 sm:hidden" active={moreOpen} onClick={() => setMoreOpen((v) => !v)} />
       </div>
 
       {/* Formatting toolbar — scrolls horizontally on phones */}
@@ -269,8 +269,8 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
         <span className="text-sm italic text-muted" aria-hidden>fx</span>
         <Input aria-label="Formula bar" className="min-w-[10rem] flex-1 font-mono text-sm" list="fx-functions"
           value={editing && editing.r === sel.r2 && editing.c === sel.c2 ? editing.value : activeRaw == null ? '' : String(activeRaw)}
-          onFocus={() => { if (!editing) setEditingRaw({ r: sel.r2, c: sel.c2, value: activeRaw == null ? '' : String(activeRaw) }) }}
-          onChange={(e) => setEditingRaw({ r: sel.r2, c: sel.c2, value: e.target.value })}
+          onFocus={() => { if (!editing) setEditingRaw({ r: sel.r2, c: sel.c2, value: activeRaw == null ? '' : String(activeRaw), bar: true }) }}
+          onChange={(e) => setEditingRaw({ r: sel.r2, c: sel.c2, value: e.target.value, bar: true })}
           onKeyDown={(e) => { if (e.key === 'Enter' && editing) { e.preventDefault(); commit(editing.r, editing.c, editing.value, 'down') } if (e.key === 'Escape') setEditingRaw(null) }}
           onBlur={() => { if (editing && editing.r === sel.r2 && editing.c === sel.c2) commit(editing.r, editing.c, editing.value, 'none') }}
           placeholder="Value or formula, e.g. =SUM(B1:B10)" />
@@ -279,6 +279,7 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
           <Input aria-label="Search cells" className="ps-8" placeholder="Search…" value={search} onChange={(e) => setSearch(e.target.value)}
             onKeyDown={(e) => { if (e.key === 'Enter' && hits.list.length) { const i = hits.list.findIndex(([r, c]) => r > sel.r2 || (r === sel.r2 && c > sel.c2)); const [r, c] = hits.list[i < 0 ? 0 : i]; setSel({ r1: r, c1: c, r2: r, c2: c }) } }} /></div>
         {search && <Badge>{hits.list.length} found</Badge>}
+        <Button size="sm" variant="ghost" icon={Replace} onClick={() => setModal('replace')}>Replace</Button>
         <Select aria-label="Filter column" className="w-auto" value={filterCol} onChange={(e) => setFilterCol(e.target.value)}><option value="">No filter</option>{data.columns.map((c) => <option key={c.id} value={c.id}>Filter: {c.name}</option>)}</Select>
         {filterCol && <Input aria-label="Filter text" className="w-32" placeholder="contains…" value={filterText} onChange={(e) => setFilterText(e.target.value)} />}
       </div>
@@ -299,8 +300,31 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
         <span className="hidden md:inline">Tip: type to edit, Enter to move down, Ctrl+C / Ctrl+V copy-paste with formatting, Shift+arrows to select. Phones: tap to select, tap again to edit.</span>
       </div>
 
-      {modal === 'columns' && <ColumnModal col={data.columns[sel.c2]} index={sel.c2} total={data.totals[data.columns[sel.c2].id] ?? 'none'} onClose={() => setModal(null)}
+      {modal === 'columns' && <ColumnModal businessLinks={!!host.links} col={data.columns[sel.c2]} index={sel.c2} total={data.totals[data.columns[sel.c2].id] ?? 'none'} onClose={() => setModal(null)}
         onSave={(col, tot) => apply({ ...data, columns: data.columns.map((c) => (c.id === col.id ? col : c)), totals: { ...data.totals, [col.id]: tot }, showTotals: data.showTotals || tot !== 'none' })} />}
+      {modal === 'replace' && <ReplaceModal initial={search} onClose={() => setModal(null)} onReplace={(find, repl, matchCase, whole) => {
+        const esc = find.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        const re = new RegExp(whole ? `^${esc}$` : esc, matchCase ? 'g' : 'gi')
+        let n = 0
+        const rows = data.rows.map((row) => {
+          let changed = false
+          const cells = { ...row.cells }
+          for (const c of data.columns) {
+            const v = cells[c.id]
+            if (v == null || (typeof v === 'string' && v.startsWith('='))) continue
+            const str = String(v); re.lastIndex = 0
+            if (!re.test(str)) continue
+            re.lastIndex = 0
+            const out = str.replace(re, () => { n++; return repl })
+            cells[c.id] = typeof v === 'number' && out.trim() !== '' && !Number.isNaN(Number(out)) ? Number(out) : out
+            changed = true
+          }
+          return changed ? { ...row, cells } : row
+        })
+        if (n) apply({ ...data, rows })
+        toast(n ? `Replaced ${n} occurrence${n === 1 ? '' : 's'}` : 'Nothing found', n ? 'success' : 'info')
+        return n
+      }} />}
       {modal === 'rules' && <RulesModal rules={data.rules} columns={data.columns} onClose={() => setModal(null)} onSave={(rules) => apply({ ...data, rules })} />}
       {modal === 'chart' && <ChartModal title={name} columns={data.columns} values={values} rowIdx={view.slice(b.top, b.bottom === b.top ? view.length : b.bottom + 1)} left={b.left} right={b.right} onClose={() => setModal(null)} />}
       {modal && typeof modal === 'object' && 'attach' in modal && (
@@ -313,5 +337,23 @@ export function CustomSheetEditor({ sheet }: { sheet: GxSheet }) {
           onPick={(id) => apply(setCell(data, view[r], c, id ?? ''))} />
       })()}
     </div>
+  )
+}
+
+function ReplaceModal({ initial, onReplace, onClose }: { initial: string; onReplace: (find: string, repl: string, matchCase: boolean, whole: boolean) => number; onClose: () => void }) {
+  const [find, setFind] = useState(initial)
+  const [repl, setRepl] = useState('')
+  const [matchCase, setMatchCase] = useState(false)
+  const [whole, setWhole] = useState(false)
+  return (
+    <Modal open onClose={onClose} title="Find and replace" footer={<><Button onClick={onClose}>Close</Button><Button variant="primary" disabled={!find} onClick={() => { if (onReplace(find, repl, matchCase, whole)) onClose() }}>Replace all</Button></>}>
+      <div className="grid gap-3">
+        <Field label="Find" htmlFor="fr-f"><Input id="fr-f" autoFocus value={find} onChange={(e) => setFind(e.target.value)} /></Field>
+        <Field label="Replace with" htmlFor="fr-r"><Input id="fr-r" value={repl} onChange={(e) => setRepl(e.target.value)} /></Field>
+        <label className="flex min-h-[40px] items-center gap-2 text-sm"><input type="checkbox" checked={matchCase} onChange={(e) => setMatchCase(e.target.checked)} />Match case</label>
+        <label className="flex min-h-[40px] items-center gap-2 text-sm"><input type="checkbox" checked={whole} onChange={(e) => setWhole(e.target.checked)} />Match entire cell contents</label>
+        <p className="text-xs text-muted">Formulas are left unchanged. You can undo with Ctrl+Z.</p>
+      </div>
+    </Modal>
   )
 }

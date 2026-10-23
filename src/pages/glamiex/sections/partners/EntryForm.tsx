@@ -14,7 +14,7 @@ import { Avatar, RECORD_NOTE, useBp, type FormKind } from './shared'
 
 const TITLES: Record<FormKind, string> = {
   investment: 'Add Business Investment', transfer: 'Send Money / Partner Settlement', cash: 'Record revenue or expense',
-  withdrawal: 'Capital withdrawal', distribution: 'Pay out profit',
+  withdrawal: 'Capital withdrawal', distribution: 'Pay out profit', minus: 'Money out', plus: 'Money in',
 }
 
 export function EntryForm({ kind, preset, onClose }: { kind: FormKind; preset?: { partnerId?: string }; onClose: () => void }) {

@@ -14,7 +14,9 @@ import { SYSTEM_SHEETS, type SystemKey } from '@/features/sheets/systemSheets'
 import { gxAudit } from '@/features/glamiex/service'
 import { CustomSheetEditor } from '../sheets/CustomSheetEditor'
 import { SystemSheetView } from '../sheets/SystemSheetView'
-import { useGx } from '../context'
+import { live, useGx } from '../context'
+import type { SheetHost } from '@/features/sheets/repo'
+import type { GxSheet } from '@/features/sheets/types'
 import { BackLink } from './shared'
 
 export default function Sheets({ id = 'all' }: { id?: string }) {
@@ -27,7 +29,24 @@ function CustomById({ id }: { id: string }) {
   const sheet = useLiveQuery(() => db.gxSheets.get(id), [id])
   if (sheet === undefined) return <Spinner label="Opening sheet" />
   if (!sheet || sheet.deletedAt) return <div><BackLink to="/glamiex/sheets/all" label="All sheets" /><EmptyState icon={Sheet} title="Sheet not found">It may have been deleted. Check Trash to restore it.</EmptyState></div>
-  return <div><BackLink to="/glamiex/sheets/all" label="All sheets" /><CustomSheetEditor key={sheet.id} sheet={sheet} /></div>
+  return <div><BackLink to="/glamiex/sheets/all" label="All sheets" /><GxEditor sheet={sheet} /></div>
+}
+
+function GxEditor({ sheet }: { sheet: GxSheet }) {
+  const { data: gx, go } = useGx()
+  const host: SheetHost = {
+    repo: sheetsRepo, create: createSheet, open: (id) => go(id ? `sheets/${id}` : 'sheets/all'),
+    audit: (id, action, detail) => gxAudit('sheet', id, action, detail), printTag: 'GLAMIEX sheet · currency PKR',
+    deleteNote: 'The sheet moves to Trash and can be restored. Business records are not affected.',
+    links: {
+      options: (t) => t === 'product' ? live(gx.products).map((p) => ({ id: p.id, label: `${p.name} (${p.sku})` }))
+        : t === 'customer' ? live(gx.people).map((p) => ({ id: p.id, label: `${p.name} · ${p.type}` }))
+        : live(gx.orders).map((o) => ({ id: o.id, label: o.orderNo })),
+      label: (t, id) => t === 'product' ? gx.products.find((p) => p.id === id)?.name ?? '(deleted product)' : t === 'customer' ? gx.people.find((p) => p.id === id)?.name ?? '(deleted person)' : gx.orders.find((o) => o.id === id)?.orderNo ?? '(deleted sale)',
+      path: (t, id) => `/glamiex/${t === 'product' ? 'products' : t === 'customer' ? 'people' : 'sales'}/${id}`,
+    },
+  }
+  return <CustomSheetEditor key={sheet.id} sheet={sheet} host={host} />
 }
 
 function SheetsHome({ archived, openNew }: { archived: boolean; openNew: boolean }) {

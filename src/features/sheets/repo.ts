@@ -13,6 +13,28 @@ export async function createSheet(name: string, data: SheetData = blankSheet(), 
   return s
 }
 
+/* Personal workspace spreadsheets (/sheets): same engine, separate table, no business audit trail. */
+export const wsSheetsRepo = makeRepo<GxSheet>(db.sheets, () => ({ name: 'Untitled sheet', description: '', ...blankSheet(), order: Date.now() }))
+export async function createWsSheet(name: string, data: SheetData = blankSheet(), description = '') {
+  return wsSheetsRepo.create({ name, description, ...data, order: Date.now() })
+}
+export function useWsSheets() {
+  return useLiveQuery(() => db.sheets.filter((s) => !s.deletedAt).toArray().then((x) => x.sort((a, b) => b.updatedAt - a.updatedAt)), [])
+}
+
+/** What the sheet editor needs from the area it runs in (GLAMIEX or the personal workspace). */
+export interface SheetHost {
+  repo: Pick<typeof sheetsRepo, 'update' | 'toggle' | 'trash'>
+  create: (name: string, data: SheetData) => Promise<{ id: string }>
+  /** Navigate to a sheet id, or to the list when id is null. */
+  open: (id: string | null) => void
+  audit?: (id: string, action: 'delete', detail: string) => Promise<void>
+  /** Label used on printouts. */
+  printTag: string
+  deleteNote: string
+  links?: { options: (t: string) => { id: string; label: string }[]; label: (t: string, id: string) => string; path: (t: string, id: string) => string }
+}
+
 export function useSheets() {
   return useLiveQuery(() => db.gxSheets.filter((s) => !s.deletedAt).toArray().then((x) => x.sort((a, b) => a.order - b.order)), [])
 }

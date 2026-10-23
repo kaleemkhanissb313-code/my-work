@@ -19,7 +19,7 @@ test('business partner accounting: invest, settle, allocate, pay out, reverse an
   for (const n of ['Noman', 'Kaleem', 'Awais', 'Salman', 'Hasnain']) await expect(card(page, n)).toBeVisible()
 
   // 1) Rs 100,000 initial capital, unequal split; validation first.
-  await page.getByRole('button', { name: 'Add investment' }).first().click()
+  await page.getByRole('button', { name: 'Split investment' }).first().click()
   await dialog(page).getByLabel('Total investment amount').fill('100000')
   await dialog(page).getByLabel('Noman').fill('40000')
   await save(page)
@@ -97,7 +97,7 @@ test('business partner accounting: invest, settle, allocate, pay out, reverse an
   await page.getByRole('tab', { name: 'Dashboard' }).click()
   await card(page, 'Noman').click()
   await expect(page.getByRole('heading', { name: 'Noman' })).toBeVisible()
-  await expect(page.getByText('Outstanding balance').locator('..')).toContainText('Rs 40,000')
+  await expect(page.getByText('Overall balance', { exact: true }).first().locator('..')).toContainText('Rs 40,000')
   await expect(page.getByText('Money paid').locator('..')).toContainText('Rs 0')
   const [download] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'CSV' }).click()])
   expect(download.suggestedFilename()).toMatch(/partner-statement-noman\.csv/)

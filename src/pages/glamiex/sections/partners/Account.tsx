@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { ArrowLeft, ArrowLeftRight, Landmark, PiggyBank } from 'lucide-react'
+import { ArrowLeft, ArrowLeftRight, Landmark, Minus, PiggyBank, Plus } from 'lucide-react'
 import { Link } from 'react-router'
 import { Button, Field, Input } from '@/components/ui'
 import { cn } from '@/lib/cn'
@@ -9,10 +9,11 @@ import { partnerEntries, pct } from '@/features/glamiex/partners/engine'
 import type { BpPartner } from '@/features/glamiex/partners/types'
 import { TxnTable } from './Ledger'
 import { statementSheet } from './PartnerReports'
-import { Avatar, TYPE_GROUPS, effectiveType, useBp } from './shared'
+import { Avatar, TYPE_GROUPS, effectiveType, signed, signTone, useBp } from './shared'
 
 export default function Account({ partner: p }: { partner: BpPartner }) {
-  const { txns, figures, byId, openForm } = useBp()
+  const { txns, figures, net, byId, openForm } = useBp()
+  const n = net.partners.find((x) => x.partnerId === p.id)!
   const f = figures.partners.find((x) => x.partnerId === p.id)!
   const [group, setGroup] = useState('all')
   const [from, setFrom] = useState('')
@@ -36,7 +37,9 @@ export default function Account({ partner: p }: { partner: BpPartner }) {
           <h2 className="truncate text-xl font-bold">{p.name}</h2>
           <p className="text-xs text-muted">Ownership {pct(p.ownershipBp)} · Profit share {pct(p.profitBp)} · Loss share {pct(p.lossBp)} · Share of current capital {pct(capShare)}</p>
         </div>
-        <div className="text-end"><div className="text-xs text-muted">Outstanding balance</div><div className={cn('text-2xl font-bold tabular-nums', f.balance < 0 && 'text-danger')}>{pkr(f.balance)}</div></div>
+        <div className="text-end"><div className="text-xs text-muted">Overall balance</div><div className={cn('text-2xl font-bold tabular-nums', signTone(n.balance))}>{signed(n.balance)}</div>
+          <div className="text-xs text-muted">Invested {signed(-n.invested)} · expenses {signed(-n.expenses)} · income {signed(n.income)}</div>
+          <div className="mt-2 flex justify-end gap-2"><Button size="sm" variant="danger" icon={Minus} onClick={() => openForm('minus', { partnerId: p.id })}>Investment / expense</Button><Button size="sm" variant="primary" icon={Plus} onClick={() => openForm('plus', { partnerId: p.id })}>Income</Button></div></div>
       </div>
       <div className="flex flex-wrap gap-2">
         <Button variant="primary" icon={PiggyBank} onClick={() => openForm('investment')}>Add investment</Button>

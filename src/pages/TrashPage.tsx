@@ -12,7 +12,7 @@ import { time12 } from '@/lib/time12'
 const TABLES = {
   docs: 'Document', projects: 'Project', tasks: 'Task', events: 'Event', media: 'Media', bookmarks: 'Link',
   records: 'Record', datasets: 'Dataset', folders: 'Folder', palettes: 'Palette', timerSessions: 'Time entry',
-  gxProducts: 'GLAMIEX product', gxPeople: 'GLAMIEX person', gxExpenses: 'GLAMIEX expense', gxAdIncome: 'GLAMIEX ad income', gxAdSpend: 'GLAMIEX ad spend', gxSheets: 'GLAMIEX sheet',
+  gxProducts: 'GLAMIEX product', gxPeople: 'GLAMIEX person', gxExpenses: 'GLAMIEX expense', gxAdIncome: 'GLAMIEX ad income', gxAdSpend: 'GLAMIEX ad spend', gxSheets: 'GLAMIEX sheet', sheets: 'Spreadsheet',
 } as const
 type TableName = keyof typeof TABLES
 

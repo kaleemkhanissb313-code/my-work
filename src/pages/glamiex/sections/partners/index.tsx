@@ -4,9 +4,10 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { Spinner, Tabs } from '@/components/ui'
 import { toast } from '@/components/feedback'
 import { db } from '@/lib/db'
-import { computeFigures } from '@/features/glamiex/partners/engine'
+import { computeFigures, netPosition } from '@/features/glamiex/partners/engine'
 import { seedPartners, useBpData } from '@/features/glamiex/partners/service'
 import { EntryForm } from './EntryForm'
+import { QuickEntry } from './QuickEntry'
 import { BpCtx, type BpCtxValue, type FormKind } from './shared'
 
 const Dashboard = lazy(() => import('./Dashboard'))
@@ -34,7 +35,7 @@ export default function Partners({ id }: { id?: string }) {
     if (!data || data.partners.length < 5) return null
     const projects = [...new Set([...data.txns.map((t) => t.project).filter(Boolean), ...(appProjects ?? []).map((p) => p.name)])].sort()
     return {
-      ...data, projects, figures: computeFigures(data.partners, data.txns), byId: new Map(data.partners.map((p) => [p.id, p])),
+      ...data, projects, figures: computeFigures(data.partners, data.txns), net: netPosition(data.partners, data.txns), byId: new Map(data.partners.map((p) => [p.id, p])),
       openForm: (kind, preset) => setForm({ kind, preset }),
     }
   }, [data, appProjects])
@@ -51,7 +52,8 @@ export default function Partners({ id }: { id?: string }) {
           {partner ? <Account partner={partner} /> : tab === 'ledger' ? <Ledger /> : tab === 'pl' ? <ProfitLoss /> : tab === 'reports' ? <PartnerReports /> : tab === 'settings' ? <PartnerSettings /> : <Dashboard />}
         </Suspense>
       </div>
-      {form && <EntryForm kind={form.kind} preset={form.preset} onClose={() => setForm(null)} />}
+      {form && (form.kind === 'minus' || form.kind === 'plus') && <QuickEntry sign={form.kind} preset={form.preset} onClose={() => setForm(null)} />}
+      {form && form.kind !== 'minus' && form.kind !== 'plus' && <EntryForm kind={form.kind} preset={form.preset} onClose={() => setForm(null)} />}
     </BpCtx.Provider>
   )
 }

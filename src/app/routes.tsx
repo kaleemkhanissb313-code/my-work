@@ -19,6 +19,7 @@ const TasksPage = p(() => import('@/pages/tasks/TasksPage'), 'TasksPage')
 const CalendarPage = p(() => import('@/pages/calendar/CalendarPage'), 'CalendarPage')
 const TimelinesPage = p(() => import('@/pages/calendar/TimelinesPage'), 'TimelinesPage')
 const DocsPage = p(() => import('@/pages/docs/DocsPage'), 'DocsPage')
+const SheetsPage = lazy(() => import('@/pages/sheets/SheetsPage'))
 const DocEditor = p(() => import('@/pages/docs/DocEditor'), 'DocEditor')
 const MediaPage = p(() => import('@/pages/media/MediaPage'), 'MediaPage')
 const LinksPage = p(() => import('@/pages/links/LinksPage'), 'LinksPage')
@@ -61,6 +62,7 @@ export const router = createBrowserRouter([
       { path: 'notes', element: <DocsPage kind="note" /> },
       { path: 'notes/:id', element: <DocEditor /> },
       { path: 'templates', element: <DocsPage kind="template" /> },
+      { path: 'sheets/:id?', element: <SheetsPage /> },
       { path: 'media', element: <MediaPage /> },
       { path: 'studio', element: <StudioPage /> },
       { path: 'access', element: <AccessPage /> },

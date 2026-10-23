@@ -8,7 +8,8 @@ import type { CellFmt, SheetCol, TotalFn } from './types'
 
 export interface Sel { r1: number; c1: number; r2: number; c2: number }
 export const selBounds = (s: Sel) => ({ top: Math.min(s.r1, s.r2), bottom: Math.max(s.r1, s.r2), left: Math.min(s.c1, s.c2), right: Math.max(s.c1, s.c2) })
-export interface Editing { r: number; c: number; value: string }
+/** bar: the value is being typed in the formula bar, so the cell shows no input of its own (it would steal focus). */
+export interface Editing { r: number; c: number; value: string; bar?: boolean }
 
 export interface GridProps {
   columns: SheetCol[]
@@ -202,7 +203,7 @@ export function Grid(p: GridProps) {
                   const v = p.value(r, ci)
                   const f = p.fmtOf(r, ci, v)
                   const numeric = typeof v === 'number' || isNumericFmt(f.fmt ?? 'auto')
-                  const isEditing = p.editing && p.editing.r === r && p.editing.c === ci
+                  const isEditing = p.editing && !p.editing.bar && p.editing.r === r && p.editing.c === ci
                   const hit = p.highlight?.has(`${r}:${ci}`)
                   return (
                     <td key={c.id} role="gridcell" aria-selected={selected}

@@ -13,7 +13,7 @@ import { uid } from '@/lib/id'
 import { toast } from '@/components/feedback'
 
 /* ---------- Column settings ---------- */
-export function ColumnModal({ col, index, total, onSave, onClose }: { col: SheetCol; index: number; total: TotalFn; onSave: (c: SheetCol, total: TotalFn) => void; onClose: () => void }) {
+export function ColumnModal({ col, index, total, onSave, onClose, businessLinks = true }: { col: SheetCol; index: number; total: TotalFn; businessLinks?: boolean; onSave: (c: SheetCol, total: TotalFn) => void; onClose: () => void }) {
   const [name, setName] = useState(col.name)
   const [type, setType] = useState<ColType>(col.type)
   const [width, setWidth] = useState(String(col.width))
@@ -23,7 +23,7 @@ export function ColumnModal({ col, index, total, onSave, onClose }: { col: Sheet
       <Button variant="primary" disabled={!name.trim()} onClick={() => { onSave({ ...col, name: name.trim(), type, width: Math.max(60, Math.min(600, Number(width) || col.width)) }, tot); onClose() }}>Save</Button></>}>
       <div className="grid gap-3 sm:grid-cols-2">
         <Field label="Column name" htmlFor="cm-name"><Input id="cm-name" value={name} onChange={(e) => setName(e.target.value)} /></Field>
-        <Field label="Data type" htmlFor="cm-type" hint="Controls validation, number format and links"><Select id="cm-type" value={type} onChange={(e) => setType(e.target.value as ColType)}>{COL_TYPES.map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</Select></Field>
+        <Field label="Data type" htmlFor="cm-type" hint="Controls validation, number format and links"><Select id="cm-type" value={type} onChange={(e) => setType(e.target.value as ColType)}>{COL_TYPES.filter((t) => businessLinks || !['product', 'customer', 'order'].includes(t.id)).map((t) => <option key={t.id} value={t.id}>{t.label}</option>)}</Select></Field>
         <Field label="Width (px)" htmlFor="cm-w"><Input id="cm-w" inputMode="numeric" value={width} onChange={(e) => setWidth(e.target.value.replace(/\D/g, ''))} /></Field>
         <Field label="Total row" htmlFor="cm-t"><Select id="cm-t" value={tot} onChange={(e) => setTot(e.target.value as TotalFn)}>{(['none', 'sum', 'avg', 'min', 'max', 'count'] as TotalFn[]).map((t) => <option key={t} value={t}>{t === 'none' ? 'No total' : t.toUpperCase()}</option>)}</Select></Field>
       </div>

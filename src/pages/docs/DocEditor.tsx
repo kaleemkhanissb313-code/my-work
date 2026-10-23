@@ -5,11 +5,22 @@ import { EditorContent, useEditor, type Editor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import Link from '@tiptap/extension-link'
 import Placeholder from '@tiptap/extension-placeholder'
+import Underline from '@tiptap/extension-underline'
+import TextAlign from '@tiptap/extension-text-align'
+import Highlight from '@tiptap/extension-highlight'
+import { Color, FontFamily, FontSize, TextStyle } from '@tiptap/extension-text-style'
+import { TableKit } from '@tiptap/extension-table'
+import { TaskItem, TaskList } from '@tiptap/extension-list'
+import Image from '@tiptap/extension-image'
+import Subscript from '@tiptap/extension-subscript'
+import Superscript from '@tiptap/extension-superscript'
 import {
-  AlertTriangle, ArrowLeft, Bold, BookTemplate, Check, ClipboardCopy, Code, Copy, Download, FileQuestion, FileText, Heading1, Heading2, Heading3,
+  AlertTriangle, ArrowLeft, Bold, BookTemplate, Check, ClipboardCopy, Code, Copy, Download, FileQuestion, FileText,
   Italic, Link2, List, ListOrdered, Loader2, Minus, Pilcrow, Printer, Quote, Redo2, RotateCcw, Save, SquareCode, Star, Strikethrough, Tags,
-  Trash2, Undo2, Wand2,
+  Trash2, Undo2, Wand2, Underline as UnderlineIcon, AlignLeft, AlignCenter, AlignRight, AlignJustify, ListChecks, Table as TableIcon,
+  ImagePlus, Highlighter, Type, Subscript as SubIcon, Superscript as SupIcon, RemoveFormatting, Maximize2, Minimize2, ListTree, Rows3, Columns3, Eraser,
 } from 'lucide-react'
+import { ColorPicker as SwatchPicker } from '@/features/colors/ColorPicker'
 import { db } from '@/lib/db'
 import { docsRepo } from '@/services/repo'
 import { safeWrite, toast } from '@/components/feedback'
@@ -82,7 +93,9 @@ function DocEditorInner({ id }: { id: string }) {
   const [saveError, setSaveError] = useState('')
   const [draftOffer, setDraftOffer] = useState<Draft | null>(null)
   const [linkOpen, setLinkOpen] = useState(false)
-  const [showMeta, setShowMeta] = useState(true)
+  const [showMeta, setShowMeta] = useState(() => typeof window === 'undefined' || window.innerWidth >= 1024)
+  const [focus, setFocus] = useState(false)
+  const [imageOpen, setImageOpen] = useState(false)
 
   // Latest unsaved values live in refs so timers / unmount flush see them without re-binding.
   const latest = useRef({ title: '', description: '', content: '' })
@@ -128,6 +141,12 @@ function DocEditorInner({ id }: { id: string }) {
     extensions: [
       StarterKit.configure({ heading: { levels: [1, 2, 3] }, link: false, underline: false }),
       SafeLink,
+      Underline, Subscript, Superscript, TextStyle, Color, FontFamily, FontSize,
+      Highlight.configure({ multicolor: true }),
+      TextAlign.configure({ types: ['heading', 'paragraph'] }),
+      TableKit.configure({ table: { resizable: true } }),
+      TaskList, TaskItem.configure({ nested: true }),
+      Image.configure({ allowBase64: true, HTMLAttributes: { loading: 'lazy' } }),
       Placeholder.configure({ placeholder: 'Start writing…' }),
     ],
     content: '',
@@ -245,7 +264,7 @@ function DocEditorInner({ id }: { id: string }) {
   const meta = (patch: Partial<Doc>) => void safeWrite(() => docsRepo.update(doc.id, patch))
 
   return (
-    <div className="mx-auto max-w-6xl">
+    <div className={cn('mx-auto max-w-6xl', focus && 'max-w-3xl')}>
       <div className="mb-4 flex flex-wrap items-center gap-2">
         <RouterLink to={listPath} className="btn btn-ghost h-9 px-3 text-sm"><ArrowLeft className="h-4 w-4" aria-hidden />{listLabel}</RouterLink>
         {doc.isTemplate && <Badge tone="accent">Template</Badge>}
@@ -260,6 +279,7 @@ function DocEditorInner({ id }: { id: string }) {
           <IconButton icon={Copy} label="Duplicate" onClick={() => void doDuplicate()} />
           {!doc.isTemplate && <IconButton icon={BookTemplate} label="Save as template" onClick={doTemplate} />}
           <IconButton icon={Trash2} label="Move to trash" onClick={() => void doTrash()} />
+          <IconButton icon={focus ? Minimize2 : Maximize2} label={focus ? 'Exit focus mode' : 'Focus mode'} active={focus} onClick={() => { setFocus(!focus); if (!focus) setShowMeta(false) }} />
           <IconButton icon={Tags} label={showMeta ? 'Hide details panel' : 'Show details panel'} active={showMeta} onClick={() => setShowMeta(!showMeta)} />
         </div>
       </div>
@@ -279,8 +299,8 @@ function DocEditorInner({ id }: { id: string }) {
             className="border-transparent bg-transparent px-1 text-2xl font-bold shadow-none focus:border-line sm:text-3xl" />
           <Input aria-label="Description" value={description} onChange={(e) => onDescription(e.target.value)} placeholder="Add a short description…" maxLength={500}
             className="border-transparent bg-transparent px-1 text-muted shadow-none focus:border-line" />
-          <Toolbar editor={editor} onLink={() => setLinkOpen(true)} />
-          <div className="card min-h-[50vh] p-4 sm:p-6">
+          <Toolbar editor={editor} onLink={() => setLinkOpen(true)} onImage={() => setImageOpen(true)} />
+          <div className="card min-h-[50vh] px-3 py-4 sm:p-6 lg:px-10">
             <EditorContent editor={editor} />
           </div>
           <p className="text-xs text-muted" aria-live="polite">{stats.words.toLocaleString()} words · {stats.characters.toLocaleString()} characters · ~{Math.max(1, Math.round(stats.readingMinutes))} min read</p>
@@ -288,6 +308,7 @@ function DocEditorInner({ id }: { id: string }) {
 
         {showMeta && (
           <aside className="space-y-4" aria-label="Document details">
+            <Outline editor={editor} />
             <Card>
               <CardTitle icon={Tags}>Details</CardTitle>
               <div className="space-y-3">
@@ -325,6 +346,7 @@ function DocEditorInner({ id }: { id: string }) {
       </div>
 
       <LinkModal open={linkOpen} editor={editor} onClose={() => setLinkOpen(false)} />
+      <ImageModal open={imageOpen} editor={editor} onClose={() => setImageOpen(false)} />
 
       <Modal open={blocker.state === 'blocked'} onClose={() => blocker.reset?.()} title="Unsaved changes"
         footer={<>
@@ -382,35 +404,139 @@ function ExportMenu({ onMarkdown, onText, onPrint, onWord }: { onMarkdown: () =>
   )
 }
 
-function Toolbar({ editor, onLink }: { editor: Editor | null; onLink: () => void }) {
+const FONTS = [['', 'Default'], ['Inter, system-ui, sans-serif', 'Sans'], ['Georgia, serif', 'Serif'], ['ui-monospace, monospace', 'Mono'], ['"Plus Jakarta Sans Variable", sans-serif', 'Display']] as const
+const SIZES = ['12px', '14px', '15px', '16px', '18px', '20px', '24px', '30px', '36px']
+
+function Toolbar({ editor, onLink, onImage }: { editor: Editor | null; onLink: () => void; onImage: () => void }) {
   if (!editor) return null
   const btn = (label: string, Icon: typeof Bold, active: boolean, run: () => void, disabled = false) => (
-    <IconButton key={label} icon={Icon} label={label} active={active} disabled={disabled} onClick={run} className={cn(active && 'bg-raised')} />
+    <IconButton key={label} icon={Icon} label={label} active={active} disabled={disabled} onClick={run} className={cn('h-9 w-9 shrink-0', active && 'bg-raised')} />
   )
   const c = () => editor.chain().focus()
-  const sep = (k: string) => <span key={k} className="mx-1 h-6 w-px bg-line" aria-hidden />
+  const sep = (k: string) => <span key={k} className="mx-1 h-6 w-px shrink-0 bg-line" aria-hidden />
+  const block = editor.isActive('heading', { level: 1 }) ? 'h1' : editor.isActive('heading', { level: 2 }) ? 'h2' : editor.isActive('heading', { level: 3 }) ? 'h3' : 'p'
+  const ts = editor.getAttributes('textStyle') as { fontFamily?: string; fontSize?: string; color?: string }
+  const inTable = editor.isActive('table')
+  const tableActions: [string, () => void][] = [
+    ['Row above', () => c().addRowBefore().run()], ['Row below', () => c().addRowAfter().run()],
+    ['Column left', () => c().addColumnBefore().run()], ['Column right', () => c().addColumnAfter().run()],
+    ['Header row', () => c().toggleHeaderRow().run()], ['Merge / split', () => c().mergeOrSplit().run()],
+  ]
   return (
-    <div role="toolbar" aria-label="Formatting" className="card sticky top-2 z-20 flex flex-wrap items-center gap-0.5 p-1.5">
-      {btn('Heading 1', Heading1, editor.isActive('heading', { level: 1 }), () => c().toggleHeading({ level: 1 }).run())}
-      {btn('Heading 2', Heading2, editor.isActive('heading', { level: 2 }), () => c().toggleHeading({ level: 2 }).run())}
-      {btn('Heading 3', Heading3, editor.isActive('heading', { level: 3 }), () => c().toggleHeading({ level: 3 }).run())}
-      {btn('Paragraph', Pilcrow, editor.isActive('paragraph'), () => c().setParagraph().run())}
-      {sep('s1')}
-      {btn('Bold', Bold, editor.isActive('bold'), () => c().toggleBold().run())}
-      {btn('Italic', Italic, editor.isActive('italic'), () => c().toggleItalic().run())}
-      {btn('Strikethrough', Strikethrough, editor.isActive('strike'), () => c().toggleStrike().run())}
-      {btn('Inline code', Code, editor.isActive('code'), () => c().toggleCode().run())}
-      {btn('Link', Link2, editor.isActive('link'), onLink)}
-      {sep('s2')}
-      {btn('Bullet list', List, editor.isActive('bulletList'), () => c().toggleBulletList().run())}
-      {btn('Numbered list', ListOrdered, editor.isActive('orderedList'), () => c().toggleOrderedList().run())}
-      {btn('Quote', Quote, editor.isActive('blockquote'), () => c().toggleBlockquote().run())}
-      {btn('Code block', SquareCode, editor.isActive('codeBlock'), () => c().toggleCodeBlock().run())}
-      {btn('Horizontal rule', Minus, false, () => c().setHorizontalRule().run())}
-      {sep('s3')}
-      {btn('Undo', Undo2, false, () => c().undo().run(), !editor.can().undo())}
-      {btn('Redo', Redo2, false, () => c().redo().run(), !editor.can().redo())}
+    <div className="sticky top-2 z-20 space-y-1">
+      {/* One scrollable row on phones; wraps on larger screens */}
+      <div role="toolbar" aria-label="Formatting" className="card flex items-center gap-0.5 overflow-x-auto p-1.5 sm:flex-wrap" style={{ scrollbarWidth: 'thin' }}>
+        {btn('Undo (Ctrl+Z)', Undo2, false, () => c().undo().run(), !editor.can().undo())}
+        {btn('Redo (Ctrl+Y)', Redo2, false, () => c().redo().run(), !editor.can().redo())}
+        {sep('s0')}
+        <Select aria-label="Text style" className="h-9 w-[118px] shrink-0 px-2 text-xs" value={block} onChange={(e) => {
+          const v = e.target.value
+          if (v === 'p') c().setParagraph().run(); else c().toggleHeading({ level: Number(v.slice(1)) as 1 | 2 | 3 }).run()
+        }}>
+          <option value="p">Normal text</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="h3">Heading 3</option>
+        </Select>
+        <Select aria-label="Font" className="h-9 w-[92px] shrink-0 px-2 text-xs" value={ts.fontFamily ?? ''} onChange={(e) => (e.target.value ? c().setFontFamily(e.target.value).run() : c().unsetFontFamily().run())}>
+          {FONTS.map(([v, l]) => <option key={l} value={v}>{l}</option>)}
+        </Select>
+        <Select aria-label="Font size" className="h-9 w-[74px] shrink-0 px-2 text-xs" value={ts.fontSize ?? ''} onChange={(e) => (e.target.value ? c().setFontSize(e.target.value).run() : c().unsetFontSize().run())}>
+          <option value="">Size</option>{SIZES.map((x) => <option key={x} value={x}>{parseInt(x)}</option>)}
+        </Select>
+        {sep('s1')}
+        {btn('Bold (Ctrl+B)', Bold, editor.isActive('bold'), () => c().toggleBold().run())}
+        {btn('Italic (Ctrl+I)', Italic, editor.isActive('italic'), () => c().toggleItalic().run())}
+        {btn('Underline (Ctrl+U)', UnderlineIcon, editor.isActive('underline'), () => c().toggleUnderline().run())}
+        {btn('Strikethrough', Strikethrough, editor.isActive('strike'), () => c().toggleStrike().run())}
+        <span className="shrink-0"><SwatchPicker label="Text color" icon={<Type className="h-4 w-4" aria-hidden />} value={ts.color} onChange={(col) => (col ? c().setColor(col).run() : c().unsetColor().run())} /></span>
+        <span className="shrink-0"><SwatchPicker label="Highlight color" icon={<Highlighter className="h-4 w-4" aria-hidden />} value={editor.getAttributes('highlight').color as string | undefined} onChange={(col) => (col ? c().setHighlight({ color: col }).run() : c().unsetHighlight().run())} /></span>
+        {btn('Link', Link2, editor.isActive('link'), onLink)}
+        {btn('Insert image', ImagePlus, false, onImage)}
+        {sep('s2')}
+        {btn('Align left', AlignLeft, editor.isActive({ textAlign: 'left' }), () => c().setTextAlign('left').run())}
+        {btn('Align center', AlignCenter, editor.isActive({ textAlign: 'center' }), () => c().setTextAlign('center').run())}
+        {btn('Align right', AlignRight, editor.isActive({ textAlign: 'right' }), () => c().setTextAlign('right').run())}
+        {btn('Justify', AlignJustify, editor.isActive({ textAlign: 'justify' }), () => c().setTextAlign('justify').run())}
+        {sep('s3')}
+        {btn('Checklist', ListChecks, editor.isActive('taskList'), () => c().toggleTaskList().run())}
+        {btn('Bullet list', List, editor.isActive('bulletList'), () => c().toggleBulletList().run())}
+        {btn('Numbered list', ListOrdered, editor.isActive('orderedList'), () => c().toggleOrderedList().run())}
+        {btn('Quote', Quote, editor.isActive('blockquote'), () => c().toggleBlockquote().run())}
+        {btn('Code block', SquareCode, editor.isActive('codeBlock'), () => c().toggleCodeBlock().run())}
+        {btn('Inline code', Code, editor.isActive('code'), () => c().toggleCode().run())}
+        {btn('Subscript', SubIcon, editor.isActive('subscript'), () => c().toggleSubscript().run())}
+        {btn('Superscript', SupIcon, editor.isActive('superscript'), () => c().toggleSuperscript().run())}
+        {btn('Insert table', TableIcon, inTable, () => c().insertTable({ rows: 3, cols: 3, withHeaderRow: true }).run(), inTable)}
+        {btn('Horizontal line', Minus, false, () => c().setHorizontalRule().run())}
+        {btn('Clear formatting', RemoveFormatting, false, () => c().unsetAllMarks().clearNodes().run())}
+        {btn('Paragraph', Pilcrow, editor.isActive('paragraph'), () => c().setParagraph().run())}
+      </div>
+      {inTable && (
+        <div role="toolbar" aria-label="Table" className="card flex items-center gap-1 overflow-x-auto p-1 text-xs" style={{ scrollbarWidth: 'thin' }}>
+          <span className="shrink-0 px-2 font-semibold text-muted">Table</span>
+          {tableActions.map(([l, run]) => <button key={l} type="button" className="btn btn-soft h-8 shrink-0 px-2 text-xs" onClick={run}>{l}</button>)}
+          <button type="button" className="btn btn-soft h-8 shrink-0 px-2 text-xs" onClick={() => c().deleteRow().run()}><Rows3 className="h-3.5 w-3.5" aria-hidden />Delete row</button>
+          <button type="button" className="btn btn-soft h-8 shrink-0 px-2 text-xs" onClick={() => c().deleteColumn().run()}><Columns3 className="h-3.5 w-3.5" aria-hidden />Delete column</button>
+          <button type="button" className="btn btn-soft h-8 shrink-0 px-2 text-xs text-danger" onClick={() => c().deleteTable().run()}><Eraser className="h-3.5 w-3.5" aria-hidden />Delete table</button>
+        </div>
+      )}
     </div>
+  )
+}
+
+/** Clickable list of the document's headings. */
+function Outline({ editor }: { editor: Editor | null }) {
+  if (!editor) return null
+  const items: { level: number; text: string; pos: number }[] = []
+  editor.state.doc.descendants((node, pos) => {
+    if (node.type.name === 'heading' && node.textContent.trim()) items.push({ level: node.attrs.level as number, text: node.textContent.trim(), pos })
+    return node.type.name !== 'heading'
+  })
+  const jump = (pos: number) => {
+    editor.chain().focus().setTextSelection(pos + 1).run()
+    ;(editor.view.nodeDOM(pos) as HTMLElement | null)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+  }
+  return (
+    <Card>
+      <CardTitle icon={ListTree}>Outline</CardTitle>
+      {!items.length ? <p className="text-xs text-muted">Headings you add appear here. Use the Text style menu to add one.</p> : (
+        <nav aria-label="Document outline"><ul className="max-h-64 space-y-0.5 overflow-y-auto text-sm">
+          {items.map((h, i) => (
+            <li key={i}><button type="button" className="block w-full truncate rounded-lg py-1.5 pe-2 text-start hover:bg-raised" style={{ paddingInlineStart: `${(h.level - 1) * 12 + 8}px` }} onClick={() => jump(h.pos)}>{h.text}</button></li>
+          ))}
+        </ul></nav>
+      )}
+    </Card>
+  )
+}
+
+const MAX_IMAGE = 1.5 * 1024 * 1024
+function ImageModal({ open, editor, onClose }: { open: boolean; editor: Editor | null; onClose: () => void }) {
+  const [url, setUrl] = useState('')
+  const [alt, setAlt] = useState('')
+  const [err, setErr] = useState<string | null>(null)
+  useEffect(() => { if (open) { setUrl(''); setAlt(''); setErr(null) } }, [open])
+  if (!editor) return null
+  const insert = (src: string) => { editor.chain().focus().setImage({ src, alt: alt.trim() || undefined }).run(); onClose() }
+  const fromFile = (f: File) => {
+    if (!/^image\/(png|jpe?g|gif|webp)$/.test(f.type)) return setErr('Choose a PNG, JPG, GIF or WebP image.')
+    if (f.size > MAX_IMAGE) return setErr('Images up to 1.5 MB can be embedded. For larger files, upload to the Media Library and link to it.')
+    const r = new FileReader()
+    r.onload = () => insert(String(r.result))
+    r.readAsDataURL(f)
+  }
+  const fromLink = () => {
+    const u = normaliseUrl(url.trim())
+    if (!u || !/^https:\/\//i.test(u)) return setErr('Enter an https:// image link.')
+    insert(u)
+  }
+  return (
+    <Modal open={open} onClose={onClose} title="Insert image"
+      footer={<><Button onClick={onClose}>Cancel</Button><Button variant="primary" onClick={fromLink}>Insert from link</Button></>}>
+      <div className="grid gap-3">
+        <Field label="Upload from this device" htmlFor="img-file" hint="Embedded in the document (max 1.5 MB)."><input id="img-file" type="file" accept="image/png,image/jpeg,image/gif,image/webp" className="block w-full text-sm" onChange={(e) => { const f = e.target.files?.[0]; if (f) fromFile(f) }} /></Field>
+        <Field label="…or image link" htmlFor="img-url" error={err}><Input id="img-url" value={url} onChange={(e) => setUrl(e.target.value)} placeholder="https://…/photo.jpg" inputMode="url" /></Field>
+        <Field label="Description (alt text)" htmlFor="img-alt" hint="Helps screen readers and search."><Input id="img-alt" value={alt} onChange={(e) => setAlt(e.target.value)} /></Field>
+      </div>
+    </Modal>
   )
 }
 

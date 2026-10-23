@@ -204,3 +204,54 @@ export function reversalOf(t: BpTxn, reason: string, date: string, time: string)
 export function partnerEntries(txns: BpTxn[], partnerId: string) {
   return txns.filter((t) => !t.deletedAt && (t.fromId === partnerId || t.toId === partnerId || t.lines.some((l) => l.partnerId === partnerId && l.amount)))
 }
+
+/*
+ * Overall balance (partners' money view): money the partners put in or spend is negative, money that comes back from
+ * orders / income is positive.  balance = income − investments − expenses.
+ *  - Investments (initial capital + additional) count against the partner(s) in their split lines.
+ *  - Capital withdrawals give unused investment back, so they reduce the investment figure.
+ *  - Expenses count against the partner who paid (fromId); income counts for the partner who received it (toId).
+ *    Entries without a partner count only in the business total ("business account").
+ *  - Profit allocations, profit pay-outs and partner-to-partner transfers only move money that is already counted,
+ *    so they do not change the overall balance. Reversals cancel the entry they reverse.
+ */
+export interface NetFigures { invested: Paisa; expenses: Paisa; income: Paisa; balance: Paisa }
+export interface NetPosition extends NetFigures { partners: (NetFigures & { partnerId: string })[]; business: NetFigures }
+
+export function netPosition(partners: Pick<BpPartner, 'id'>[], txns: BpTxn[]): NetPosition {
+  const blank = (): NetFigures => ({ invested: 0, expenses: 0, income: 0, balance: 0 })
+  const per = new Map(partners.map((p) => [p.id, blank()]))
+  const business = blank()
+  const total = blank()
+  const add = (partnerId: string | null, k: 'invested' | 'expenses' | 'income', a: Paisa) => {
+    total[k] += a
+    const f = partnerId ? per.get(partnerId) : undefined
+    if (f) f[k] += a; else business[k] += a
+  }
+  for (const t of txns) {
+    if (t.deletedAt) continue
+    const { type, sign } = effectOf(t)
+    switch (type) {
+      case 'initial_capital': case 'investment': for (const l of t.lines) add(l.partnerId, 'invested', sign * l.amount); break
+      case 'withdrawal': for (const l of t.lines) add(l.partnerId, 'invested', -sign * l.amount); break
+      case 'expense': add(t.fromId, 'expenses', sign * t.amount); break
+      case 'revenue': add(t.toId, 'income', sign * t.amount); break
+      default: break
+    }
+  }
+  const fin = (f: NetFigures) => { f.balance = f.income - f.invested - f.expenses; return f }
+  return {
+    ...fin(total), business: fin(business),
+    partners: partners.map((p) => ({ partnerId: p.id, ...fin(per.get(p.id)!) })),
+  }
+}
+
+/** Signed effect of one entry on the overall balance (0 when it does not change it). */
+export function netEffect(t: Pick<BpTxn, 'type' | 'reversesType' | 'amount' | 'deletedAt'>): Paisa {
+  if (t.deletedAt) return 0
+  const { type, sign } = effectOf(t)
+  if (type === 'revenue') return sign * t.amount
+  if (type === 'initial_capital' || type === 'investment' || type === 'expense') return -sign * t.amount
+  if (type === 'withdrawal') return sign * t.amount
+  return 0
+}

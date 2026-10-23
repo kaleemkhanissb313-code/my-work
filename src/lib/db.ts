@@ -47,6 +47,8 @@ export class AppDB extends Dexie {
   gxExpenses!: EntityTable<GxExpense, 'id'>
   gxAudit!: EntityTable<GxAuditEvent, 'id'>
   gxSheets!: EntityTable<GxSheet, 'id'>
+  /** Personal workspace spreadsheets (same engine as GLAMIEX sheets, but not business data). */
+  sheets!: EntityTable<GxSheet, 'id'>
   gxReturns!: EntityTable<GxReturn, 'id'>
   gxShipments!: EntityTable<GxShipment, 'id'>
   gxPartners!: EntityTable<GxPartner, 'id'>
@@ -112,6 +114,8 @@ export class AppDB extends Dexie {
     this.version(6).stores({ bpPartners: 'id, order, deletedAt', bpTxns: 'id, &txnNo, type, date, updatedAt, deletedAt' })
     // v7: Payment Image Creator records (one image per partner payment; images stored inside the record).
     this.version(7).stores({ prRecords: 'id, partnerId, date, status, updatedAt, deletedAt' })
+    // v8: personal workspace spreadsheets (/sheets). Additive only.
+    this.version(8).stores({ sheets: 'id, order, updatedAt, deletedAt' })
   }
 }
 
@@ -123,6 +127,6 @@ export const entityTables = [
   'docs', 'folders', 'projects', 'tasks', 'events', 'media', 'bookmarks', 'timerSessions', 'datasets', 'records', 'habitLogs', 'vault', 'palettes',
   'gxProducts', 'gxStock', 'gxOrders', 'gxRefunds', 'gxPeople', 'gxPayments', 'gxAdIncome', 'gxAdSpend', 'gxExpenses', 'gxSheets',
   'gxReturns', 'gxShipments', 'gxPartners', 'gxRiderPays', 'npPeople', 'npPayments',
-  'bpPartners', 'bpTxns', 'prRecords',
+  'bpPartners', 'bpTxns', 'prRecords', 'sheets',
 ] as const
 export type EntityTableName = (typeof entityTables)[number]

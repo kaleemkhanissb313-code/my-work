@@ -19,7 +19,7 @@ export const featureLabel = (k: FeatureKey) => FEATURES.find((f) => f.key === k)
 /** Path prefix → feature (most specific first). Paths not listed (dashboard, settings, access, privacy…) are always open to signed-in users. */
 const PATHS: [string, FeatureKey][] = [
   ['/life/foods', 'foods'], ['/life', 'life'], ['/home', 'home'], ['/work', 'work'], ['/projects', 'projects'], ['/tasks', 'tasks'],
-  ['/calendar', 'calendar'], ['/timelines', 'calendar'], ['/documents', 'documents'], ['/notes', 'documents'], ['/templates', 'documents'],
+  ['/calendar', 'calendar'], ['/timelines', 'calendar'], ['/documents', 'documents'], ['/notes', 'documents'], ['/templates', 'documents'], ['/sheets', 'documents'],
   ['/media', 'media'], ['/studio', 'studio'], ['/links', 'links'], ['/time', 'tools'], ['/calculator', 'tools'], ['/numbers', 'tools'],
   ['/colors', 'tools'], ['/text', 'tools'], ['/graphs', 'graphs'], ['/reports', 'graphs'], ['/finance', 'finance'], ['/glamiex', 'glamiex'],
   ['/security', 'security'], ['/vault', 'vault'],
@@ -31,7 +31,7 @@ export function featureForPath(path: string): FeatureKey | null {
 
 /** Remote table → feature (records are per-collection, see recordFeature). */
 export const TABLE_FEATURE: Record<string, FeatureKey | 'records'> = {
-  docs: 'documents', folders: 'documents', projects: 'projects', tasks: 'tasks', events: 'calendar', media_files: 'media', bookmarks: 'links',
+  docs: 'documents', folders: 'documents', ws_sheets: 'documents', projects: 'projects', tasks: 'tasks', events: 'calendar', media_files: 'media', bookmarks: 'links',
   timer_sessions: 'tools', datasets: 'graphs', habit_logs: 'life', vault_items: 'vault', palettes: 'tools', records: 'records',
 }
 export const tableFeature = (remote: string): FeatureKey | 'records' => TABLE_FEATURE[remote] ?? (/^(gx_|np_|bp_|pr_)/.test(remote) ? 'glamiex' : 'life')
