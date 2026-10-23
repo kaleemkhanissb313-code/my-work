@@ -411,12 +411,14 @@ export function Dashboard() {
 
   return (
     <div>
-      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card relative mb-6 overflow-hidden p-4 sm:p-6">
+      <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card dash-hero relative mb-6 overflow-hidden p-4 sm:p-6">
         <div className="pointer-events-none absolute -end-16 -top-16 h-56 w-56 rounded-full opacity-40 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--accent)), transparent 70%)' }} />
+        <div className="pointer-events-none absolute -bottom-24 start-1/4 h-56 w-72 rounded-full opacity-25 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--work)), transparent 70%)' }} />
+        <div className="pointer-events-none absolute -bottom-20 -start-16 h-48 w-48 rounded-full opacity-20 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--life)), transparent 70%)' }} />
         <div className="relative flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm text-muted">{format(now, 'EEEE, MMMM d, yyyy')}</p>
-            <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Hi {s.displayName.trim() || 'Kaleem'}</h1>
+            <h1 className="mt-1 text-2xl font-bold tracking-tight sm:text-3xl">Hi <span className="dash-grad-text">{s.displayName.trim() || 'Kaleem'}</span></h1>
             <p className="text-sm text-muted">{greet}.</p>
             <p className="mt-1 text-sm text-muted">
               {counts ? `${counts.tasks} open task${counts.tasks === 1 ? '' : 's'} · ${counts.projects} active project${counts.projects === 1 ? '' : 's'} · ${counts.docs} document${counts.docs === 1 ? '' : 's'}${planned ? ` · ${doneToday}/${planned} due today done` : ''}` : ' '}
@@ -430,12 +432,12 @@ export function Dashboard() {
         {/* Four equal tiles in ONE row on every screen: icon above a short label on phones, inline on larger screens. */}
         <nav aria-label="Areas" className="relative mt-4 grid grid-cols-4 gap-1 sm:flex sm:flex-wrap sm:gap-2">
           {(['life', 'home', 'work'] as const).map((a) => (
-            <Link key={a} to={`/${a}`} className="btn btn-soft h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:h-9 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-3 sm:py-0 sm:text-sm">
+            <Link key={a} to={`/${a}`} style={{ '--tone': `var(--${a})` } as React.CSSProperties} className="btn btn-soft dash-tint h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:h-9 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-3 sm:py-0 sm:text-sm">
               {a === 'life' ? <Heart className="h-5 w-5 text-life sm:h-4 sm:w-4" aria-hidden /> : a === 'home' ? <Home className="h-5 w-5 text-home sm:h-4 sm:w-4" aria-hidden /> : <Briefcase className="h-5 w-5 text-work sm:h-4 sm:w-4" aria-hidden />}
               <span className="tile-label">{a === 'life' ? 'My Life' : AREA_LABEL[a]}</span>
             </Link>
           ))}
-          {canCustomize && <button type="button" onClick={() => setCustomize(true)} className="btn btn-soft h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:ms-auto sm:h-10 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-0 sm:text-sm">
+          {canCustomize && <button type="button" onClick={() => setCustomize(true)} style={{ '--tone': 'var(--accent)' } as React.CSSProperties} className="btn btn-soft dash-tint h-auto min-h-[56px] min-w-0 flex-col gap-1 px-0.5 py-2 text-[12px] sm:ms-auto sm:h-10 sm:min-h-0 sm:flex-row sm:gap-2 sm:px-4 sm:py-0 sm:text-sm">
             <LayoutGrid className="h-5 w-5 sm:h-4 sm:w-4" aria-hidden /><span className="tile-label">Customize</span>
           </button>}
         </nav>
@@ -456,7 +458,8 @@ export function Dashboard() {
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
           {(showAll ? visible : visible.slice(0, FIRST_WIDGETS)).map((w, i) => {
             const W = WIDGETS[w.id]
-            return <motion.div key={w.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i * 0.03, 0.3) }} className={w.id === 'chart' ? 'md:col-span-2' : undefined}><W /></motion.div>
+            return <motion.div key={w.id} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: Math.min(i * 0.03, 0.3) }}
+              className={cn('dash-tone', w.id === 'chart' && 'md:col-span-2')} style={{ '--tone': `var(--${WIDGET_TONE[w.id] ?? 'accent'})` } as React.CSSProperties}><W /></motion.div>
           })}
         </div>
       )}
@@ -511,10 +514,17 @@ function CustomizeModal({ open, onClose }: { open: boolean; onClose: () => void 
 const FIRST_WIDGETS = 6
 
 const SHORTCUTS: [string, string, typeof FileText, string][] = [
-  ['/tasks', 'Tasks', CheckSquare, 'text-accent'], ['/documents', 'Docs', FileText, 'text-work'], ['/sheets', 'Sheets', Sheet, 'text-ok'],
-  ['/notes', 'Notes', NotebookPen, 'text-life'], ['/calendar', 'Calendar', CalendarDays, 'text-home'], ['/links', 'Links', Link2, 'text-accent'],
-  ['/finance', 'Finance', Banknote, 'text-ok'], ['/glamiex', 'GLAMIEX', Gem, 'text-accent'],
+  ['/tasks', 'Tasks', CheckSquare, 'accent'], ['/documents', 'Docs', FileText, 'work'], ['/sheets', 'Sheets', Sheet, 'ok'],
+  ['/notes', 'Notes', NotebookPen, 'life'], ['/calendar', 'Calendar', CalendarDays, 'home'], ['/links', 'Links', Link2, 'accent2'],
+  ['/finance', 'Finance', Banknote, 'secure'], ['/glamiex', 'GLAMIEX', Gem, 'life'],
 ]
+
+/** Category colour for each dashboard card (a theme token name; works in light and dark). */
+const WIDGET_TONE: Record<string, string> = {
+  today: 'accent', work: 'work', home: 'home', overdue: 'danger', events: 'accent2', deadlines: 'warn', projects: 'work', habits: 'life',
+  maintenance: 'home', bills: 'secure', recentDocs: 'work', recentMedia: 'life', links: 'accent2', timer: 'accent', calc: 'ok', chart: 'accent',
+  quick: 'accent2', security: 'secure',
+}
 /** One row of the most-used places (scrolls sideways on small phones). */
 function Shortcuts() {
   return (
@@ -522,8 +532,8 @@ function Shortcuts() {
       <ul className="-mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:mx-0 sm:grid sm:grid-cols-8 sm:overflow-visible sm:px-0" style={{ scrollbarWidth: 'none' }}>
         {SHORTCUTS.map(([to, label, I, tone]) => (
           <li key={to} className="shrink-0">
-            <Link to={to} className="card card-hover flex h-[76px] w-[76px] flex-col items-center justify-center gap-1.5 text-xs font-medium sm:w-full">
-              <I className={cn('h-5 w-5', tone)} aria-hidden />{label}
+            <Link to={to} style={{ '--tone': `var(--${tone})` } as React.CSSProperties} className="card card-hover dash-tile flex h-[76px] w-[76px] flex-col items-center justify-center gap-1.5 text-xs font-medium sm:w-full">
+              <span className="dash-chip grid h-8 w-8 place-items-center rounded-xl"><I className="h-[18px] w-[18px]" aria-hidden /></span>{label}
             </Link>
           </li>
         ))}
