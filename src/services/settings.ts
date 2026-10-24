@@ -50,7 +50,7 @@ export function mergeSettings(stored: Partial<Settings> | undefined): Settings {
 
 /** Accent presets shown in Settings. `swatch` is the button gradient (from → to). */
 export const ACCENTS: { id: Exclude<Settings['accent'], 'custom'>; label: string; swatch: [string, string] }[] = [
-  { id: 'teal', label: 'Ocean teal', swatch: ['#0f766e', '#0e7490'] },
+  { id: 'teal', label: 'Royal blue', swatch: ['#2d60eb', '#1e40af'] },
   { id: 'violet', label: 'Royal violet', swatch: ['#6d28d9', '#1d4ed8'] },
   { id: 'sunset', label: 'Sunset', swatch: ['#c2410c', '#be185d'] },
   { id: 'gold', label: 'Gold', swatch: ['#b45309', '#a16207'] },
