@@ -25,7 +25,7 @@ export const DASHBOARD_WIDGETS = [
 ] as const
 
 export const DEFAULT_SETTINGS: Settings = {
-  theme: 'dark',
+  theme: 'light',
   accent: 'teal',
   customAccent: '#0f766e',
   background: { kind: 'default', value: '' },
@@ -50,7 +50,7 @@ export function mergeSettings(stored: Partial<Settings> | undefined): Settings {
 
 /** Accent presets shown in Settings. `swatch` is the button gradient (from → to). */
 export const ACCENTS: { id: Exclude<Settings['accent'], 'custom'>; label: string; swatch: [string, string] }[] = [
-  { id: 'teal', label: 'Royal blue', swatch: ['#2d60eb', '#1e40af'] },
+  { id: 'teal', label: 'Blue', swatch: ['#2563eb', '#1d4ed8'] },
   { id: 'violet', label: 'Royal violet', swatch: ['#6d28d9', '#1d4ed8'] },
   { id: 'sunset', label: 'Sunset', swatch: ['#c2410c', '#be185d'] },
   { id: 'gold', label: 'Gold', swatch: ['#b45309', '#a16207'] },
@@ -90,4 +90,12 @@ export async function updateSettings(patch: Partial<Settings>) {
 export function useSettings(): Settings {
   const row = useLiveQuery(() => db.kv.get('settings'), [])
   return mergeSettings(row?.value as Partial<Settings> | undefined)
+}
+
+/** One-time switch to the white theme (requested by the owner, 25 Oct 2026). Later changes in Settings are kept. */
+export async function applyWhiteThemeOnce() {
+  const FLAG = 'appearance.white.v1'
+  if ((await db.kv.get(FLAG))?.value) return
+  await updateSettings({ theme: 'light' })
+  await db.kv.put({ key: FLAG, value: Date.now() })
 }

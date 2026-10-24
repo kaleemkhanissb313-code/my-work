@@ -4,50 +4,48 @@
 
 /* ---------- Design tokens (RGB triplets so Tailwind can apply alpha) ---------- */
 :root {
-  /* One royal-blue system: surfaces, lines and text are all tinted from the same blue. */
-  --bg: 240 244 255;
+  /* Clean white SaaS workspace: white surfaces, cool grey lines, one blue accent. */
+  --bg: 246 248 252;
   --surface: 255 255 255;
-  --raised: 232 238 253;
-  --line: 207 218 246;
-  --fg: 14 24 56;
-  --muted: 78 93 136;
-  /* Accent (default "royal blue"). --accent/--accent2 are for text, rings and highlights;
-     --btn-from/--btn-to are darker so white button text keeps WCAG AA contrast (≥ 4.5:1). */
-  --accent: 37 84 222;
+  --raised: 240 243 249;
+  --line: 228 232 240;
+  --fg: 17 24 39;
+  --muted: 100 110 130;
+  /* Accent (default "blue"). --btn-from/--btn-to keep white button text at WCAG AA contrast. */
+  --accent: 37 99 235;
   --accent2: 29 78 216;
   --on-accent: 255 255 255;
-  --btn-from: 45 96 235;
-  --btn-to: 30 64 175;
-  /* Status colours stay recognisable (errors must look like errors); everything else is blue. */
+  --btn-from: 37 99 235;
+  --btn-to: 37 99 235;
   --ok: 5 150 105;
   --warn: 180 83 9;
   --danger: 220 38 38;
-  /* Area colours are shades of the same blue (no rainbow). */
-  --home: 30 64 175;
+  /* Area colours are the same blue (no rainbow). */
+  --home: 37 99 235;
   --work: 37 99 235;
-  --life: 59 91 219;
-  --secure: 29 78 216;
-  --shadow: 23 37 84;
+  --life: 37 99 235;
+  --secure: 37 99 235;
+  --shadow: 15 23 42;
   color-scheme: light;
 }
 .dark {
-  --bg: 7 13 36;
-  --surface: 12 22 54;
-  --raised: 20 34 76;
-  --line: 34 52 104;
-  --fg: 230 236 255;
-  --muted: 150 166 214;
-  --accent: 104 146 255;
-  --accent2: 132 166 255;
-  --on-accent: 7 13 36;
+  --bg: 11 15 25;
+  --surface: 18 24 38;
+  --raised: 27 35 53;
+  --line: 40 50 72;
+  --fg: 230 235 245;
+  --muted: 150 160 182;
+  --accent: 96 150 255;
+  --accent2: 129 170 255;
+  --on-accent: 11 15 25;
   --ok: 52 211 153;
   --warn: 251 191 36;
   --danger: 248 113 113;
-  --home: 125 160 255;
-  --work: 104 146 255;
-  --life: 147 176 255;
-  --secure: 120 154 255;
-  --shadow: 2 6 23;
+  --home: 96 150 255;
+  --work: 96 150 255;
+  --life: 96 150 255;
+  --secure: 96 150 255;
+  --shadow: 0 0 0;
   color-scheme: dark;
 }
 
@@ -68,10 +66,6 @@
     line-height: 1.55;
     font-feature-settings: 'cv11', 'ss01';
     text-rendering: optimizeLegibility;
-    background-image:
-      radial-gradient(1200px 600px at 10% -10%, rgb(var(--accent) / 0.06), transparent 60%),
-      radial-gradient(900px 500px at 110% 10%, rgb(var(--accent2) / 0.05), transparent 60%);
-    background-attachment: fixed;
   }
   /* Type scale: headings use the display face and scale fluidly; size utilities (text-xl …) still override. */
   h1, h2, h3, h4 { font-family: theme('fontFamily.display'); color: rgb(var(--fg)); letter-spacing: -0.015em; text-wrap: balance; overflow-wrap: anywhere; }
@@ -94,11 +88,11 @@
 @layer components {
   .glass {
     @apply bg-surface/80 backdrop-blur-xl border border-line/70;
-    box-shadow: 0 1px 0 rgb(255 255 255 / 0.04) inset, 0 10px 30px -12px rgb(var(--shadow) / 0.35);
+    box-shadow: 0 1px 2px rgb(var(--shadow) / 0.05);
   }
   .card {
     @apply rounded-2xl border border-line/60 bg-surface transition-[box-shadow,border-color] duration-200;
-    box-shadow: 0 1px 2px rgb(var(--shadow) / 0.06), 0 8px 24px -18px rgb(var(--shadow) / 0.35);
+    box-shadow: 0 1px 2px rgb(var(--shadow) / 0.04), 0 4px 16px -10px rgb(var(--shadow) / 0.12);
   }
   .card-hover { @apply transition-[transform,box-shadow,border-color] duration-200; }
   .card-hover:hover { transform: translateY(-1px); border-color: rgb(var(--accent) / 0.35); box-shadow: 0 1px 2px rgb(var(--shadow) / 0.08), 0 14px 32px -18px rgb(var(--shadow) / 0.45); }
@@ -114,8 +108,8 @@
   .btn svg { flex-shrink: 0; }
   .btn-3d {
     @apply text-white;
-    background-image: linear-gradient(180deg, rgb(var(--btn-from) / 1), rgb(var(--btn-to) / 1));
-    box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.22), 0 1px 2px rgb(var(--btn-to) / 0.35), 0 6px 16px -8px rgb(var(--btn-from) / 0.6);
+    background-color: rgb(var(--btn-from));
+    box-shadow: 0 1px 2px rgb(var(--btn-to) / 0.25);
   }
   .btn-3d:not(:disabled):hover { filter: brightness(1.07) saturate(1.05); box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25), 0 2px 4px rgb(var(--btn-to) / 0.35), 0 10px 22px -10px rgb(var(--btn-from) / 0.75); }
   .btn-soft { @apply border border-line bg-surface text-fg; box-shadow: 0 1px 2px rgb(var(--shadow) / 0.06); }
@@ -137,9 +131,9 @@
   .chip { @apply inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-medium border; }
   .kbd { @apply inline-flex items-center rounded-md border border-line bg-raised px-1.5 text-[10px] font-mono text-muted; box-shadow: 0 1px 0 rgb(var(--line)); }
   .nav-item { @apply flex min-h-[38px] items-center gap-3 rounded-xl px-3 py-2 text-sm font-medium text-muted transition-colors hover:bg-raised/70 hover:text-fg; }
-  .nav-item.active { @apply bg-accent/10 text-fg; box-shadow: inset 3px 0 0 rgb(var(--accent)); }
-  .nav-item.active svg { color: rgb(var(--accent)); }
-  [dir="rtl"] .nav-item.active { box-shadow: inset -3px 0 0 rgb(var(--accent)); }
+  .nav-item.active { background: rgb(var(--btn-from)); color: rgb(var(--on-accent)); box-shadow: 0 1px 2px rgb(var(--btn-from) / 0.3); }
+  .nav-item.active svg { color: rgb(var(--on-accent)); }
+  .nav-item.active:hover { background: rgb(var(--btn-from)); color: rgb(var(--on-accent)); }
   .progress-track { @apply h-2 w-full rounded-full bg-raised overflow-hidden; box-shadow: inset 0 1px 2px rgb(var(--shadow) / 0.3); }
   .progress-bar { @apply h-full rounded-full; background-image: linear-gradient(90deg, rgb(var(--accent)), rgb(var(--accent2))); transition: width 600ms cubic-bezier(.2,.8,.2,1); }
 
@@ -177,23 +171,40 @@
   .prose-editor p.is-editor-empty:first-child::before { content: attr(data-placeholder); @apply text-muted/60 float-left h-0 pointer-events-none; }
 }
 
-/* Dashboard: one blue, used in lighter and darker steps for depth (no per-section colours). */
-.dash-hero { background-image: linear-gradient(135deg, rgb(var(--accent) / 0.16), rgb(var(--accent2) / 0.05) 55%, rgb(var(--accent) / 0.10)); border-color: rgb(var(--accent) / 0.28); }
-.dash-grad-text { background-image: linear-gradient(90deg, rgb(var(--accent2)), rgb(var(--accent))); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.dash-tint { background: rgb(var(--accent) / 0.08); border-color: rgb(var(--accent) / 0.22); }
-.dash-tint:hover { background: rgb(var(--accent) / 0.15); }
+/* Dashboard: flat white cards, the blue accent only on icons, links and active states. */
+.dash-hero { border-color: rgb(var(--line)); }
+.dash-grad-text { color: rgb(var(--accent)); }
 .dash-tint svg { color: rgb(var(--accent)) !important; }
-.dash-tile { background-image: linear-gradient(160deg, rgb(var(--accent) / 0.12), rgb(var(--accent) / 0.02)); border-color: rgb(var(--accent) / 0.20); }
-.dash-tile:hover { border-color: rgb(var(--accent) / 0.50); }
-.dash-chip { background: rgb(var(--accent) / 0.14); color: rgb(var(--accent)); }
-.dash-tone > .card { position: relative; overflow: hidden; border-color: rgb(var(--accent) / 0.16);
-  background-image: linear-gradient(180deg, rgb(var(--accent) / 0.06), transparent 50%); }
-.dash-tone > .card::before { content: ''; position: absolute; inset: 0 0 auto 0; height: 2px; background: linear-gradient(90deg, rgb(var(--accent) / 0.9), rgb(var(--accent) / 0.05)); }
-.dash-tone > .card h2 > span:first-child { background: rgb(var(--accent) / 0.12); color: rgb(var(--accent)); }
+.dash-tile:hover { border-color: rgb(var(--accent) / 0.45); }
+.dash-chip { background: rgb(var(--accent) / 0.10); color: rgb(var(--accent)); }
+.dash-tone > .card h2 > span:first-child { background: rgb(var(--accent) / 0.10); color: rgb(var(--accent)); }
+aside.glass, header.glass { background-color: rgb(var(--surface)); backdrop-filter: none; }
 
-/* Shell: sidebar and top bar carry the same blue, a touch deeper than the page. */
-aside.glass { background-image: linear-gradient(180deg, rgb(var(--accent) / 0.07), rgb(var(--accent) / 0.02)); }
-header.glass { background-image: linear-gradient(90deg, rgb(var(--accent) / 0.05), transparent 60%); }
+/* Motion: short, soft and purposeful (switched off by the reduced-motion rules below). */
+@keyframes ui-rise { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+@keyframes ui-pop { 0% { transform: scale(1); } 50% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.dash-hero { animation: ui-rise .45s cubic-bezier(.2,.8,.2,1) both; }
+nav[aria-label='Shortcuts'] li { animation: ui-rise .4s cubic-bezier(.2,.8,.2,1) both; }
+nav[aria-label='Shortcuts'] li:nth-child(1) { animation-delay: 95ms; }
+nav[aria-label='Shortcuts'] li:nth-child(2) { animation-delay: 130ms; }
+nav[aria-label='Shortcuts'] li:nth-child(3) { animation-delay: 165ms; }
+nav[aria-label='Shortcuts'] li:nth-child(4) { animation-delay: 200ms; }
+nav[aria-label='Shortcuts'] li:nth-child(5) { animation-delay: 235ms; }
+nav[aria-label='Shortcuts'] li:nth-child(6) { animation-delay: 270ms; }
+nav[aria-label='Shortcuts'] li:nth-child(7) { animation-delay: 305ms; }
+nav[aria-label='Shortcuts'] li:nth-child(8) { animation-delay: 340ms; }
+.dash-tile .dash-chip, .dash-tone > .card h2 > span:first-child, .dash-tint svg { transition: transform .25s cubic-bezier(.2,.8,.2,1), background-color .2s; }
+.dash-tile:hover .dash-chip { transform: translateY(-2px) scale(1.08); background: rgb(var(--accent) / 0.16); }
+.dash-tile:active .dash-chip { animation: ui-pop .3s ease; }
+.dash-tone > .card:hover h2 > span:first-child { transform: rotate(-6deg) scale(1.06); }
+.dash-tint:hover svg { transform: scale(1.12); }
+.nav-item { transition: background-color .18s, color .18s, transform .18s; }
+.nav-item:not(.active):hover { transform: translateX(2px); }
+[dir='rtl'] .nav-item:not(.active):hover { transform: translateX(-2px); }
+.nav-item svg { transition: transform .2s; }
+.nav-item:hover svg { transform: scale(1.08); }
+.btn-3d:not(:disabled):hover { transform: translateY(-1px); box-shadow: 0 6px 16px -6px rgb(var(--btn-from) / 0.55); }
+.card-hover:hover { transform: translateY(-2px); }
 
 /* FullCalendar theming */
 .fc { --fc-border-color: rgb(var(--line)); --fc-page-bg-color: transparent; --fc-neutral-bg-color: rgb(var(--raised)); --fc-today-bg-color: rgb(var(--accent) / 0.10); --fc-button-bg-color: rgb(var(--raised)); --fc-button-border-color: rgb(var(--line)); --fc-button-text-color: rgb(var(--fg)); --fc-button-hover-bg-color: rgb(var(--line)); --fc-button-active-bg-color: rgb(var(--accent)); --fc-button-active-border-color: rgb(var(--accent)); --fc-event-border-color: transparent; font-size: 0.85rem; }

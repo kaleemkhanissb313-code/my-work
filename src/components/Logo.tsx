@@ -2,7 +2,7 @@ import { useId } from 'react'
 
 /** Brand teal from the workMYwork logo. */
 export const BRAND_TEAL = '#4aa3a6'
-/** In the app the logo follows the theme's single accent colour (royal blue by default). */
+/** In the app the logo follows the theme's single accent colour (blue by default). */
 const BRAND_ACCENT = 'rgb(var(--accent))'
 
 /**

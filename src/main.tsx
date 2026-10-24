@@ -6,13 +6,13 @@ import { initLock } from './services/security'
 import { initAuth } from './services/auth'
 import { initAccess } from './services/access'
 import { startAutoSync } from './services/autoSync'
-import { applyAppearance, getSettings } from './services/settings'
+import { applyAppearance, applyWhiteThemeOnce, getSettings } from './services/settings'
 import '@fontsource-variable/inter/wght.css'
 import '@fontsource-variable/plus-jakarta-sans/wght.css'
 import './index.css'
 
 // Apply the saved theme and accent before first paint to avoid a flash.
-void getSettings().then(applyAppearance)
+void applyWhiteThemeOnce().then(getSettings).then(applyAppearance)
 void initLock()
 initAuth()
 initAccess()

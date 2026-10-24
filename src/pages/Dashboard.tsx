@@ -412,9 +412,6 @@ export function Dashboard() {
   return (
     <div>
       <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="card dash-hero relative mb-6 overflow-hidden p-4 sm:p-6">
-        <div className="pointer-events-none absolute -end-16 -top-16 h-56 w-56 rounded-full opacity-40 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--accent)), transparent 70%)' }} />
-        <div className="pointer-events-none absolute -bottom-24 start-1/4 h-56 w-72 rounded-full opacity-25 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--work)), transparent 70%)' }} />
-        <div className="pointer-events-none absolute -bottom-20 -start-16 h-48 w-48 rounded-full opacity-20 blur-3xl" style={{ background: 'radial-gradient(circle, rgb(var(--life)), transparent 70%)' }} />
         <div className="relative flex flex-wrap items-end justify-between gap-4">
           <div>
             <p className="text-sm text-muted">{format(now, 'EEEE, MMMM d, yyyy')}</p>

@@ -56,7 +56,7 @@ describe('repository persistence', () => {
 
 describe('settings', () => {
   it('merges defaults and persists updates', async () => {
-    expect((await getSettings()).theme).toBe('dark')
+    expect((await getSettings()).theme).toBe('light')
     await updateSettings({ theme: 'light', currency: 'PKR' })
     const s = await getSettings()
     expect(s.theme).toBe('light'); expect(s.currency).toBe('PKR'); expect(s.pomodoro.workMin).toBe(25)
